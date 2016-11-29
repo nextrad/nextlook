@@ -1,0 +1,15 @@
+#ifndef PLOTTING_HPP
+#define PLOTTING_HPP
+
+//Libraries
+#include <opencv2/opencv.hpp>
+
+//Functions
+void plotWaterfall(void);
+void plotDoppler(void);
+void updateWaterfall(int rangeLine, uint8_t  *imageValues);
+void updateDoppler(uint8_t  *imageValues);
+void initOpenCV(int *thresholdSlider);
+void GNUplot(void);
+
+#endif

@@ -1,0 +1,12 @@
+#ifndef GENERAL_HPP
+#define GENERAL_HPP
+
+#include "../main.hpp"
+#include <time.h>
+
+void  initTerminal(void);
+void  startTime(void);
+float getTime(void);
+void  printMsg(std::string msg);
+
+#endif
