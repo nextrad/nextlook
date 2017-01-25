@@ -31,6 +31,10 @@ void SignalProcessor::allocateMemory(void)
 
 void SignalProcessor::createPlans(void)
 {	
+	//init fftw for multi-threading
+	fftw_init_threads();
+	fftw_plan_with_nthreads(THREADS);
+	
 	//fftw plans
 	rangePlan   = fftw_plan_dft_1d(COMPLEX_SAMPLES_AFTER_ZERO_PADDING, rangeBuffer  , rangeBuffer  , FFTW_FORWARD , FFTW_MEASURE );
 	refPlan     = fftw_plan_dft_1d(COMPLEX_SAMPLES_AFTER_ZERO_PADDING, refBuffer    , refBuffer    , FFTW_FORWARD , FFTW_ESTIMATE);
@@ -199,6 +203,8 @@ void SignalProcessor::freeMemory(void)
 	fftw_free(dopplerBuffer);
 	fftw_free(dopplerData);
 	
+	fftw_cleanup_threads();
+	
 	free(binDataset);
 	free(refDataset);
 	
@@ -216,7 +222,7 @@ void SignalProcessor::postProcessMatched(int rangeLine)
 
 	for (int j = 0; j < COMPLEX_SAMPLES_AFTER_ZERO_PADDING; j++)
 	{
-		magnitude = sqrt(pow(rangeBuffer[j][0], 2) + pow(rangeBuffer[j][1], 2));
+		magnitude = 10*log(sqrt(pow(rangeBuffer[j][0], 2) + pow(rangeBuffer[j][1], 2)));
 
 		if (magnitude > maxResult)
 		{
@@ -226,12 +232,11 @@ void SignalProcessor::postProcessMatched(int rangeLine)
 
 	for (int j = 0; j < COMPLEX_SAMPLES_AFTER_ZERO_PADDING; j++)
 	{
-		magnitude = sqrt(pow(rangeBuffer[j][0], 2) + pow(rangeBuffer[j][1], 2));
+		magnitude = 10*log(sqrt(pow(rangeBuffer[j][0], 2) + pow(rangeBuffer[j][1], 2)));
 		matchedImageBuffer[j] = (uint8_t)((magnitude/maxResult)*255);
 	}
 	
 	updateWaterfall(rangeLine, matchedImageBuffer);
-	//plot.gnuPlot((double)matchedImageBuffer, "matched result", NORMAL, AMPLITUDE);
 }
 
 

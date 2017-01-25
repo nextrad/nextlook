@@ -25,4 +25,5 @@ add_executable( next_proc
 target_link_libraries( 	next_proc 
 						${OpenCV_LIBS} 
 						${FFTW_LIBRARY}
+						-lfftw3_threads
 						)

@@ -1,15 +1,22 @@
 #include "timer.hpp"
 
 
+double Timer::getTimeInSec(void)
+{
+	gettimeofday(&time,NULL);    
+	return (double)time.tv_sec + (double)time.tv_usec * .000001;
+}
+
 void Timer::start(void)
 {
-	startTime = clock();
+	startTime = getTimeInSec();
 }
 
 
-float Timer::getTimeElapsed(void)
-{
-	return ((float)clock() - (float)startTime)/CLOCKS_PER_SEC;
+double Timer::getTimeElapsed(void)
+{    
+    gettimeofday(&time,NULL);         
+	return getTimeInSec() - startTime;
 }
 
 

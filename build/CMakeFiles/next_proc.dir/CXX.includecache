@@ -6,23 +6,23 @@
 
 #IncludeRegexTransform: 
 
-/home/darryn/Dropbox/Projects/NeXtRad/next_proc_v0.0.2/main.cpp
+/home/darryn/Git/nextrad-processor/main.cpp
 source/includes.hpp
-/home/darryn/Dropbox/Projects/NeXtRad/next_proc_v0.0.2/source/includes.hpp
+/home/darryn/Git/nextrad-processor/source/includes.hpp
 source/parameters.hpp
-/home/darryn/Dropbox/Projects/NeXtRad/next_proc_v0.0.2/source/parameters.hpp
+/home/darryn/Git/nextrad-processor/source/parameters.hpp
 source/utilities/timer.hpp
-/home/darryn/Dropbox/Projects/NeXtRad/next_proc_v0.0.2/source/utilities/timer.hpp
+/home/darryn/Git/nextrad-processor/source/utilities/timer.hpp
 source/utilities/window.hpp
-/home/darryn/Dropbox/Projects/NeXtRad/next_proc_v0.0.2/source/utilities/window.hpp
+/home/darryn/Git/nextrad-processor/source/utilities/window.hpp
 source/utilities/logger.hpp
-/home/darryn/Dropbox/Projects/NeXtRad/next_proc_v0.0.2/source/utilities/logger.hpp
+/home/darryn/Git/nextrad-processor/source/utilities/logger.hpp
 source/plotting.hpp
-/home/darryn/Dropbox/Projects/NeXtRad/next_proc_v0.0.2/source/plotting.hpp
+/home/darryn/Git/nextrad-processor/source/plotting.hpp
 source/signal_processor.hpp
-/home/darryn/Dropbox/Projects/NeXtRad/next_proc_v0.0.2/source/signal_processor.hpp
+/home/darryn/Git/nextrad-processor/source/signal_processor.hpp
 
-/home/darryn/Dropbox/Projects/NeXtRad/next_proc_v0.0.2/source/includes.hpp
+/home/darryn/Git/nextrad-processor/source/includes.hpp
 stdlib.h
 -
 stdint.h
@@ -52,61 +52,63 @@ fftw3.h
 opencv2/opencv.hpp
 -
 
-/home/darryn/Dropbox/Projects/NeXtRad/next_proc_v0.0.2/source/parameters.hpp
+/home/darryn/Git/nextrad-processor/source/parameters.hpp
 
-/home/darryn/Dropbox/Projects/NeXtRad/next_proc_v0.0.2/source/plotting.cpp
+/home/darryn/Git/nextrad-processor/source/plotting.cpp
 plotting.hpp
-/home/darryn/Dropbox/Projects/NeXtRad/next_proc_v0.0.2/source/plotting.hpp
+/home/darryn/Git/nextrad-processor/source/plotting.hpp
 
-/home/darryn/Dropbox/Projects/NeXtRad/next_proc_v0.0.2/source/plotting.hpp
+/home/darryn/Git/nextrad-processor/source/plotting.hpp
 includes.hpp
-/home/darryn/Dropbox/Projects/NeXtRad/next_proc_v0.0.2/source/includes.hpp
+/home/darryn/Git/nextrad-processor/source/includes.hpp
 parameters.hpp
-/home/darryn/Dropbox/Projects/NeXtRad/next_proc_v0.0.2/source/parameters.hpp
+/home/darryn/Git/nextrad-processor/source/parameters.hpp
 utilities/logger.hpp
-/home/darryn/Dropbox/Projects/NeXtRad/next_proc_v0.0.2/source/utilities/logger.hpp
+/home/darryn/Git/nextrad-processor/source/utilities/logger.hpp
 
-/home/darryn/Dropbox/Projects/NeXtRad/next_proc_v0.0.2/source/signal_processor.cpp
+/home/darryn/Git/nextrad-processor/source/signal_processor.cpp
 signal_processor.hpp
-/home/darryn/Dropbox/Projects/NeXtRad/next_proc_v0.0.2/source/signal_processor.hpp
+/home/darryn/Git/nextrad-processor/source/signal_processor.hpp
 
-/home/darryn/Dropbox/Projects/NeXtRad/next_proc_v0.0.2/source/signal_processor.hpp
+/home/darryn/Git/nextrad-processor/source/signal_processor.hpp
 includes.hpp
-/home/darryn/Dropbox/Projects/NeXtRad/next_proc_v0.0.2/source/includes.hpp
+/home/darryn/Git/nextrad-processor/source/includes.hpp
 parameters.hpp
-/home/darryn/Dropbox/Projects/NeXtRad/next_proc_v0.0.2/source/parameters.hpp
+/home/darryn/Git/nextrad-processor/source/parameters.hpp
 plotting.hpp
-/home/darryn/Dropbox/Projects/NeXtRad/next_proc_v0.0.2/source/plotting.hpp
+/home/darryn/Git/nextrad-processor/source/plotting.hpp
 utilities/timer.hpp
-/home/darryn/Dropbox/Projects/NeXtRad/next_proc_v0.0.2/source/utilities/timer.hpp
+/home/darryn/Git/nextrad-processor/source/utilities/timer.hpp
 utilities/window.hpp
-/home/darryn/Dropbox/Projects/NeXtRad/next_proc_v0.0.2/source/utilities/window.hpp
+/home/darryn/Git/nextrad-processor/source/utilities/window.hpp
 utilities/logger.hpp
-/home/darryn/Dropbox/Projects/NeXtRad/next_proc_v0.0.2/source/utilities/logger.hpp
+/home/darryn/Git/nextrad-processor/source/utilities/logger.hpp
 
-/home/darryn/Dropbox/Projects/NeXtRad/next_proc_v0.0.2/source/utilities/logger.cpp
+/home/darryn/Git/nextrad-processor/source/utilities/logger.cpp
 logger.hpp
-/home/darryn/Dropbox/Projects/NeXtRad/next_proc_v0.0.2/source/utilities/logger.hpp
+/home/darryn/Git/nextrad-processor/source/utilities/logger.hpp
 
-/home/darryn/Dropbox/Projects/NeXtRad/next_proc_v0.0.2/source/utilities/logger.hpp
+/home/darryn/Git/nextrad-processor/source/utilities/logger.hpp
 timer.hpp
-/home/darryn/Dropbox/Projects/NeXtRad/next_proc_v0.0.2/source/utilities/timer.hpp
+/home/darryn/Git/nextrad-processor/source/utilities/timer.hpp
 ../includes.hpp
-/home/darryn/Dropbox/Projects/NeXtRad/next_proc_v0.0.2/source/includes.hpp
+/home/darryn/Git/nextrad-processor/source/includes.hpp
 
-/home/darryn/Dropbox/Projects/NeXtRad/next_proc_v0.0.2/source/utilities/timer.cpp
+/home/darryn/Git/nextrad-processor/source/utilities/timer.cpp
 timer.hpp
-/home/darryn/Dropbox/Projects/NeXtRad/next_proc_v0.0.2/source/utilities/timer.hpp
+/home/darryn/Git/nextrad-processor/source/utilities/timer.hpp
 
-/home/darryn/Dropbox/Projects/NeXtRad/next_proc_v0.0.2/source/utilities/timer.hpp
+/home/darryn/Git/nextrad-processor/source/utilities/timer.hpp
 time.h
 -
+sys/time.h
+-
 
-/home/darryn/Dropbox/Projects/NeXtRad/next_proc_v0.0.2/source/utilities/window.cpp
+/home/darryn/Git/nextrad-processor/source/utilities/window.cpp
 window.hpp
-/home/darryn/Dropbox/Projects/NeXtRad/next_proc_v0.0.2/source/utilities/window.hpp
+/home/darryn/Git/nextrad-processor/source/utilities/window.hpp
 
-/home/darryn/Dropbox/Projects/NeXtRad/next_proc_v0.0.2/source/utilities/window.hpp
+/home/darryn/Git/nextrad-processor/source/utilities/window.hpp
 ../includes.hpp
-/home/darryn/Dropbox/Projects/NeXtRad/next_proc_v0.0.2/source/includes.hpp
+/home/darryn/Git/nextrad-processor/source/includes.hpp
 

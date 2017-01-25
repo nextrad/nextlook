@@ -19,20 +19,22 @@ indent_mode=2
 
 [project]
 name=nextProc
-base_path=/media/Storage/Dropbox/Projects/NeXtRad/next_proc_v0.0.2
+base_path=/home/darryn/Git/nextrad-processor
 description=
+file_patterns=
 
 [long line marker]
 long_line_behaviour=1
 long_line_column=72
 
 [files]
-current_page=1
-FILE_NAME_0=1334;C++;0;EUTF-8;1;1;0;%2Fhome%2Fdarryn%2FDropbox%2FProjects%2FNeXtRad%2Fnext_proc_v0.0.2%2Fsource%2Fparameters.hpp;0;4
-FILE_NAME_1=5643;C++;0;EUTF-8;1;1;0;%2Fhome%2Fdarryn%2FDropbox%2FProjects%2FNeXtRad%2Fnext_proc_v0.0.2%2Fsource%2Fplotting.cpp;0;4
-FILE_NAME_2=0;C++;0;EUTF-8;1;1;0;%2Fhome%2Fdarryn%2FDropbox%2FProjects%2FNeXtRad%2Fnext_proc_v0.0.2%2Fsource%2Fplotting.hpp;0;4
-FILE_NAME_3=0;C++;0;EUTF-8;1;1;0;%2Fhome%2Fdarryn%2FDropbox%2FProjects%2FNeXtRad%2Fnext_proc_v0.0.2%2Fsource%2Fsignal_processor.cpp;0;4
-FILE_NAME_4=0;C++;0;EUTF-8;1;1;0;%2Fhome%2Fdarryn%2FDropbox%2FProjects%2FNeXtRad%2Fnext_proc_v0.0.2%2Fsource%2Fsignal_processor.hpp;0;4
+current_page=0
+FILE_NAME_0=179;C++;0;EUTF-8;1;1;0;%2Fhome%2Fdarryn%2FGit%2Fnextrad-processor%2Fmain.cpp;0;4
+FILE_NAME_1=1451;C++;0;EUTF-8;1;1;0;%2Fhome%2Fdarryn%2FGit%2Fnextrad-processor%2Fsource%2Fparameters.hpp;0;4
+FILE_NAME_2=8668;C++;0;EUTF-8;1;1;0;%2Fhome%2Fdarryn%2FGit%2Fnextrad-processor%2Fsource%2Fsignal_processor.cpp;0;4
+FILE_NAME_3=0;C++;0;EUTF-8;1;1;0;%2Fhome%2Fdarryn%2FGit%2Fnextrad-processor%2Fsource%2Fsignal_processor.hpp;0;4
+FILE_NAME_4=98;C++;0;EUTF-8;1;1;0;%2Fhome%2Fdarryn%2FGit%2Fnextrad-processor%2Fsource%2Fplotting.cpp;0;4
+FILE_NAME_5=0;C++;0;EUTF-8;1;1;0;%2Fhome%2Fdarryn%2FGit%2Fnextrad-processor%2Fsource%2Fplotting.hpp;0;4
 
 [VTE]
-last_dir=/media/Storage/Dropbox/Projects/NeXtRad/next_proc_v0.0.2/build
+last_dir=/home/darryn/Git/nextrad-processor/build

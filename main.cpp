@@ -26,9 +26,9 @@ int main(int argc, char *argv[])
 	signalProcessor.complxConjRef();
 	
 	loopThroughDataset();
-
-	cv::waitKey(0);
+	
 	signalProcessor.freeMemory();
+	cv::waitKey(0);
 
 	return 0;
 }
@@ -47,7 +47,7 @@ void loopThroughDataset(void)
 		signalProcessor.popDopplerData(i); 		
 		signalProcessor.processDoppler(i); 
 		//cv::waitKey(0);
-	}
+	}	
 }
 
 

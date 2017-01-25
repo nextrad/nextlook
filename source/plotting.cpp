@@ -2,8 +2,8 @@
 
 //globals
 cv::Mat waterImage, doppImage;
-int waterfallColourMapSlider = 0;
-int dopplerColourMapSlider = 0;
+int waterfallColourMapSlider = 2;
+int dopplerColourMapSlider = 2;
 int	thresholdSlider = 0;
 
 const int thresholdMax = 255;

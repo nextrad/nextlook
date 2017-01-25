@@ -43,10 +43,10 @@ RM = /usr/bin/cmake -E remove -f
 EQUALS = =
 
 # The top-level source directory on which CMake was run.
-CMAKE_SOURCE_DIR = /home/darryn/Dropbox/Projects/NeXtRad/next_proc_v0.0.2
+CMAKE_SOURCE_DIR = /home/darryn/Git/nextrad-processor
 
 # The top-level build directory on which CMake was run.
-CMAKE_BINARY_DIR = /home/darryn/Dropbox/Projects/NeXtRad/next_proc_v0.0.2/build
+CMAKE_BINARY_DIR = /home/darryn/Git/nextrad-processor/build
 
 # Include any dependencies generated for this target.
 include CMakeFiles/next_proc.dir/depend.make
@@ -59,16 +59,16 @@ include CMakeFiles/next_proc.dir/flags.make
 
 CMakeFiles/next_proc.dir/main.cpp.o: CMakeFiles/next_proc.dir/flags.make
 CMakeFiles/next_proc.dir/main.cpp.o: ../main.cpp
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/darryn/Dropbox/Projects/NeXtRad/next_proc_v0.0.2/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_1) "Building CXX object CMakeFiles/next_proc.dir/main.cpp.o"
-	/usr/bin/c++   $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/next_proc.dir/main.cpp.o -c /home/darryn/Dropbox/Projects/NeXtRad/next_proc_v0.0.2/main.cpp
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/darryn/Git/nextrad-processor/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_1) "Building CXX object CMakeFiles/next_proc.dir/main.cpp.o"
+	/usr/bin/c++   $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/next_proc.dir/main.cpp.o -c /home/darryn/Git/nextrad-processor/main.cpp
 
 CMakeFiles/next_proc.dir/main.cpp.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/next_proc.dir/main.cpp.i"
-	/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/darryn/Dropbox/Projects/NeXtRad/next_proc_v0.0.2/main.cpp > CMakeFiles/next_proc.dir/main.cpp.i
+	/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/darryn/Git/nextrad-processor/main.cpp > CMakeFiles/next_proc.dir/main.cpp.i
 
 CMakeFiles/next_proc.dir/main.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/next_proc.dir/main.cpp.s"
-	/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/darryn/Dropbox/Projects/NeXtRad/next_proc_v0.0.2/main.cpp -o CMakeFiles/next_proc.dir/main.cpp.s
+	/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/darryn/Git/nextrad-processor/main.cpp -o CMakeFiles/next_proc.dir/main.cpp.s
 
 CMakeFiles/next_proc.dir/main.cpp.o.requires:
 
@@ -83,16 +83,16 @@ CMakeFiles/next_proc.dir/main.cpp.o.provides.build: CMakeFiles/next_proc.dir/mai
 
 CMakeFiles/next_proc.dir/source/plotting.cpp.o: CMakeFiles/next_proc.dir/flags.make
 CMakeFiles/next_proc.dir/source/plotting.cpp.o: ../source/plotting.cpp
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/darryn/Dropbox/Projects/NeXtRad/next_proc_v0.0.2/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_2) "Building CXX object CMakeFiles/next_proc.dir/source/plotting.cpp.o"
-	/usr/bin/c++   $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/next_proc.dir/source/plotting.cpp.o -c /home/darryn/Dropbox/Projects/NeXtRad/next_proc_v0.0.2/source/plotting.cpp
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/darryn/Git/nextrad-processor/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_2) "Building CXX object CMakeFiles/next_proc.dir/source/plotting.cpp.o"
+	/usr/bin/c++   $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/next_proc.dir/source/plotting.cpp.o -c /home/darryn/Git/nextrad-processor/source/plotting.cpp
 
 CMakeFiles/next_proc.dir/source/plotting.cpp.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/next_proc.dir/source/plotting.cpp.i"
-	/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/darryn/Dropbox/Projects/NeXtRad/next_proc_v0.0.2/source/plotting.cpp > CMakeFiles/next_proc.dir/source/plotting.cpp.i
+	/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/darryn/Git/nextrad-processor/source/plotting.cpp > CMakeFiles/next_proc.dir/source/plotting.cpp.i
 
 CMakeFiles/next_proc.dir/source/plotting.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/next_proc.dir/source/plotting.cpp.s"
-	/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/darryn/Dropbox/Projects/NeXtRad/next_proc_v0.0.2/source/plotting.cpp -o CMakeFiles/next_proc.dir/source/plotting.cpp.s
+	/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/darryn/Git/nextrad-processor/source/plotting.cpp -o CMakeFiles/next_proc.dir/source/plotting.cpp.s
 
 CMakeFiles/next_proc.dir/source/plotting.cpp.o.requires:
 
@@ -107,16 +107,16 @@ CMakeFiles/next_proc.dir/source/plotting.cpp.o.provides.build: CMakeFiles/next_p
 
 CMakeFiles/next_proc.dir/source/signal_processor.cpp.o: CMakeFiles/next_proc.dir/flags.make
 CMakeFiles/next_proc.dir/source/signal_processor.cpp.o: ../source/signal_processor.cpp
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/darryn/Dropbox/Projects/NeXtRad/next_proc_v0.0.2/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_3) "Building CXX object CMakeFiles/next_proc.dir/source/signal_processor.cpp.o"
-	/usr/bin/c++   $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/next_proc.dir/source/signal_processor.cpp.o -c /home/darryn/Dropbox/Projects/NeXtRad/next_proc_v0.0.2/source/signal_processor.cpp
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/darryn/Git/nextrad-processor/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_3) "Building CXX object CMakeFiles/next_proc.dir/source/signal_processor.cpp.o"
+	/usr/bin/c++   $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/next_proc.dir/source/signal_processor.cpp.o -c /home/darryn/Git/nextrad-processor/source/signal_processor.cpp
 
 CMakeFiles/next_proc.dir/source/signal_processor.cpp.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/next_proc.dir/source/signal_processor.cpp.i"
-	/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/darryn/Dropbox/Projects/NeXtRad/next_proc_v0.0.2/source/signal_processor.cpp > CMakeFiles/next_proc.dir/source/signal_processor.cpp.i
+	/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/darryn/Git/nextrad-processor/source/signal_processor.cpp > CMakeFiles/next_proc.dir/source/signal_processor.cpp.i
 
 CMakeFiles/next_proc.dir/source/signal_processor.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/next_proc.dir/source/signal_processor.cpp.s"
-	/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/darryn/Dropbox/Projects/NeXtRad/next_proc_v0.0.2/source/signal_processor.cpp -o CMakeFiles/next_proc.dir/source/signal_processor.cpp.s
+	/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/darryn/Git/nextrad-processor/source/signal_processor.cpp -o CMakeFiles/next_proc.dir/source/signal_processor.cpp.s
 
 CMakeFiles/next_proc.dir/source/signal_processor.cpp.o.requires:
 
@@ -131,16 +131,16 @@ CMakeFiles/next_proc.dir/source/signal_processor.cpp.o.provides.build: CMakeFile
 
 CMakeFiles/next_proc.dir/source/utilities/timer.cpp.o: CMakeFiles/next_proc.dir/flags.make
 CMakeFiles/next_proc.dir/source/utilities/timer.cpp.o: ../source/utilities/timer.cpp
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/darryn/Dropbox/Projects/NeXtRad/next_proc_v0.0.2/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_4) "Building CXX object CMakeFiles/next_proc.dir/source/utilities/timer.cpp.o"
-	/usr/bin/c++   $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/next_proc.dir/source/utilities/timer.cpp.o -c /home/darryn/Dropbox/Projects/NeXtRad/next_proc_v0.0.2/source/utilities/timer.cpp
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/darryn/Git/nextrad-processor/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_4) "Building CXX object CMakeFiles/next_proc.dir/source/utilities/timer.cpp.o"
+	/usr/bin/c++   $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/next_proc.dir/source/utilities/timer.cpp.o -c /home/darryn/Git/nextrad-processor/source/utilities/timer.cpp
 
 CMakeFiles/next_proc.dir/source/utilities/timer.cpp.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/next_proc.dir/source/utilities/timer.cpp.i"
-	/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/darryn/Dropbox/Projects/NeXtRad/next_proc_v0.0.2/source/utilities/timer.cpp > CMakeFiles/next_proc.dir/source/utilities/timer.cpp.i
+	/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/darryn/Git/nextrad-processor/source/utilities/timer.cpp > CMakeFiles/next_proc.dir/source/utilities/timer.cpp.i
 
 CMakeFiles/next_proc.dir/source/utilities/timer.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/next_proc.dir/source/utilities/timer.cpp.s"
-	/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/darryn/Dropbox/Projects/NeXtRad/next_proc_v0.0.2/source/utilities/timer.cpp -o CMakeFiles/next_proc.dir/source/utilities/timer.cpp.s
+	/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/darryn/Git/nextrad-processor/source/utilities/timer.cpp -o CMakeFiles/next_proc.dir/source/utilities/timer.cpp.s
 
 CMakeFiles/next_proc.dir/source/utilities/timer.cpp.o.requires:
 
@@ -155,16 +155,16 @@ CMakeFiles/next_proc.dir/source/utilities/timer.cpp.o.provides.build: CMakeFiles
 
 CMakeFiles/next_proc.dir/source/utilities/window.cpp.o: CMakeFiles/next_proc.dir/flags.make
 CMakeFiles/next_proc.dir/source/utilities/window.cpp.o: ../source/utilities/window.cpp
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/darryn/Dropbox/Projects/NeXtRad/next_proc_v0.0.2/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_5) "Building CXX object CMakeFiles/next_proc.dir/source/utilities/window.cpp.o"
-	/usr/bin/c++   $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/next_proc.dir/source/utilities/window.cpp.o -c /home/darryn/Dropbox/Projects/NeXtRad/next_proc_v0.0.2/source/utilities/window.cpp
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/darryn/Git/nextrad-processor/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_5) "Building CXX object CMakeFiles/next_proc.dir/source/utilities/window.cpp.o"
+	/usr/bin/c++   $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/next_proc.dir/source/utilities/window.cpp.o -c /home/darryn/Git/nextrad-processor/source/utilities/window.cpp
 
 CMakeFiles/next_proc.dir/source/utilities/window.cpp.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/next_proc.dir/source/utilities/window.cpp.i"
-	/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/darryn/Dropbox/Projects/NeXtRad/next_proc_v0.0.2/source/utilities/window.cpp > CMakeFiles/next_proc.dir/source/utilities/window.cpp.i
+	/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/darryn/Git/nextrad-processor/source/utilities/window.cpp > CMakeFiles/next_proc.dir/source/utilities/window.cpp.i
 
 CMakeFiles/next_proc.dir/source/utilities/window.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/next_proc.dir/source/utilities/window.cpp.s"
-	/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/darryn/Dropbox/Projects/NeXtRad/next_proc_v0.0.2/source/utilities/window.cpp -o CMakeFiles/next_proc.dir/source/utilities/window.cpp.s
+	/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/darryn/Git/nextrad-processor/source/utilities/window.cpp -o CMakeFiles/next_proc.dir/source/utilities/window.cpp.s
 
 CMakeFiles/next_proc.dir/source/utilities/window.cpp.o.requires:
 
@@ -179,16 +179,16 @@ CMakeFiles/next_proc.dir/source/utilities/window.cpp.o.provides.build: CMakeFile
 
 CMakeFiles/next_proc.dir/source/utilities/logger.cpp.o: CMakeFiles/next_proc.dir/flags.make
 CMakeFiles/next_proc.dir/source/utilities/logger.cpp.o: ../source/utilities/logger.cpp
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/darryn/Dropbox/Projects/NeXtRad/next_proc_v0.0.2/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_6) "Building CXX object CMakeFiles/next_proc.dir/source/utilities/logger.cpp.o"
-	/usr/bin/c++   $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/next_proc.dir/source/utilities/logger.cpp.o -c /home/darryn/Dropbox/Projects/NeXtRad/next_proc_v0.0.2/source/utilities/logger.cpp
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/darryn/Git/nextrad-processor/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_6) "Building CXX object CMakeFiles/next_proc.dir/source/utilities/logger.cpp.o"
+	/usr/bin/c++   $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/next_proc.dir/source/utilities/logger.cpp.o -c /home/darryn/Git/nextrad-processor/source/utilities/logger.cpp
 
 CMakeFiles/next_proc.dir/source/utilities/logger.cpp.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/next_proc.dir/source/utilities/logger.cpp.i"
-	/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/darryn/Dropbox/Projects/NeXtRad/next_proc_v0.0.2/source/utilities/logger.cpp > CMakeFiles/next_proc.dir/source/utilities/logger.cpp.i
+	/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/darryn/Git/nextrad-processor/source/utilities/logger.cpp > CMakeFiles/next_proc.dir/source/utilities/logger.cpp.i
 
 CMakeFiles/next_proc.dir/source/utilities/logger.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/next_proc.dir/source/utilities/logger.cpp.s"
-	/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/darryn/Dropbox/Projects/NeXtRad/next_proc_v0.0.2/source/utilities/logger.cpp -o CMakeFiles/next_proc.dir/source/utilities/logger.cpp.s
+	/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/darryn/Git/nextrad-processor/source/utilities/logger.cpp -o CMakeFiles/next_proc.dir/source/utilities/logger.cpp.s
 
 CMakeFiles/next_proc.dir/source/utilities/logger.cpp.o.requires:
 
@@ -240,7 +240,7 @@ next_proc: /usr/lib/x86_64-linux-gnu/libopencv_imgproc.so.2.4.9
 next_proc: /usr/lib/x86_64-linux-gnu/libopencv_flann.so.2.4.9
 next_proc: /usr/lib/x86_64-linux-gnu/libopencv_core.so.2.4.9
 next_proc: CMakeFiles/next_proc.dir/link.txt
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --bold --progress-dir=/home/darryn/Dropbox/Projects/NeXtRad/next_proc_v0.0.2/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_7) "Linking CXX executable next_proc"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --bold --progress-dir=/home/darryn/Git/nextrad-processor/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_7) "Linking CXX executable next_proc"
 	$(CMAKE_COMMAND) -E cmake_link_script CMakeFiles/next_proc.dir/link.txt --verbose=$(VERBOSE)
 
 # Rule to build all files generated by this target.
@@ -262,6 +262,6 @@ CMakeFiles/next_proc.dir/clean:
 .PHONY : CMakeFiles/next_proc.dir/clean
 
 CMakeFiles/next_proc.dir/depend:
-	cd /home/darryn/Dropbox/Projects/NeXtRad/next_proc_v0.0.2/build && $(CMAKE_COMMAND) -E cmake_depends "Unix Makefiles" /home/darryn/Dropbox/Projects/NeXtRad/next_proc_v0.0.2 /home/darryn/Dropbox/Projects/NeXtRad/next_proc_v0.0.2 /home/darryn/Dropbox/Projects/NeXtRad/next_proc_v0.0.2/build /home/darryn/Dropbox/Projects/NeXtRad/next_proc_v0.0.2/build /home/darryn/Dropbox/Projects/NeXtRad/next_proc_v0.0.2/build/CMakeFiles/next_proc.dir/DependInfo.cmake --color=$(COLOR)
+	cd /home/darryn/Git/nextrad-processor/build && $(CMAKE_COMMAND) -E cmake_depends "Unix Makefiles" /home/darryn/Git/nextrad-processor /home/darryn/Git/nextrad-processor /home/darryn/Git/nextrad-processor/build /home/darryn/Git/nextrad-processor/build /home/darryn/Git/nextrad-processor/build/CMakeFiles/next_proc.dir/DependInfo.cmake --color=$(COLOR)
 .PHONY : CMakeFiles/next_proc.dir/depend
 
