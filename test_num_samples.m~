@@ -1,0 +1,9 @@
+f_id = fopen('/home/darryn/Documents/NeXtRAD/12th/12_12_2016_14_48_59_adc0data.dat');
+raw_data = fread(f_id, 4096, 'int16');
+
+for k = 1 : 2048
+    if (mod(k, 2) == 0)
+        rangeBuffer[i][0] = binDataset[i*2 + start    ]*rangeWindow.getSample(i);     //real component    
+		rangeBuffer[i][1] = binDataset[i*2 + start + 1]*rangeWindow.getSample(i);     //complex component
+    end;
+end;

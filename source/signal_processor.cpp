@@ -1,8 +1,8 @@
 #include "signal_processor.hpp"
 
 int	dopplerDataStart = 0; 	
-Window rangeWindow(HANNING, COMPLEX_SAMPLES_PER_RANGE_LINE);			
-Window dopplerWindow(HANNING, RANGE_LINES_PER_DOPPLER_CPI);			
+Window rangeWindow(HAMMING, COMPLEX_SAMPLES_PER_RANGE_LINE);			
+Window dopplerWindow(HAMMING, RANGE_LINES_PER_DOPPLER_CPI);			
 
 SignalProcessor::SignalProcessor(void)
 {	
@@ -174,7 +174,7 @@ void SignalProcessor::complxMulti(void)
 //process data extracted from the bin file into the complex rangeBuffer line by line.
 void SignalProcessor::popRangeBuffer(int rangeLine)
 {
-	int start = rangeLine*COMPLEX_SAMPLES_PER_RANGE_LINE;
+	int start = rangeLine*VALUES_PER_RANGE_LINE;
 		
 	//populate complex range data and remove offset	
 	for (int i = 0; i < COMPLEX_SAMPLES_AFTER_ZERO_PADDING; i++)
@@ -235,6 +235,8 @@ void SignalProcessor::postProcessMatched(int rangeLine)
 		magnitude = 10*log(sqrt(pow(rangeBuffer[j][0], 2) + pow(rangeBuffer[j][1], 2)));
 		matchedImageBuffer[j] = (uint8_t)((magnitude/maxResult)*255);
 	}
+	
+	plot.gnuPlot(matchedImageBuffer, "matched image buffer");
 	
 	updateWaterfall(rangeLine, matchedImageBuffer);
 }

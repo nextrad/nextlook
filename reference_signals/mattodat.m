@@ -1,4 +1,4 @@
-signal_name = '/home/darryn/Git/nextrad-processor/reference_signals/matlab_format/Ref_PL_Xband_MPALNA_7_5us';
+signal_name = '/home/darryn/Git/nextrad-processor/reference_signals/matlab_format/Ref_PL_Xband_MPALNA_5us';
 in_file_name = strcat(signal_name, '.mat');
 out_file_name = strcat(signal_name, '.dat');
 

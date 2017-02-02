@@ -27,6 +27,7 @@ class Plot
 	public:
 		Plot(void);
 		void gnuPlot(fftw_complex *array, char const *plotTitle, plotType type = NORMAL, plotStyle style = AMPLITUDE);	
+		void gnuPlot(uint8_t *array, char const *plotTitle);
 };
 
 #endif

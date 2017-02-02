@@ -3,7 +3,7 @@
 //globals
 cv::Mat waterImage, doppImage;
 int waterfallColourMapSlider = 2;
-int dopplerColourMapSlider = 2;
+int dopplerColourMapSlider = 1;
 int	thresholdSlider = 0;
 
 const int thresholdMax = 255;
@@ -14,6 +14,45 @@ Plot::Plot(void)
 {
 
 }
+
+void Plot::gnuPlot(uint8_t *array, char const *plotTitle)
+{
+	if (DEBUG_MODE)
+	{
+		FILE *pipe_gp = popen("gnuplot", "w");	
+	
+		char writeTitle[100];
+		strcpy(writeTitle, "set title '");
+		strcat(writeTitle, plotTitle);
+		strcat(writeTitle, "'\n");
+		
+		char writeFileName[100];
+		strcpy(writeFileName, "set output '");
+		strcat(writeFileName, plotTitle);
+		strcat(writeFileName, ".eps'\n");	
+
+		fputs("set terminal postscript eps enhanced color font 'Helvetica,20' linewidth 0.5\n", pipe_gp);
+		fputs(writeTitle, pipe_gp);	
+		fputs(writeFileName, pipe_gp);
+		
+		fputs("plot '-' using 1:2 with lines notitle\n", pipe_gp);
+		for (int i = 0; i < COMPLEX_SAMPLES_AFTER_ZERO_PADDING; i++) 
+		{
+			//float magnitude = 10*log(sqrt(pow(array[i][0], 2) + pow(array[i][1], 2)));							
+			fprintf(pipe_gp, "%i %i\n", i, array[i]);
+		}
+		
+		fputs("e\n", pipe_gp);
+		pclose(pipe_gp);	
+		
+		char writeMessage[100];
+		strcpy(writeMessage, "Generated Plot: ");
+		strcat(writeMessage, plotTitle);	
+		
+		logger.write(writeMessage);
+	}
+}
+
 
 
 void Plot::gnuPlot(fftw_complex *array, char const *plotTitle, plotType type, plotStyle style)
@@ -56,7 +95,7 @@ void Plot::gnuPlot(fftw_complex *array, char const *plotTitle, plotType type, pl
 						fputs("plot '-' using 1:2 with lines notitle\n", pipe_gp);
 						for (int i = 0; i < COMPLEX_SAMPLES_AFTER_ZERO_PADDING; i++) 
 						{
-							float magnitude = sqrt(pow(array[i][0], 2) + pow(array[i][1], 2));							
+							float magnitude = 10*log(sqrt(pow(array[i][0], 2) + pow(array[i][1], 2)));							
 							fprintf(pipe_gp, "%i %f\n", i, magnitude);
 						}
 						break;
@@ -123,7 +162,7 @@ void initOpenCV(void)
 
 	cv::moveWindow("Waterfall Plot", 0, 0);					//trackbar is 54 units in height
 	cv::moveWindow("Doppler Plot", 500, 0); 
-	cv::moveWindow("Control Window", 100, 0); 
+	cv::moveWindow("Control Window", 750, 0); 
 
 	cv::resizeWindow("Control Window", 300, 3*54);
 
@@ -177,7 +216,7 @@ void plotDoppler(void)
 		
 		doppImage.release();
 		
-		cv::equalizeHist(resizedImage, resizedImage);
+		//cv::equalizeHist(resizedImage, resizedImage);
 		cv::threshold(resizedImage, resizedImage, thresholdSlider, thresholdMax, 3);		
 		cv::applyColorMap(resizedImage, resizedImage, dopplerColourMapSlider);
 		
