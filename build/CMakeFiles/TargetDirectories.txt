@@ -1,3 +1,0 @@
-/home/darryn/Git/nextrad-processor/build/CMakeFiles/edit_cache.dir
-/home/darryn/Git/nextrad-processor/build/CMakeFiles/rebuild_cache.dir
-/home/darryn/Git/nextrad-processor/build/CMakeFiles/next_proc.dir
