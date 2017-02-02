@@ -1,11 +1,11 @@
 cmake_minimum_required(VERSION 2.8)
-project( next_proc )
+project( quicklook )
 
 find_package( OpenCV REQUIRED )
 find_library(FFTW_LIBRARY NAMES fftw3)
 
 
-add_executable( next_proc 
+add_executable( quicklook 
 				main.cpp 
 				source/plotting.cpp
 				source/plotting.hpp
@@ -22,7 +22,7 @@ add_executable( next_proc
 				)
 
 
-target_link_libraries( 	next_proc 
+target_link_libraries( 	quicklook 
 						${OpenCV_LIBS} 
 						${FFTW_LIBRARY}
 						-lfftw3_threads

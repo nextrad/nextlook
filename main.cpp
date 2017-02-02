@@ -53,8 +53,8 @@ void loopThroughDataset(void)
 void initTerminal(void)
 {
 	system("clear\n");
-	printf("NeXtRad ARD Processor\n");
-	printf("---------------------\n");
+	printf("NeXtRAD Quicklook Processor\n");
+	printf("---------------------------\n");
 }
 
 
