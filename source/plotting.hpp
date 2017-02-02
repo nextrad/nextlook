@@ -5,6 +5,9 @@
 #include "parameters.hpp"
 #include "utilities/logger.hpp"
 
+#define COLOUR_MAP_WIDTH 30
+#define COLOUR_MAP_PATH "../colour_maps/"
+
 //Functions
 void plotWaterfall(void);
 void plotDoppler(void);

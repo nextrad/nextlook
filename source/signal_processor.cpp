@@ -1,8 +1,8 @@
 #include "signal_processor.hpp"
 
 int	dopplerDataStart = 0; 	
-Window rangeWindow(HAMMING, COMPLEX_SAMPLES_PER_RANGE_LINE);			
-Window dopplerWindow(HAMMING, RANGE_LINES_PER_DOPPLER_CPI);			
+Window rangeWindow(UNIFORM, COMPLEX_SAMPLES_PER_RANGE_LINE);			
+Window dopplerWindow(UNIFORM, RANGE_LINES_PER_DOPPLER_CPI);			
 
 SignalProcessor::SignalProcessor(void)
 {	
@@ -101,7 +101,7 @@ void SignalProcessor::processDoppler(int rangeLine)
 {
 	if ((rangeLine + 1 - dopplerDataStart) == RANGE_LINES_PER_DOPPLER_CPI)  //check that dopplerData is full
 	{
-		for (int i = 0; i < COMPLEX_SAMPLES_AFTER_ZERO_PADDING/2 + 1; i++)		
+		for (int i = 0; i < COMPLEX_SAMPLES_AFTER_ZERO_PADDING; i++)		
 		{
 			popDopplerBuffer(i);	
 			fftDopplerData();

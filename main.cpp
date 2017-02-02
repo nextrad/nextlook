@@ -46,7 +46,6 @@ void loopThroughDataset(void)
 
 		signalProcessor.popDopplerData(i); 		
 		signalProcessor.processDoppler(i); 
-		//cv::waitKey(0);
 	}	
 }
 

@@ -3,11 +3,15 @@
 //globals
 cv::Mat waterImage, doppImage;
 int waterfallColourMapSlider = 2;
-int dopplerColourMapSlider = 1;
+int dopplerColourMapSlider = 2;
 int	thresholdSlider = 0;
+int histogramSlider = 1;
+int slowSlider = 0;
 
 const int thresholdMax = 255;
 const int colourMapMax = 11;
+const int histogramMax = 1;
+const int slowMax = 500;
 
 
 Plot::Plot(void)
@@ -164,16 +168,18 @@ void initOpenCV(void)
 	cv::moveWindow("Doppler Plot", 500, 0); 
 	cv::moveWindow("Control Window", 750, 0); 
 
-	cv::resizeWindow("Control Window", 300, 3*54);
+	cv::resizeWindow("Control Window", 300, 100);
 
 	cv::createTrackbar( "Threshold Value", "Control Window", &thresholdSlider, thresholdMax);
 	cv::createTrackbar( "Doppler Colour Map", "Control Window", &dopplerColourMapSlider, colourMapMax);
 	cv::createTrackbar( "Waterfall Colour Map", "Control Window", &waterfallColourMapSlider, colourMapMax);
+	cv::createTrackbar( "Slow Processing", "Control Window", &slowSlider, slowMax);
+	cv::createTrackbar( "Histogram Equalisation", "Control Window", &histogramSlider, histogramMax);
 }
 
 void updateWaterfall(int rangeLine, uint8_t  *imageValues)
 {
-	cv::Mat row = cv::Mat(1, COMPLEX_SAMPLES_AFTER_ZERO_PADDING/2 + 1, CV_8U, imageValues);
+	cv::Mat row = cv::Mat(1, COMPLEX_SAMPLES_AFTER_ZERO_PADDING, CV_8U, imageValues);
 	waterImage.push_back(row);
 			
 	if (((rangeLine%(UPDATE_LINE - 1) == 0) || rangeLine == (NUMBER_OF_RANGE_LINES - 1)) && rangeLine != 0)
@@ -193,7 +199,9 @@ void plotWaterfall(void)
 		cv::Size size(500, 500);		
 		cv::resize(waterImage, resizedImage, size);	
 		
-		cv::equalizeHist(resizedImage, resizedImage);	
+		if (histogramSlider)
+			cv::equalizeHist(resizedImage, resizedImage);	
+		
 		cv::threshold(resizedImage, resizedImage, thresholdSlider, thresholdMax, 3);
 		cv::applyColorMap(resizedImage, resizedImage, waterfallColourMapSlider);	
 		
@@ -201,8 +209,8 @@ void plotWaterfall(void)
 		cv::flip(resizedImage, resizedImage, 0);
 
 		cv::imshow("Waterfall Plot", resizedImage);
-		cv::imwrite("waterfall_plot.png", resizedImage);
-		cv::waitKey(1);	
+		cv::imwrite("../results/waterfall_plot.jpg", resizedImage);
+		cv::waitKey(1 + slowSlider);	
 		resizedImage.release();
 		//waterImage.release();
 }
@@ -224,7 +232,7 @@ void plotDoppler(void)
 	
 		cv::imshow("Doppler Plot", resizedImage);
 		//printf("Doppler Plot:\t\t\tOK\t%fs\n", getTime());
-		cv::imwrite("doppler_plot.png", resizedImage);
+		cv::imwrite("../results/doppler_plot.jpg", resizedImage);
 		cv::waitKey(1);
 		resizedImage.release();	
 		doppImage.release();
