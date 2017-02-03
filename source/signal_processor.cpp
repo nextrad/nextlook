@@ -1,8 +1,8 @@
 #include "signal_processor.hpp"
 
 int	dopplerDataStart = 0; 	
-Window rangeWindow(UNIFORM, COMPLEX_SAMPLES_PER_RANGE_LINE);			
-Window dopplerWindow(UNIFORM, RANGE_LINES_PER_DOPPLER_CPI);			
+Window rangeWindow(HAMMING, COMPLEX_SAMPLES_IN_REFERENCE_WAVEFORM);			
+Window dopplerWindow(HAMMING, RANGE_LINES_PER_DOPPLER_CPI);			
 
 SignalProcessor::SignalProcessor(void)
 {	
@@ -181,8 +181,8 @@ void SignalProcessor::popRangeBuffer(int rangeLine)
 	{
 		if (i < COMPLEX_SAMPLES_PER_RANGE_LINE)
 		{	
-			rangeBuffer[i][0] = binDataset[i*2 + start    ]*rangeWindow.getSample(i);     //real component    
-			rangeBuffer[i][1] = binDataset[i*2 + start + 1]*rangeWindow.getSample(i);     //complex component
+			rangeBuffer[i][0] = binDataset[i*2 + start    ]; //*rangeWindow.getSample(i);     //real component    
+			rangeBuffer[i][1] = binDataset[i*2 + start + 1]; //*rangeWindow.getSample(i);     //complex component
 		}
 		else
 		{
@@ -222,7 +222,7 @@ void SignalProcessor::postProcessMatched(int rangeLine)
 
 	for (int j = 0; j < COMPLEX_SAMPLES_AFTER_ZERO_PADDING; j++)
 	{
-		magnitude = 10*log(sqrt(pow(rangeBuffer[j][0], 2) + pow(rangeBuffer[j][1], 2)));
+		magnitude = log(sqrt(pow(rangeBuffer[j][0], 2) + pow(rangeBuffer[j][1], 2)));
 
 		if (magnitude > maxResult)
 		{
@@ -232,7 +232,7 @@ void SignalProcessor::postProcessMatched(int rangeLine)
 
 	for (int j = 0; j < COMPLEX_SAMPLES_AFTER_ZERO_PADDING; j++)
 	{
-		magnitude = 10*log(sqrt(pow(rangeBuffer[j][0], 2) + pow(rangeBuffer[j][1], 2)));
+		magnitude = log(sqrt(pow(rangeBuffer[j][0], 2) + pow(rangeBuffer[j][1], 2)));
 		matchedImageBuffer[j] = (uint8_t)((magnitude/maxResult)*255);
 	}
 	
@@ -303,8 +303,8 @@ void SignalProcessor::loadReferenceWaveform(void)
 	{
 		if (i < COMPLEX_SAMPLES_IN_REFERENCE_WAVEFORM)
 		{	
-			refBuffer[i][0] = refDataset[i*2];     //real component    
-			refBuffer[i][1] = refDataset[i*2 + 1]; //complex component
+			refBuffer[i][0] = refDataset[i*2    ]*rangeWindow.getSample(i);     //real component    
+			refBuffer[i][1] = refDataset[i*2 + 1]*rangeWindow.getSample(i);  	//complex component
 		}
 		else
 		{

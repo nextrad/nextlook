@@ -5,7 +5,7 @@ cv::Mat waterImage, doppImage;
 int waterfallColourMapSlider = 2;
 int dopplerColourMapSlider = 2;
 int	thresholdSlider = 0;
-int histogramSlider = 1;
+int histogramSlider = 0;
 int slowSlider = 0;
 
 const int thresholdMax = 255;
@@ -200,7 +200,9 @@ void plotWaterfall(void)
 		cv::resize(waterImage, resizedImage, size);	
 		
 		if (histogramSlider)
+		{
 			cv::equalizeHist(resizedImage, resizedImage);	
+		}
 		
 		cv::threshold(resizedImage, resizedImage, thresholdSlider, thresholdMax, 3);
 		cv::applyColorMap(resizedImage, resizedImage, waterfallColourMapSlider);	
@@ -209,7 +211,7 @@ void plotWaterfall(void)
 		cv::flip(resizedImage, resizedImage, 0);
 
 		cv::imshow("Waterfall Plot", resizedImage);
-		cv::imwrite("../results/waterfall_plot.jpg", resizedImage);
+		cv::imwrite("../results/waterfall_plot.jpg", resizedImage);	//%TODO - Append dataset name to waterfall title
 		cv::waitKey(1 + slowSlider);	
 		resizedImage.release();
 		//waterImage.release();
@@ -232,8 +234,8 @@ void plotDoppler(void)
 	
 		cv::imshow("Doppler Plot", resizedImage);
 		//printf("Doppler Plot:\t\t\tOK\t%fs\n", getTime());
-		cv::imwrite("../results/doppler_plot.jpg", resizedImage);
-		cv::waitKey(1);
+		cv::imwrite("../results/doppler_plot.jpg", resizedImage); //%TODO - Append dataset name to Doppler title
+		//cv::waitKey(1);
 		resizedImage.release();	
 		doppImage.release();
 }
