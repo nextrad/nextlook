@@ -4,9 +4,9 @@
 #include "includes.hpp"
 #include "parameters.hpp"
 #include "plotting.hpp"
-#include "utilities/timer.hpp"
-#include "utilities/window.hpp"
-#include "utilities/logger.hpp" 
+#include "timer.hpp"
+#include "window.hpp"
+#include "logger.hpp" 
 
 class SignalProcessor
 {

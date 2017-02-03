@@ -3,7 +3,7 @@
 
 #include "includes.hpp"
 #include "parameters.hpp"
-#include "utilities/logger.hpp"
+#include "logger.hpp"
 
 #define COLOUR_MAP_WIDTH 30
 #define COLOUR_MAP_PATH "../colour_maps/"

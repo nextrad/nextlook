@@ -2,7 +2,7 @@
 #define LOGGER_HPP
 
 #include "timer.hpp"
-#include "../includes.hpp"
+#include "includes.hpp"
 
 class Logger
 {

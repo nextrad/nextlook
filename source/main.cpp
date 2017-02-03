@@ -1,10 +1,10 @@
-#include "source/includes.hpp"
-#include "source/parameters.hpp"
-#include "source/utilities/timer.hpp"
-#include "source/utilities/window.hpp"
-#include "source/utilities/logger.hpp"
-#include "source/plotting.hpp"
-#include "source/signal_processor.hpp"
+#include "includes.hpp"
+#include "parameters.hpp"
+#include "timer.hpp"
+#include "window.hpp"
+#include "logger.hpp"
+#include "plotting.hpp"
+#include "signal_processor.hpp"
 
 void loopThroughDataset(void);
 void initTerminal(void); 
