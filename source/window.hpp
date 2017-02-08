@@ -1,7 +1,7 @@
 #ifndef WINDOW_HPP
 #define WINDOW_HPP
 
-#include "../includes.hpp"
+#include "includes.hpp"
 
 enum WindowFunction{HANNING, HAMMING, UNIFORM, BLACKMAN};
 
