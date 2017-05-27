@@ -22,7 +22,7 @@
 
 //the number of range lines used to form the CPI for Doppler processing.
 //again, it is best to use a multiple of 2 or 3, as fft's are performed faster.
-#define RANGE_LINES_PER_DOPPLER_CPI				64
+#define RANGE_LINES_PER_DOPPLER_CPI				128
 
 //for every 'UPDATE_LINE' number of range lines which are processed, Doppler processing is performed and the plots are updated.
 #define UPDATE_LINE								128
@@ -32,7 +32,7 @@
 #define DEBUG_MODE								false
 
 //binary dataset to be processed
-#define DATASET									"/home/darryn/Documents/NeXtRAD/12th/12_12_2016_14_48_59_adc1data.dat"
+#define DATASET									"/home/darryn/Documents/NeXtRAD/12_12_2016_14_48_59_adc1data.dat"
 
 //binary reference signal to be processed
 #define REFERENCE								"../reference_signals/Ref_PL_Xband_MPALNA_3us.dat"

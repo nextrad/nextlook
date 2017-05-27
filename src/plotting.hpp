@@ -1,7 +1,9 @@
 #ifndef PLOTTING_HPP
 #define PLOTTING_HPP
 
-#include "includes.hpp"
+#include <opencv2/opencv.hpp>
+#include <fftw3.h>
+
 #include "parameters.hpp"
 #include "logger.hpp"
 
@@ -24,8 +26,8 @@ enum plotStyle {AMPLITUDE, IQ};
 class Plot 
 {
 	private:
-		string title;
-		string xlable, ylable;
+		std::string title;
+		std::string xlable, ylable;
 		Logger logger;
 	public:
 		Plot(void);

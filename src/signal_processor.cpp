@@ -318,6 +318,12 @@ void SignalProcessor::loadReferenceWaveform(void)
 }
 
 
+void SignalProcessor::getExperimentParameters(void)
+{
+	
+}
+
+
 
 
 

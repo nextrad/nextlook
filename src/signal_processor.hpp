@@ -1,12 +1,30 @@
 #ifndef SIGNAL_PROCESSOR_HPP
 #define SIGNAL_PROCESSOR_HPP
 
-#include "includes.hpp"
+#include <fftw3.h>
+
 #include "parameters.hpp"
 #include "plotting.hpp"
 #include "timer.hpp"
 #include "window.hpp"
 #include "logger.hpp" 
+
+typedef struct
+{
+	bool is_doppler;	
+	bool is_debug;		
+	int n_threads;
+	int ncs_reference;		
+	int ncs_range_line;		
+	int ncs_padded; 		
+	int n_range_lines; 		
+	int ns_doppler_cpi; 	
+	int update_line;
+
+	char* dataset_filename; 	
+	char* reference_filename; 	
+
+} Experiment;
 
 class SignalProcessor
 {
@@ -26,6 +44,7 @@ class SignalProcessor
 		Timer timer;
 		Logger logger;
 		Plot plot;
+		Experiment experiment;
 		
 		//fftw plans
 		fftw_plan rangePlan;
@@ -64,7 +83,10 @@ class SignalProcessor
 		void complxMulti(void);		
 		void postProcessMatched(int rangeLine);
 		void popRangeBuffer(int rangeLine);	
+		
+		void getExperimentParameters(void);
 };
+
 
 #endif
 

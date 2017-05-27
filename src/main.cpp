@@ -1,4 +1,3 @@
-#include "includes.hpp"
 #include "parameters.hpp"
 #include "timer.hpp"
 #include "window.hpp"
@@ -15,6 +14,8 @@ int main(int argc, char *argv[])
 {
 	initTerminal();	
 	initOpenCV();
+	
+	signalProcessor.getExperimentParameters();
 	
 	signalProcessor.allocateMemory();
 	signalProcessor.createPlans();
