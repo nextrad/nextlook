@@ -180,6 +180,7 @@ void OpenCVPlot::initOpenCV(void)
 	doppImage = cv::Mat::ones(experiment->n_range_lines, experiment->ncs_doppler_cpi, CV_64F);
 }
 
+
 void OpenCVPlot::addToWaterPlot(int rangeLine, double  *imageValues)
 {
 	cv::Mat matchedRow = cv::Mat(1, experiment->ncs_padded, CV_64F, imageValues);	
@@ -190,14 +191,13 @@ void OpenCVPlot::addToWaterPlot(int rangeLine, double  *imageValues)
 		plotWaterfall();
 }
 
+
 void OpenCVPlot::addToDopplerPlot(int dopplerLine, double *imageValues)
 {
-	/*cv::Mat dopplerRow = cv::Mat(1, experiment->ncs_doppler_cpi, CV_64F, imageValues);	
-	cv::abs(dopplerRow);		
-	dopplerRow.copyTo(doppImage(cv::Rect(0, dopplerLine, dopplerRow.cols, dopplerRow.rows)));*/
-	
-	doppImage.push_back(cv::Mat(1, experiment->ncs_doppler_cpi, CV_64F, imageValues));
+	cv::Mat row = cv::Mat(1, experiment->ncs_doppler_cpi, CV_64F, imageValues);
+	doppImage.push_back(row);
 }
+
 
 void OpenCVPlot::plotWaterfall(void)
 {
@@ -205,38 +205,41 @@ void OpenCVPlot::plotWaterfall(void)
 	cv::log(resizedWaterImage, resizedWaterImage);
 	cv::normalize(resizedWaterImage, resizedWaterImage, 0.0, 1.0, cv::NORM_MINMAX);
 
-	resizedWaterImage.convertTo(processedImage, CV_8U, 255);	
+	resizedWaterImage.convertTo(processedWaterImage, CV_8U, 255);	
 	
-	cv::equalizeHist(processedImage, processedImage);
-
-	cv::applyColorMap(processedImage, processedImage, waterfallColourMapSlider);	
-	cv::transpose(processedImage, processedImage);
-	cv::flip(processedImage, processedImage, 0);		
-		
-	cv::imshow("RTI Plot", processedImage);
-	cv::imwrite("../results/waterfall_plot.jpg", processedImage);	//%TODO - Append dataset name to waterfall title
+	cv::equalizeHist(processedWaterImage, processedWaterImage);
+	cv::threshold(processedWaterImage, processedWaterImage, thresholdSlider, thresholdMax, 3);	
+	cv::applyColorMap(processedWaterImage, processedWaterImage, waterfallColourMapSlider);	
+	cv::transpose(processedWaterImage, processedWaterImage);
+	cv::flip(processedWaterImage, processedWaterImage, 0);		
+	
+	cv::imshow("RTI Plot", processedWaterImage);
+	//cv::imwrite("../results/waterfall_plot.jpg", processedWaterImage);	//%TODO - Append dataset name to waterfall title
 	cv::waitKey(1 + slowSlider);	
 }
 
+
 void OpenCVPlot::plotDoppler(void)
 {
-	cv::resize(doppImage, resizedDopperImage, doppSize);	
+	cv::resize(doppImage, resizedDopperImage, doppSize);		
+	doppImage.release();
 	cv::log(resizedDopperImage, resizedDopperImage);
 	cv::normalize(resizedDopperImage, resizedDopperImage, 0.0, 1.0, cv::NORM_MINMAX);
-
-	resizedDopperImage.convertTo(processedImage, CV_8U, 255);	
 	
-	cv::equalizeHist(processedImage, processedImage);
-
-	cv::applyColorMap(processedImage, processedImage, dopplerColourMapSlider);	
-	//cv::transpose(processedImage, processedImage);
-	cv::flip(processedImage, processedImage, 0);	
+	resizedDopperImage.convertTo(processedDopplerImage, CV_8U, 255);
 	
-	cv::imshow("Doppler Plot", processedImage);
-	//printf("Doppler Plot:\t\t\tOK\t%fs\n", getTime());
-	//cv::imwrite("../results/doppler_plot.jpg", processedImage); //%TODO - Append dataset name to Doppler title
+	cv::equalizeHist(processedDopplerImage, processedDopplerImage);
+	cv::threshold(processedDopplerImage, processedDopplerImage, thresholdSlider, thresholdMax, 3);		
+	cv::applyColorMap(processedDopplerImage, processedDopplerImage, dopplerColourMapSlider);
+	
+	cv::flip(processedDopplerImage, processedDopplerImage, 0);
+
+	cv::imshow("Doppler Plot", processedDopplerImage);
+
+	//cv::imwrite("../results/doppler_plot.jpg", resizedDopperImage); //%TODO - Append dataset name to Doppler title
 	//cv::waitKey(1);
-	processedImage.release();	
+	resizedDopperImage.release();
+	processedDopplerImage.release();	
 	doppImage.release();
 }
 

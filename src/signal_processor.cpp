@@ -124,14 +124,29 @@ void SignalProcessor::popDopplerBuffer(int dopplerLine)
 
 void SignalProcessor::addToDopplerPlot(int dopplerLine, OpenCVPlot &plot)
 {
+	float maxResult = 0.0f;	
+	float result = 0.0f;
+	double processed = 0;
+
+	//find max result
 	for (int i = 0; i < experiment->ncs_doppler_cpi; i++)
 	{
+		result = (sqrt(dopplerBuffer[i][0]*dopplerBuffer[i][0] + dopplerBuffer[i][1]*dopplerBuffer[i][1]));
+
+		if (result > maxResult)
+			maxResult = result;
+	}
+
+	for (int i = 0; i < experiment->ncs_doppler_cpi; i++)
+	{
+		processed = (((sqrt(dopplerBuffer[i][0]*dopplerBuffer[i][0] + dopplerBuffer[i][1]*dopplerBuffer[i][1]))/maxResult)*255);
+
 		//perform fft shift
 		if (i < (experiment->ncs_doppler_cpi/2 + 1))		
-			dopplerImageBuffer[i + (experiment->ncs_doppler_cpi/2 - 1)] = 0;
+			dopplerImageBuffer[i + (experiment->ncs_doppler_cpi/2 - 1)] = processed;
 		else
-			dopplerImageBuffer[i - (experiment->ncs_doppler_cpi/2 + 1)] = 0;
-	}
+			dopplerImageBuffer[i - (experiment->ncs_doppler_cpi/2 + 1)] = processed;
+	}	
 	
 	plot.addToDopplerPlot(dopplerLine, dopplerImageBuffer);
 }

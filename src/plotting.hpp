@@ -34,9 +34,11 @@ class OpenCVPlot
 		cv::Mat waterImage;
 		cv::Mat doppImage;
 		
-		cv::Mat processedImage;	
 		cv::Mat resizedWaterImage;
+		cv::Mat processedWaterImage;	
+		
 		cv::Mat resizedDopperImage;
+		cv::Mat processedDopplerImage;
 		
 		cv::Size waterSize;
 		cv::Size doppSize;
