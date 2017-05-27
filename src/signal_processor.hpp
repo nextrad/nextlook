@@ -2,29 +2,16 @@
 #define SIGNAL_PROCESSOR_HPP
 
 #include <fftw3.h>
+#include <fstream>
+#include "SimpleIni.hpp"
 
-#include "parameters.hpp"
 #include "plotting.hpp"
 #include "timer.hpp"
 #include "window.hpp"
 #include "logger.hpp" 
+#include "experiment.hpp" 
 
-typedef struct
-{
-	bool is_doppler;	
-	bool is_debug;		
-	int n_threads;
-	int ncs_reference;		
-	int ncs_range_line;		
-	int ncs_padded; 		
-	int n_range_lines; 		
-	int ns_doppler_cpi; 	
-	int update_line;
-
-	char* dataset_filename; 	
-	char* reference_filename; 	
-
-} Experiment;
+#define EXP_FILE "../experiment.ini"
 
 class SignalProcessor
 {
@@ -33,7 +20,7 @@ class SignalProcessor
 		int16_t 		*binDataset; 
 		int16_t 		*refDataset;
 		fftw_complex	*refBuffer;
-		fftw_complex 	*rangeBuffer;
+		fftw_complex 	*lineBuffer;
 		fftw_complex 	*resultBuffer;
 		fftw_complex 	*dopplerBuffer;
 		fftw_complex 	*dopplerData;
@@ -43,8 +30,11 @@ class SignalProcessor
 		
 		Timer timer;
 		Logger logger;
-		Plot plot;
-		Experiment experiment;
+		
+		Experiment* experiment;
+		
+		Window rangeWindow;
+		Window dopplerWindow;
 		
 		//fftw plans
 		fftw_plan rangePlan;
@@ -52,9 +42,11 @@ class SignalProcessor
 		fftw_plan resultPlan;
 		fftw_plan dopplerPlan;		
 		
+		int dopplerDataStart;
+		
 	public:
 		//constructor
-		SignalProcessor(void);
+		SignalProcessor(Experiment* exp);
 		
 		//memory management
 		void allocateMemory(void);
@@ -76,12 +68,12 @@ class SignalProcessor
 
 		void popDopplerData(int rangeLine);
 		void popDopplerBuffer(int dopplerLine);		
-		void processDoppler(int rangeLine);
+		void processDoppler(int rangeLine, OpenCVPlot &plot);
 		void postProcessDoppler(void);
 		
 		void complxConjRef(void);
 		void complxMulti(void);		
-		void postProcessMatched(int rangeLine);
+		void postProcessMatched(int rangeLine, OpenCVPlot &plot);
 		void popRangeBuffer(int rangeLine);	
 		
 		void getExperimentParameters(void);

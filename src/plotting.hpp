@@ -4,35 +4,56 @@
 #include <opencv2/opencv.hpp>
 #include <fftw3.h>
 
-#include "parameters.hpp"
 #include "logger.hpp"
+#include "experiment.hpp" 
 
+/*
 #define COLOUR_MAP_WIDTH 30
-#define COLOUR_MAP_PATH "../colour_maps/"
+#define COLOUR_MAP_PATH "../colour_maps/"*/
 
-//Functions
-void plotWaterfall(void);
-void plotDoppler(void);
-void updateWaterfall(int rangeLine, uint8_t  *imageValues);
-void updateDoppler(uint8_t  *imageValues);
-void initOpenCV(void);
-static void updatePlots(int, void*);
-
-
-extern int dopplerThresholdSlider;
 enum plotType {NORMAL, FFT_SHIFT};
 enum plotStyle {AMPLITUDE, IQ};
 
-class Plot 
+class OpenCVPlot 
+{
+	private:
+		const int cmap_width = 30;
+		const char* cmap_path = "../colour_maps/";	
+		const int thresholdMax = 255;
+		const int colourMapMax = 11;
+		const int histogramMax = 1;
+		const int slowMax = 500;	
+		
+		int waterfallColourMapSlider;
+		int dopplerColourMapSlider;
+		int	thresholdSlider;
+		int histogramSlider;
+		int slowSlider;
+		
+		cv::Mat waterImage;
+		cv::Mat doppImage;
+		Experiment* experiment;
+	public:
+		OpenCVPlot(Experiment* exp);
+		void plotWaterfall(void);
+		void plotDoppler(void);
+		void updateWaterfall(int rangeLine, uint8_t  *imageValues);
+		void updateDoppler(uint8_t  *imageValues);
+		void initOpenCV(void);
+		static void updatePlots(int, void*);
+};
+
+class GNUPlot 
 {
 	private:
 		std::string title;
 		std::string xlable, ylable;
-		Logger logger;
+		Logger logger;		
+		Experiment* experiment;
 	public:
-		Plot(void);
-		void gnuPlot(fftw_complex *array, char const *plotTitle, plotType type = NORMAL, plotStyle style = AMPLITUDE);	
-		void gnuPlot(uint8_t *array, char const *plotTitle);
+		GNUPlot(Experiment* exp);
+		void gnuPlot(fftw_complex *array, char const *plotTitle, Experiment* exp, plotType type = NORMAL, plotStyle style = AMPLITUDE);	
+		void gnuPlot(uint8_t *array, char const *plotTitle, Experiment* exp);
 };
 
 #endif

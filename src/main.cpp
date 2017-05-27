@@ -1,4 +1,3 @@
-#include "parameters.hpp"
 #include "timer.hpp"
 #include "window.hpp"
 #include "logger.hpp"
@@ -8,24 +7,26 @@
 void loopThroughDataset(void);
 void initTerminal(void); 
 
-SignalProcessor signalProcessor;
+Experiment experiment;
+SignalProcessor signalProcessor(&experiment);
+OpenCVPlot opencvPlot(&experiment);
+GNUPlot gnuPlot(&experiment);
 
 int main(int argc, char *argv[])
 {
 	initTerminal();	
-	initOpenCV();
 	
-	signalProcessor.getExperimentParameters();
+	signalProcessor.getExperimentParameters();		
 	
 	signalProcessor.allocateMemory();
 	signalProcessor.createPlans();
-	signalProcessor.loadBinaryDataset();	
-	
+	signalProcessor.loadBinaryDataset();		
 	signalProcessor.loadReferenceWaveform();	
 	
 	signalProcessor.fftRefData();		
 	signalProcessor.complxConjRef();
 	
+	opencvPlot.initOpenCV();
 	loopThroughDataset();
 	
 	signalProcessor.freeMemory();
@@ -37,16 +38,16 @@ int main(int argc, char *argv[])
 
 void loopThroughDataset(void)
 {
-	for (int i = 0; i < NUMBER_OF_RANGE_LINES; i++)
+	for (int i = 0; i < experiment.n_range_lines; i++)
 	{
 		signalProcessor.popRangeBuffer(i);
 		signalProcessor.fftRangeData();		
 		signalProcessor.complxMulti();			
 		signalProcessor.ifftMatchedData();								
-		signalProcessor.postProcessMatched(i);
+		signalProcessor.postProcessMatched(i, opencvPlot);
 
 		signalProcessor.popDopplerData(i); 		
-		signalProcessor.processDoppler(i); 
+		signalProcessor.processDoppler(i, opencvPlot); 
 	}	
 }
 

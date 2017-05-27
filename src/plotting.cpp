@@ -1,27 +1,13 @@
 #include "plotting.hpp"
 
-//globals
-cv::Mat waterImage, doppImage;
-int waterfallColourMapSlider = 2;
-int dopplerColourMapSlider = 2;
-int	thresholdSlider = 0;
-int histogramSlider = 0;
-int slowSlider = 0;
-
-const int thresholdMax = 255;
-const int colourMapMax = 11;
-const int histogramMax = 1;
-const int slowMax = 500;
-
-
-Plot::Plot(void)
+GNUPlot::GNUPlot(Experiment* exp)
 {
-
+	experiment = exp;
 }
 
-void Plot::gnuPlot(uint8_t *array, char const *plotTitle)
+void GNUPlot::gnuPlot(uint8_t *array, char const *plotTitle, Experiment* exp)
 {
-	if (DEBUG_MODE)
+	if (exp->is_debug)
 	{
 		FILE *pipe_gp = popen("gnuplot", "w");	
 	
@@ -40,7 +26,7 @@ void Plot::gnuPlot(uint8_t *array, char const *plotTitle)
 		fputs(writeFileName, pipe_gp);
 		
 		fputs("plot '-' using 1:2 with lines notitle\n", pipe_gp);
-		for (int i = 0; i < COMPLEX_SAMPLES_AFTER_ZERO_PADDING; i++) 
+		for (int i = 0; i < exp->ncs_padded; i++) 
 		{
 			//float magnitude = 10*log(sqrt(pow(array[i][0], 2) + pow(array[i][1], 2)));							
 			fprintf(pipe_gp, "%i %i\n", i, array[i]);
@@ -59,9 +45,9 @@ void Plot::gnuPlot(uint8_t *array, char const *plotTitle)
 
 
 
-void Plot::gnuPlot(fftw_complex *array, char const *plotTitle, plotType type, plotStyle style)
+void GNUPlot::gnuPlot(fftw_complex *array, char const *plotTitle, Experiment* exp, plotType type, plotStyle style)
 {
-	if (DEBUG_MODE)
+	if (exp->is_debug)
 	{
 		FILE *pipe_gp = popen("gnuplot", "w");	
 	
@@ -97,7 +83,7 @@ void Plot::gnuPlot(fftw_complex *array, char const *plotTitle, plotType type, pl
 					case AMPLITUDE: 
 					{
 						fputs("plot '-' using 1:2 with lines notitle\n", pipe_gp);
-						for (int i = 0; i < COMPLEX_SAMPLES_AFTER_ZERO_PADDING; i++) 
+						for (int i = 0; i < exp->ncs_padded; i++) 
 						{
 							float magnitude = 10*log(sqrt(pow(array[i][0], 2) + pow(array[i][1], 2)));							
 							fprintf(pipe_gp, "%i %f\n", i, magnitude);
@@ -109,14 +95,14 @@ void Plot::gnuPlot(fftw_complex *array, char const *plotTitle, plotType type, pl
 					{
 						fputs("plot '-' title 'I Samples' with lines, '-' title 'Q Samples' with lines\n", pipe_gp);
 						
-						for (int i = 0; i < COMPLEX_SAMPLES_AFTER_ZERO_PADDING; i++) 
+						for (int i = 0; i < exp->ncs_padded; i++) 
 						{
 							fprintf(pipe_gp, "%i %f\n", i, array[i][0]);
 						}
 						fflush(pipe_gp);
 						fprintf(pipe_gp, "e\n");						
 
-						for (int i = 0; i < COMPLEX_SAMPLES_AFTER_ZERO_PADDING; i++) 
+						for (int i = 0; i < exp->ncs_padded; i++) 
 						{
 							fprintf(pipe_gp, "%i %f\n", i, array[i][1]);
 						}
@@ -129,17 +115,17 @@ void Plot::gnuPlot(fftw_complex *array, char const *plotTitle, plotType type, pl
 			case FFT_SHIFT:
 			{
 				fputs("plot '-' using 1:2 with lines notitle\n", pipe_gp);
-				for (int i = 0; i < COMPLEX_SAMPLES_AFTER_ZERO_PADDING; i++) 
+				for (int i = 0; i < exp->ncs_padded; i++) 
 				{
-					if (i < (COMPLEX_SAMPLES_AFTER_ZERO_PADDING/2 + 1))
+					if (i < (exp->ncs_padded/2 + 1))
 					{
-						fprintf(pipe_gp, "%i %f\n", i, (abs(sqrt(array[i + (COMPLEX_SAMPLES_AFTER_ZERO_PADDING/2 - 1)][0]*array[i + (COMPLEX_SAMPLES_AFTER_ZERO_PADDING/2 - 1)][0] +
-																 array[i + (COMPLEX_SAMPLES_AFTER_ZERO_PADDING/2 - 1)][1]*array[i + (COMPLEX_SAMPLES_AFTER_ZERO_PADDING/2 - 1)][1]))));
+						fprintf(pipe_gp, "%i %f\n", i, (abs(sqrt(array[i + (exp->ncs_padded/2 - 1)][0]*array[i + (exp->ncs_padded/2 - 1)][0] +
+																 array[i + (exp->ncs_padded/2 - 1)][1]*array[i + (exp->ncs_padded/2 - 1)][1]))));
 					}
 					else
 					{
-						fprintf(pipe_gp, "%i %f\n", i, (abs(sqrt(array[i - (COMPLEX_SAMPLES_AFTER_ZERO_PADDING/2 + 1)][0]*array[i - (COMPLEX_SAMPLES_AFTER_ZERO_PADDING/2 + 1)][0] + 
-																 array[i - (COMPLEX_SAMPLES_AFTER_ZERO_PADDING/2 + 1)][1]*array[i - (COMPLEX_SAMPLES_AFTER_ZERO_PADDING/2 + 1)][1]))));
+						fprintf(pipe_gp, "%i %f\n", i, (abs(sqrt(array[i - (exp->ncs_padded/2 + 1)][0]*array[i - (exp->ncs_padded/2 + 1)][0] + 
+																 array[i - (exp->ncs_padded/2 + 1)][1]*array[i - (exp->ncs_padded/2 + 1)][1]))));
 					}
 				}
 				break;	
@@ -157,14 +143,25 @@ void Plot::gnuPlot(fftw_complex *array, char const *plotTitle, plotType type, pl
 	}	
 }
 
+OpenCVPlot::OpenCVPlot(Experiment* exp)
+{
+	experiment = exp;
+}
 
-void initOpenCV(void)
+
+void OpenCVPlot::initOpenCV(void)
 {	
-	cv::namedWindow("Waterfall Plot");
+	waterfallColourMapSlider = experiment->cm_rti;
+	dopplerColourMapSlider = experiment->cm_doppler;
+	thresholdSlider = experiment->threshold;
+	slowSlider = experiment->slow;
+	histogramSlider = experiment->hist_equal;
+	
+	cv::namedWindow("RTI Plot");
 	cv::namedWindow("Doppler Plot");
 	cv::namedWindow("Control Window", cv::WINDOW_NORMAL);
 
-	cv::moveWindow("Waterfall Plot", 0, 0);					//trackbar is 54 units in height
+	cv::moveWindow("RTI Plot", 0, 0);					//trackbar is 54 units in height
 	cv::moveWindow("Doppler Plot", 500, 0); 
 	cv::moveWindow("Control Window", 750, 0); 
 
@@ -172,27 +169,27 @@ void initOpenCV(void)
 
 	cv::createTrackbar( "Threshold Value", "Control Window", &thresholdSlider, thresholdMax);
 	cv::createTrackbar( "Doppler Colour Map", "Control Window", &dopplerColourMapSlider, colourMapMax);
-	cv::createTrackbar( "Waterfall Colour Map", "Control Window", &waterfallColourMapSlider, colourMapMax);
+	cv::createTrackbar( "RTI Colour Map", "Control Window", &waterfallColourMapSlider, colourMapMax);
 	cv::createTrackbar( "Slow Processing", "Control Window", &slowSlider, slowMax);
-	cv::createTrackbar( "Histogram Equalisation", "Control Window", &histogramSlider, histogramMax);
+	cv::createTrackbar( "Histogram Equalisation", "Control Window", &histogramSlider, histogramMax);	
 }
 
-void updateWaterfall(int rangeLine, uint8_t  *imageValues)
+void OpenCVPlot::updateWaterfall(int rangeLine, uint8_t  *imageValues)
 {
-	cv::Mat row = cv::Mat(1, COMPLEX_SAMPLES_AFTER_ZERO_PADDING, CV_8U, imageValues);
+	cv::Mat row = cv::Mat(1, experiment->ncs_padded, CV_8U, imageValues);
 	waterImage.push_back(row);
 			
-	if (((rangeLine%(UPDATE_LINE - 1) == 0) || rangeLine == (NUMBER_OF_RANGE_LINES - 1)) && rangeLine != 0)
+	if (((rangeLine%(experiment->update_rate - 1) == 0) || rangeLine == (experiment->n_range_lines - 1)) && rangeLine != 0)
 		plotWaterfall();
 }
 
-void updateDoppler(uint8_t  *imageValues)
+void OpenCVPlot::updateDoppler(uint8_t  *imageValues)
 {
-	cv::Mat row = cv::Mat(1, RANGE_LINES_PER_DOPPLER_CPI, CV_8U, imageValues);
+	cv::Mat row = cv::Mat(1, experiment->ncs_doppler_cpi, CV_8U, imageValues);
 	doppImage.push_back(row);
 }
 
-void plotWaterfall(void)
+void OpenCVPlot::plotWaterfall(void)
 {
 		cv::Mat resizedImage;	
 
@@ -210,14 +207,14 @@ void plotWaterfall(void)
 		cv::transpose(resizedImage, resizedImage);
 		cv::flip(resizedImage, resizedImage, 0);
 
-		cv::imshow("Waterfall Plot", resizedImage);
+		cv::imshow("RTI Plot", resizedImage);
 		cv::imwrite("../results/waterfall_plot.jpg", resizedImage);	//%TODO - Append dataset name to waterfall title
 		cv::waitKey(1 + slowSlider);	
 		resizedImage.release();
 		//waterImage.release();
 }
 
-void plotDoppler(void)
+void OpenCVPlot::plotDoppler(void)
 {
 		cv::Mat resizedImage;	
 

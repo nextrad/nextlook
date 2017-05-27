@@ -13,7 +13,8 @@ class Window
 		float* window;		
 		
 	public:		
-		Window(WindowFunction windowFunction, int windowSize);		
+		Window(void);		
+		void init(WindowFunction windowFunction, int windowSize);
 		float getSample(int sampleNumber);
         double sinc(double x);
 };

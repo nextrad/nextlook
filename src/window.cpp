@@ -1,6 +1,11 @@
 #include "window.hpp"
 
-Window::Window(WindowFunction windowFunction, int windowSize)
+Window::Window(void)
+{
+
+}
+
+void Window::init(WindowFunction windowFunction, int windowSize)
 {
 	function = windowFunction;
     window = (float*)malloc(windowSize*sizeof(float));
