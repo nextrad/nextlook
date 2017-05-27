@@ -20,8 +20,8 @@ void SignalProcessor::allocateMemory(void)
 
 	dopplerData     = (fftw_complex*)malloc(experiment->ncs_padded*experiment->ncs_doppler_cpi*sizeof(fftw_complex));
 	
-	matchedImageBuffer  = (uint8_t*)malloc(experiment->ncs_padded*sizeof(uint8_t));
-	dopplerImageBuffer  = (uint8_t*)malloc(experiment->ncs_doppler_cpi*sizeof(uint8_t));	
+	matchedImageBuffer  = (double*)malloc(experiment->ncs_padded*sizeof(double));
+	dopplerImageBuffer  = (double*)malloc(experiment->ncs_doppler_cpi*sizeof(double));	
 	
 	logger.write("Memory Allocated", timer);		
 }
@@ -97,14 +97,15 @@ void SignalProcessor::popDopplerData(int rangeLine)
 
 void SignalProcessor::processDoppler(int rangeLine, OpenCVPlot &plot)
 {
-	if ((rangeLine + 1 - dopplerDataStart) == experiment->ncs_doppler_cpi)  //check that dopplerData is full
+	popDopplerData(rangeLine); 
+	
+	if ((rangeLine - dopplerDataStart + 1) == experiment->ncs_doppler_cpi)  //check that dopplerData is full
 	{
 		for (int i = 0; i < experiment->ncs_padded; i++)		
 		{
 			popDopplerBuffer(i);	
 			fftDopplerData();
-			postProcessDoppler();
-			plot.updateDoppler(dopplerImageBuffer);	
+			addToDopplerPlot(i, plot);
 		}
 		plot.plotDoppler();
 	}
@@ -121,31 +122,18 @@ void SignalProcessor::popDopplerBuffer(int dopplerLine)
 }
 
 
-void SignalProcessor::postProcessDoppler(void)
+void SignalProcessor::addToDopplerPlot(int dopplerLine, OpenCVPlot &plot)
 {
-	float maxResult = 0.0f;	
-	float result = 0.0f;
-	int processed = 0;
-
-	//find max result
 	for (int i = 0; i < experiment->ncs_doppler_cpi; i++)
 	{
-		result = (sqrt(dopplerBuffer[i][0]*dopplerBuffer[i][0] + dopplerBuffer[i][1]*dopplerBuffer[i][1]));
-
-		if (result > maxResult)
-			maxResult = result;
-	}
-
-	for (int i = 0; i < experiment->ncs_doppler_cpi; i++)
-	{
-		processed = (uint8_t)(((sqrt(dopplerBuffer[i][0]*dopplerBuffer[i][0] + dopplerBuffer[i][1]*dopplerBuffer[i][1]))/maxResult)*255);
-
 		//perform fft shift
 		if (i < (experiment->ncs_doppler_cpi/2 + 1))		
-			dopplerImageBuffer[i + (experiment->ncs_doppler_cpi/2 - 1)] = processed;
+			dopplerImageBuffer[i + (experiment->ncs_doppler_cpi/2 - 1)] = 0;
 		else
-			dopplerImageBuffer[i - (experiment->ncs_doppler_cpi/2 + 1)] = processed;
+			dopplerImageBuffer[i - (experiment->ncs_doppler_cpi/2 + 1)] = 0;
 	}
+	
+	plot.addToDopplerPlot(dopplerLine, dopplerImageBuffer);
 }
 
 
@@ -213,30 +201,15 @@ void SignalProcessor::freeMemory(void)
 
 
 //pulse compressed range lines are normalized and converted to 8 bit for image generation. 
-void SignalProcessor::postProcessMatched(int rangeLine, OpenCVPlot &plot)
+void SignalProcessor::addToWaterPlot(int rangeLine, OpenCVPlot &plot)
 {
-	float maxResult = 0.0f;
-	float magnitude = 0.0f;
-
 	for (int j = 0; j < experiment->ncs_padded; j++)
 	{
-		magnitude = log(sqrt(pow(lineBuffer[j][0], 2) + pow(lineBuffer[j][1], 2)));
-
-		if (magnitude > maxResult)
-		{
-			maxResult = magnitude;
-		}
-	}
-
-	for (int j = 0; j < experiment->ncs_padded; j++)
-	{
-		magnitude = log(sqrt(pow(lineBuffer[j][0], 2) + pow(lineBuffer[j][1], 2)));
-		matchedImageBuffer[j] = (uint8_t)((magnitude/maxResult)*255);
-	}
+		matchedImageBuffer[j] = mag(lineBuffer[j]);
+	}	
 	
+	plot.addToWaterPlot(rangeLine, matchedImageBuffer);
 	//plot.gnuPlot(matchedImageBuffer, "matched image buffer");
-	
-	plot.updateWaterfall(rangeLine, matchedImageBuffer);
 }
 
 

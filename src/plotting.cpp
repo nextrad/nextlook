@@ -157,6 +157,9 @@ void OpenCVPlot::initOpenCV(void)
 	slowSlider = experiment->slow;
 	histogramSlider = experiment->hist_equal;
 	
+	waterSize = cv::Size(500, 500);
+	doppSize = cv::Size(250, 500);
+	
 	cv::namedWindow("RTI Plot");
 	cv::namedWindow("Doppler Plot");
 	cv::namedWindow("Control Window", cv::WINDOW_NORMAL);
@@ -172,68 +175,68 @@ void OpenCVPlot::initOpenCV(void)
 	cv::createTrackbar( "RTI Colour Map", "Control Window", &waterfallColourMapSlider, colourMapMax);
 	cv::createTrackbar( "Slow Processing", "Control Window", &slowSlider, slowMax);
 	cv::createTrackbar( "Histogram Equalisation", "Control Window", &histogramSlider, histogramMax);	
+	
+	waterImage = cv::Mat::ones(experiment->n_range_lines, experiment->ncs_padded, CV_64F);
+	doppImage = cv::Mat::ones(experiment->n_range_lines, experiment->ncs_doppler_cpi, CV_64F);
 }
 
-void OpenCVPlot::updateWaterfall(int rangeLine, uint8_t  *imageValues)
+void OpenCVPlot::addToWaterPlot(int rangeLine, double  *imageValues)
 {
-	cv::Mat row = cv::Mat(1, experiment->ncs_padded, CV_8U, imageValues);
-	waterImage.push_back(row);
-			
+	cv::Mat matchedRow = cv::Mat(1, experiment->ncs_padded, CV_64F, imageValues);	
+	//cv::abs(matchedRow);		
+	matchedRow.copyTo(waterImage(cv::Rect(0, rangeLine, matchedRow.cols, matchedRow.rows)));
+	
 	if (((rangeLine%(experiment->update_rate - 1) == 0) || rangeLine == (experiment->n_range_lines - 1)) && rangeLine != 0)
 		plotWaterfall();
 }
 
-void OpenCVPlot::updateDoppler(uint8_t  *imageValues)
+void OpenCVPlot::addToDopplerPlot(int dopplerLine, double *imageValues)
 {
-	cv::Mat row = cv::Mat(1, experiment->ncs_doppler_cpi, CV_8U, imageValues);
-	doppImage.push_back(row);
+	/*cv::Mat dopplerRow = cv::Mat(1, experiment->ncs_doppler_cpi, CV_64F, imageValues);	
+	cv::abs(dopplerRow);		
+	dopplerRow.copyTo(doppImage(cv::Rect(0, dopplerLine, dopplerRow.cols, dopplerRow.rows)));*/
+	
+	doppImage.push_back(cv::Mat(1, experiment->ncs_doppler_cpi, CV_64F, imageValues));
 }
 
 void OpenCVPlot::plotWaterfall(void)
 {
-		cv::Mat resizedImage;	
+	cv::resize(waterImage, resizedWaterImage, waterSize);	
+	cv::log(resizedWaterImage, resizedWaterImage);
+	cv::normalize(resizedWaterImage, resizedWaterImage, 0.0, 1.0, cv::NORM_MINMAX);
 
-		cv::Size size(500, 500);		
-		cv::resize(waterImage, resizedImage, size);	
-		
-		if (histogramSlider)
-		{
-			cv::equalizeHist(resizedImage, resizedImage);	
-		}
-		
-		cv::threshold(resizedImage, resizedImage, thresholdSlider, thresholdMax, 3);
-		cv::applyColorMap(resizedImage, resizedImage, waterfallColourMapSlider);	
-		
-		cv::transpose(resizedImage, resizedImage);
-		cv::flip(resizedImage, resizedImage, 0);
+	resizedWaterImage.convertTo(processedImage, CV_8U, 255);	
+	
+	cv::equalizeHist(processedImage, processedImage);
 
-		cv::imshow("RTI Plot", resizedImage);
-		cv::imwrite("../results/waterfall_plot.jpg", resizedImage);	//%TODO - Append dataset name to waterfall title
-		cv::waitKey(1 + slowSlider);	
-		resizedImage.release();
-		//waterImage.release();
+	cv::applyColorMap(processedImage, processedImage, waterfallColourMapSlider);	
+	cv::transpose(processedImage, processedImage);
+	cv::flip(processedImage, processedImage, 0);		
+		
+	cv::imshow("RTI Plot", processedImage);
+	cv::imwrite("../results/waterfall_plot.jpg", processedImage);	//%TODO - Append dataset name to waterfall title
+	cv::waitKey(1 + slowSlider);	
 }
 
 void OpenCVPlot::plotDoppler(void)
 {
-		cv::Mat resizedImage;	
+	cv::resize(doppImage, resizedDopperImage, doppSize);	
+	cv::log(resizedDopperImage, resizedDopperImage);
+	cv::normalize(resizedDopperImage, resizedDopperImage, 0.0, 1.0, cv::NORM_MINMAX);
 
-		cv::Size size(250, 500);		
-		cv::resize(doppImage, resizedImage, size);	
-		
-		doppImage.release();
-		
-		//cv::equalizeHist(resizedImage, resizedImage);
-		cv::threshold(resizedImage, resizedImage, thresholdSlider, thresholdMax, 3);		
-		cv::applyColorMap(resizedImage, resizedImage, dopplerColourMapSlider);
-		
-		cv::flip(resizedImage, resizedImage, 0);
+	resizedDopperImage.convertTo(processedImage, CV_8U, 255);	
 	
-		cv::imshow("Doppler Plot", resizedImage);
-		//printf("Doppler Plot:\t\t\tOK\t%fs\n", getTime());
-		cv::imwrite("../results/doppler_plot.jpg", resizedImage); //%TODO - Append dataset name to Doppler title
-		//cv::waitKey(1);
-		resizedImage.release();	
-		doppImage.release();
+	cv::equalizeHist(processedImage, processedImage);
+
+	cv::applyColorMap(processedImage, processedImage, dopplerColourMapSlider);	
+	//cv::transpose(processedImage, processedImage);
+	cv::flip(processedImage, processedImage, 0);	
+	
+	cv::imshow("Doppler Plot", processedImage);
+	//printf("Doppler Plot:\t\t\tOK\t%fs\n", getTime());
+	//cv::imwrite("../results/doppler_plot.jpg", processedImage); //%TODO - Append dataset name to Doppler title
+	//cv::waitKey(1);
+	processedImage.release();	
+	doppImage.release();
 }
 

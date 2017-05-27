@@ -25,8 +25,8 @@ class SignalProcessor
 		fftw_complex 	*dopplerBuffer;
 		fftw_complex 	*dopplerData;
 		
-		uint8_t  		*matchedImageBuffer;
-		uint8_t  		*dopplerImageBuffer;
+		double  		*matchedImageBuffer;
+		double  		*dopplerImageBuffer;
 		
 		Timer timer;
 		Logger logger;
@@ -69,14 +69,17 @@ class SignalProcessor
 		void popDopplerData(int rangeLine);
 		void popDopplerBuffer(int dopplerLine);		
 		void processDoppler(int rangeLine, OpenCVPlot &plot);
-		void postProcessDoppler(void);
 		
 		void complxConjRef(void);
 		void complxMulti(void);		
-		void postProcessMatched(int rangeLine, OpenCVPlot &plot);
+		void addToWaterPlot(int rangeLine, OpenCVPlot &plot);
+		void addToDopplerPlot(int dopplerLine, OpenCVPlot &plot);
 		void popRangeBuffer(int rangeLine);	
 		
 		void getExperimentParameters(void);
+		
+		
+		double mag(fftw_complex value){return sqrt(pow(value[0], 2) + pow(value[1], 2));};
 };
 
 

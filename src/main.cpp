@@ -44,9 +44,8 @@ void loopThroughDataset(void)
 		signalProcessor.fftRangeData();		
 		signalProcessor.complxMulti();			
 		signalProcessor.ifftMatchedData();								
-		signalProcessor.postProcessMatched(i, opencvPlot);
-
-		signalProcessor.popDopplerData(i); 		
+		signalProcessor.addToWaterPlot(i, opencvPlot);
+		
 		signalProcessor.processDoppler(i, opencvPlot); 
 	}	
 }
