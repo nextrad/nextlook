@@ -3,6 +3,7 @@
 
 #include <fftw3.h>
 #include <fstream>
+#include <boost/thread.hpp>
 #include "SimpleIni.hpp"
 
 #include "plotting.hpp"

@@ -11,6 +11,7 @@ typedef struct
 	int ncs_range_line;		
 	int ncs_padded; 		
 	int n_range_lines; 		
+	int n_range_lines_per_thread;
 	int ncs_doppler_cpi; 	
 	
 	int update_rate;	
