@@ -27,15 +27,6 @@ void SignalProcessor::allocateMemory(void)
 }
 
 
-void SignalProcessor::createRefPlan(void)
-{	
-	//fftw plan
-	refPlan     = fftw_plan_dft_1d((*experiment).ncs_padded, refBuffer, refBuffer, FFTW_FORWARD, FFTW_ESTIMATE);
-	
-	dopplerPlan = fftw_plan_dft_1d((*experiment).ncs_doppler_cpi, dopplerBuffer, dopplerBuffer, FFTW_FORWARD , FFTW_MEASURE );		
-}
-
-
 void SignalProcessor::destroyPlans(void)
 {
 	fftw_destroy_plan(rangePlan);	
@@ -47,6 +38,7 @@ void SignalProcessor::destroyPlans(void)
 
 void SignalProcessor::fftRefData(void)
 {			
+	refPlan = fftw_plan_dft_1d(experiment->ncs_padded, refBuffer, refBuffer, FFTW_FORWARD, FFTW_ESTIMATE);	
 	fftw_execute(refPlan);	
 	//gnu_plot.gnuPlot(refBuffer, "reference waveform frequency domain", FFT_SHIFT);
 }
@@ -62,6 +54,7 @@ void SignalProcessor::fftRangeData(int thread_id)
 
 void SignalProcessor::fftDopplerData(void)
 {
+	dopplerPlan = fftw_plan_dft_1d(experiment->ncs_doppler_cpi, dopplerBuffer, dopplerBuffer, FFTW_FORWARD , FFTW_MEASURE);
 	fftw_execute(dopplerPlan);
 }
 

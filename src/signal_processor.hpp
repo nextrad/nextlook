@@ -58,7 +58,6 @@ class SignalProcessor
 		void loadReferenceWaveform(void);
 		
 		//plan management
-		void createRefPlan(void);
 		void destroyPlans(void);
 		
 		//transforms

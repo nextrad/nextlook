@@ -19,13 +19,13 @@ int main(int argc, char *argv[])
 	
 	initTerminal();	
 	
-	signalProcessor.getExperimentParameters();		
+	signalProcessor.getExperimentParameters();			
 	
 	boost::thread threads[experiment.n_threads];
 	fftw_make_planner_thread_safe();
 	
-	signalProcessor.allocateMemory();
-	signalProcessor.createRefPlan();
+	signalProcessor.allocateMemory();		
+	
 	signalProcessor.loadBinaryDataset();		
 	signalProcessor.loadReferenceWaveform();	
 	
@@ -62,8 +62,10 @@ void perThread(int id)
 		signalProcessor.ifftMatchedData(id);								
 		signalProcessor.addToWaterPlot(i, opencvPlot, id, mutex);
 		
-		if (experiment.is_doppler)
+		if ((experiment.is_doppler) && (experiment.n_threads == 1))
+		{
 			signalProcessor.processDoppler(i, opencvPlot); 
+		}
 	}	
 }
 
