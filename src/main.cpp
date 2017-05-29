@@ -46,7 +46,8 @@ void loopThroughDataset(void)
 		signalProcessor.ifftMatchedData();								
 		signalProcessor.addToWaterPlot(i, opencvPlot);
 		
-		signalProcessor.processDoppler(i, opencvPlot); 
+		if (experiment.is_doppler)
+			signalProcessor.processDoppler(i, opencvPlot); 
 	}	
 }
 

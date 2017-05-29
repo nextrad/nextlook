@@ -161,23 +161,29 @@ void OpenCVPlot::initOpenCV(void)
 	doppSize = cv::Size(250, 500);
 	
 	cv::namedWindow("RTI Plot");
-	cv::namedWindow("Doppler Plot");
-	cv::namedWindow("Control Window", cv::WINDOW_NORMAL);
-
-	cv::moveWindow("RTI Plot", 0, 0);					//trackbar is 54 units in height
-	cv::moveWindow("Doppler Plot", 500, 0); 
+	cv::moveWindow("RTI Plot", 0, 0);	
+	waterImage = cv::Mat::ones(experiment->n_range_lines, experiment->ncs_padded, CV_64F);
+	
+	if (experiment->is_doppler)
+	{
+		cv::namedWindow("Doppler Plot");
+		cv::moveWindow("Doppler Plot", 500, 0); 
+		cv::createTrackbar( "Doppler Colour Map", "Control Window", &dopplerColourMapSlider, colourMapMax);
+		doppImage = cv::Mat::ones(experiment->n_range_lines, experiment->ncs_doppler_cpi, CV_64F);
+	}
+	
+	cv::namedWindow("Control Window", cv::WINDOW_NORMAL);	
 	cv::moveWindow("Control Window", 750, 0); 
 
-	cv::resizeWindow("Control Window", 300, 100);
+	//cv::resizeWindow("Control Window", 300, 100);
 
-	cv::createTrackbar( "Threshold Value", "Control Window", &thresholdSlider, thresholdMax);
-	cv::createTrackbar( "Doppler Colour Map", "Control Window", &dopplerColourMapSlider, colourMapMax);
+	cv::createTrackbar( "Threshold Value", "Control Window", &thresholdSlider, thresholdMax);	
 	cv::createTrackbar( "RTI Colour Map", "Control Window", &waterfallColourMapSlider, colourMapMax);
 	cv::createTrackbar( "Slow Processing", "Control Window", &slowSlider, slowMax);
 	cv::createTrackbar( "Histogram Equalisation", "Control Window", &histogramSlider, histogramMax);	
 	
-	waterImage = cv::Mat::ones(experiment->n_range_lines, experiment->ncs_padded, CV_64F);
-	doppImage = cv::Mat::ones(experiment->n_range_lines, experiment->ncs_doppler_cpi, CV_64F);
+	
+	
 }
 
 
@@ -206,8 +212,12 @@ void OpenCVPlot::plotWaterfall(void)
 	cv::normalize(resizedWaterImage, resizedWaterImage, 0.0, 1.0, cv::NORM_MINMAX);
 
 	resizedWaterImage.convertTo(processedWaterImage, CV_8U, 255);	
+
+	if (histogramSlider)
+	{
+		cv::equalizeHist(processedWaterImage, processedWaterImage);
+	}
 	
-	cv::equalizeHist(processedWaterImage, processedWaterImage);
 	cv::threshold(processedWaterImage, processedWaterImage, thresholdSlider, thresholdMax, 3);	
 	cv::applyColorMap(processedWaterImage, processedWaterImage, waterfallColourMapSlider);	
 	cv::transpose(processedWaterImage, processedWaterImage);
@@ -223,12 +233,17 @@ void OpenCVPlot::plotDoppler(void)
 {
 	cv::resize(doppImage, resizedDopperImage, doppSize);		
 	doppImage.release();
+	
 	cv::log(resizedDopperImage, resizedDopperImage);
 	cv::normalize(resizedDopperImage, resizedDopperImage, 0.0, 1.0, cv::NORM_MINMAX);
 	
 	resizedDopperImage.convertTo(processedDopplerImage, CV_8U, 255);
 	
-	cv::equalizeHist(processedDopplerImage, processedDopplerImage);
+	if (histogramSlider)
+	{
+		cv::equalizeHist(processedDopplerImage, processedDopplerImage);
+	}
+	
 	cv::threshold(processedDopplerImage, processedDopplerImage, thresholdSlider, thresholdMax, 3);		
 	cv::applyColorMap(processedDopplerImage, processedDopplerImage, dopplerColourMapSlider);
 	
