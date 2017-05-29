@@ -12,34 +12,27 @@ void SignalProcessor::allocateMemory(void)
 	binDataset 		= (int16_t*)malloc(experiment->n_range_lines*2*experiment->ncs_range_line*sizeof(int16_t));
 	refDataset      = (int16_t*)malloc(experiment->ncs_reference*2*sizeof(int16_t));
 	
-	lineBuffer 		= (fftw_complex*)malloc(experiment->ncs_padded*sizeof(fftw_complex));
+	lineBuffer 		= (fftw_complex*)malloc(experiment->n_threads*experiment->ncs_padded*sizeof(fftw_complex));
 	refBuffer 		= (fftw_complex*)malloc(experiment->ncs_padded*sizeof(fftw_complex));
 	
-	resultBuffer 	= (fftw_complex*)malloc(experiment->ncs_padded*sizeof(fftw_complex));
+	resultBuffer 	= (fftw_complex*)malloc(experiment->n_threads*experiment->ncs_padded*sizeof(fftw_complex));
 	dopplerBuffer   = (fftw_complex*)malloc(experiment->ncs_doppler_cpi*sizeof(fftw_complex));
 
 	dopplerData     = (fftw_complex*)malloc(experiment->ncs_padded*experiment->ncs_doppler_cpi*sizeof(fftw_complex));
 	
-	matchedImageBuffer  = (double*)malloc(experiment->ncs_padded*sizeof(double));
+	matchedImageBuffer  = (double*)malloc(experiment->n_threads*experiment->ncs_padded*sizeof(double));
 	dopplerImageBuffer  = (double*)malloc(experiment->ncs_doppler_cpi*sizeof(double));	
 	
 	logger.write("Memory Allocated", timer);		
 }
 
 
-void SignalProcessor::createPlans(void)
+void SignalProcessor::createRefPlan(void)
 {	
-	//init fftw for multi-threading
-	fftw_init_threads();
-	fftw_plan_with_nthreads((*experiment).n_threads);
+	//fftw plan
+	refPlan     = fftw_plan_dft_1d((*experiment).ncs_padded, refBuffer, refBuffer, FFTW_FORWARD, FFTW_ESTIMATE);
 	
-	//fftw plans
-	rangePlan   = fftw_plan_dft_1d((*experiment).ncs_padded		, lineBuffer   , lineBuffer   , FFTW_FORWARD , FFTW_MEASURE );
-	refPlan     = fftw_plan_dft_1d((*experiment).ncs_padded		, refBuffer    , refBuffer    , FFTW_FORWARD , FFTW_ESTIMATE);
-	resultPlan  = fftw_plan_dft_1d((*experiment).ncs_padded		, resultBuffer , lineBuffer   , FFTW_BACKWARD, FFTW_MEASURE );
-	dopplerPlan = fftw_plan_dft_1d((*experiment).ncs_doppler_cpi, dopplerBuffer, dopplerBuffer, FFTW_FORWARD , FFTW_MEASURE );	
-	
-	logger.write("FFT Plans Created", timer);			
+	dopplerPlan = fftw_plan_dft_1d((*experiment).ncs_doppler_cpi, dopplerBuffer, dopplerBuffer, FFTW_FORWARD , FFTW_MEASURE );		
 }
 
 
@@ -59,8 +52,9 @@ void SignalProcessor::fftRefData(void)
 }
 
 
-void SignalProcessor::fftRangeData(void)
+void SignalProcessor::fftRangeData(int thread_id)
 {	
+	rangePlan = fftw_plan_dft_1d(experiment->ncs_padded, &lineBuffer[thread_id*experiment->ncs_padded], &lineBuffer[thread_id*experiment->ncs_padded], FFTW_FORWARD, FFTW_MEASURE);
 	fftw_execute(rangePlan);	
 	//gnu_plot.gnuPlot(rangeBuffer, "return waveform frequency domain", FFT_SHIFT);
 }
@@ -72,8 +66,9 @@ void SignalProcessor::fftDopplerData(void)
 }
 
 
-void SignalProcessor::ifftMatchedData(void)
+void SignalProcessor::ifftMatchedData(int thread_id)
 {
+	resultPlan  = fftw_plan_dft_1d(experiment->ncs_padded, &resultBuffer[thread_id*experiment->ncs_padded], &lineBuffer[thread_id*experiment->ncs_padded], FFTW_BACKWARD, FFTW_MEASURE);
 	fftw_execute(resultPlan);
 	//gnu_plot.gnuPlot(rangeBuffer, "matched result time domain", NORMAL, AMPLITUDE);
 }
@@ -161,19 +156,20 @@ void SignalProcessor::complxConjRef(void)
 }
 
 
-void SignalProcessor::complxMulti(void)
+void SignalProcessor::complxMulti(int thread_id)
 {
 	for (int j = 0; j < (experiment->ncs_padded); j++)
 	{			
-		resultBuffer[j][0] = (lineBuffer[j][0]*refBuffer[j][0] - lineBuffer[j][1]*refBuffer[j][1]);
-		resultBuffer[j][1] = (lineBuffer[j][0]*refBuffer[j][1] + lineBuffer[j][1]*refBuffer[j][0]);
+		int k = j + thread_id*experiment->ncs_padded;
+		resultBuffer[k][0] = (lineBuffer[k][0]*refBuffer[j][0] - lineBuffer[k][1]*refBuffer[j][1]);
+		resultBuffer[k][1] = (lineBuffer[k][0]*refBuffer[j][1] + lineBuffer[k][1]*refBuffer[j][0]);
 	}
 	//plot.gnuPlot(hilbertBuffer, "matched result frequency domain", FFT_SHIFT);
 }
 
 
 //process data extracted from the bin file into the complex lineBuffer line by line.
-void SignalProcessor::popRangeBuffer(int rangeLine)
+void SignalProcessor::popRangeBuffer(int rangeLine, int thread_id)
 {
 	int start = rangeLine*2*experiment->ncs_range_line;
 		
@@ -182,13 +178,13 @@ void SignalProcessor::popRangeBuffer(int rangeLine)
 	{
 		if (i < experiment->ncs_range_line)
 		{	
-			lineBuffer[i][0] = binDataset[i*2 + start    ]; //*rangeWindow.getSample(i);     //real component    
-			lineBuffer[i][1] = binDataset[i*2 + start + 1]; //*rangeWindow.getSample(i);     //complex component
+			lineBuffer[i + thread_id*experiment->ncs_padded][0] = binDataset[i*2 + start    ]; //*rangeWindow.getSample(i);     //real component    
+			lineBuffer[i + thread_id*experiment->ncs_padded][1] = binDataset[i*2 + start + 1]; //*rangeWindow.getSample(i);     //complex component
 		}
 		else
 		{
-			lineBuffer[i][0] = 0;
-			lineBuffer[i][1] = 0; 
+			lineBuffer[i + thread_id*experiment->ncs_padded][0] = 0;
+			lineBuffer[i + thread_id*experiment->ncs_padded][1] = 0; 
 		}
 	}	
 	//plot.gnuPlot(rangeBuffer, "return waveform time domain", NORMAL, IQ);
@@ -216,14 +212,15 @@ void SignalProcessor::freeMemory(void)
 
 
 //pulse compressed range lines are normalized and converted to 8 bit for image generation. 
-void SignalProcessor::addToWaterPlot(int rangeLine, OpenCVPlot &plot)
+void SignalProcessor::addToWaterPlot(int rangeLine, OpenCVPlot &plot, int thread_id, boost::mutex &mutex)
 {
 	for (int j = 0; j < experiment->ncs_padded; j++)
 	{
-		matchedImageBuffer[j] = mag(lineBuffer[j]);
+		matchedImageBuffer[j + thread_id*experiment->ncs_padded] = mag(lineBuffer[j + thread_id*experiment->ncs_padded]);
 	}	
 	
-	plot.addToWaterPlot(rangeLine, matchedImageBuffer);
+	plot.addToWaterPlot(rangeLine, &matchedImageBuffer[thread_id*experiment->ncs_padded], mutex);
+	
 	//plot.gnuPlot(matchedImageBuffer, "matched image buffer");
 }
 
@@ -351,8 +348,11 @@ void SignalProcessor::getExperimentParameters(void)
 	experiment->slow = atoi(ini.GetValue("visualisation", "slow"));
 	experiment->threshold = atoi(ini.GetValue("visualisation", "threshold"));
 	
-	rangeWindow.init(HAMMING, experiment->ncs_reference);		
+	rangeWindow.init(HAMMING, experiment->ncs_reference);		// %TODO use selection from .ini file
 	dopplerWindow.init(HAMMING, experiment->ncs_doppler_cpi);	
+	
+	experiment->n_range_lines_per_thread = experiment->n_range_lines/experiment->n_threads;
+	
 }
 
 

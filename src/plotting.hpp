@@ -2,6 +2,7 @@
 #define PLOTTING_HPP
 
 #include <opencv2/opencv.hpp>
+#include <boost/thread.hpp>
 #include <fftw3.h>
 
 #include "logger.hpp"
@@ -48,7 +49,7 @@ class OpenCVPlot
 		OpenCVPlot(Experiment* exp);
 		void plotWaterfall(void);
 		void plotDoppler(void);
-		void addToWaterPlot(int rangeLine, double  *imageValues);
+		void addToWaterPlot(int rangeLine, double  *imageValues, boost::mutex &mutex);
 		void addToDopplerPlot(int dopplerLine, double *imageValues);
 		void initOpenCV(void);
 		static void updatePlots(int, void*);

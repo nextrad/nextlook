@@ -58,24 +58,24 @@ class SignalProcessor
 		void loadReferenceWaveform(void);
 		
 		//plan management
-		void createPlans(void);
+		void createRefPlan(void);
 		void destroyPlans(void);
 		
 		//transforms
 		void fftDopplerData(void);
 		void fftRefData(void);
-		void fftRangeData(void);
-		void ifftMatchedData(void);
+		void fftRangeData(int thread_id);
+		void ifftMatchedData(int thread_id);
 
 		void popDopplerData(int rangeLine);
 		void popDopplerBuffer(int dopplerLine);		
 		void processDoppler(int rangeLine, OpenCVPlot &plot);
 		
 		void complxConjRef(void);
-		void complxMulti(void);		
-		void addToWaterPlot(int rangeLine, OpenCVPlot &plot);
+		void complxMulti(int thread_id);		
+		void addToWaterPlot(int rangeLine, OpenCVPlot &plot, int thread_id, boost::mutex &mutex);
 		void addToDopplerPlot(int dopplerLine, OpenCVPlot &plot);
-		void popRangeBuffer(int rangeLine);	
+		void popRangeBuffer(int rangeLine, int thread_id);	
 		
 		void getExperimentParameters(void);
 		

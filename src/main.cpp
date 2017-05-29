@@ -4,22 +4,28 @@
 #include "plotting.hpp"
 #include "signal_processor.hpp"
 
-void loopThroughDataset(void);
+void perThread(int id);
 void initTerminal(void); 
 
 Experiment experiment;
 SignalProcessor signalProcessor(&experiment);
 OpenCVPlot opencvPlot(&experiment);
 GNUPlot gnuPlot(&experiment);
+boost::mutex mutex;
 
 int main(int argc, char *argv[])
 {
+	boost::thread_group threadGroup;	
+	
 	initTerminal();	
 	
 	signalProcessor.getExperimentParameters();		
 	
+	boost::thread threads[experiment.n_threads];
+	fftw_make_planner_thread_safe();
+	
 	signalProcessor.allocateMemory();
-	signalProcessor.createPlans();
+	signalProcessor.createRefPlan();
 	signalProcessor.loadBinaryDataset();		
 	signalProcessor.loadReferenceWaveform();	
 	
@@ -27,7 +33,15 @@ int main(int argc, char *argv[])
 	signalProcessor.complxConjRef();
 	
 	opencvPlot.initOpenCV();
-	loopThroughDataset();
+	
+	for (int i = 0; i < experiment.n_threads; i++)
+	{
+		threadGroup.create_thread(boost::bind(&perThread, i));
+	}
+	
+	threadGroup.join_all();	
+	
+	opencvPlot.plotWaterfall();
 	
 	signalProcessor.freeMemory();
 	cv::waitKey(0);
@@ -36,15 +50,17 @@ int main(int argc, char *argv[])
 }
 
 
-void loopThroughDataset(void)
+void perThread(int id)
 {
-	for (int i = 0; i < experiment.n_range_lines; i++)
+	int start_index = id*experiment.n_range_lines_per_thread;
+	
+	for (int i = start_index; i < start_index + experiment.n_range_lines_per_thread; i++)
 	{
-		signalProcessor.popRangeBuffer(i);
-		signalProcessor.fftRangeData();		
-		signalProcessor.complxMulti();			
-		signalProcessor.ifftMatchedData();								
-		signalProcessor.addToWaterPlot(i, opencvPlot);
+		signalProcessor.popRangeBuffer(i, id);
+		signalProcessor.fftRangeData(id);		
+		signalProcessor.complxMulti(id);			
+		signalProcessor.ifftMatchedData(id);								
+		signalProcessor.addToWaterPlot(i, opencvPlot, id, mutex);
 		
 		if (experiment.is_doppler)
 			signalProcessor.processDoppler(i, opencvPlot); 

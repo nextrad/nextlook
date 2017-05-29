@@ -187,14 +187,18 @@ void OpenCVPlot::initOpenCV(void)
 }
 
 
-void OpenCVPlot::addToWaterPlot(int rangeLine, double  *imageValues)
+void OpenCVPlot::addToWaterPlot(int rangeLine, double  *imageValues, boost::mutex &mutex)
 {
 	cv::Mat matchedRow = cv::Mat(1, experiment->ncs_padded, CV_64F, imageValues);	
 	//cv::abs(matchedRow);		
 	matchedRow.copyTo(waterImage(cv::Rect(0, rangeLine, matchedRow.cols, matchedRow.rows)));
 	
 	if (((rangeLine%(experiment->update_rate - 1) == 0) || rangeLine == (experiment->n_range_lines - 1)) && rangeLine != 0)
+	{
+		mutex.lock();
 		plotWaterfall();
+		mutex.unlock();
+	}
 }
 
 
