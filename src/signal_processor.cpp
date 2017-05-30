@@ -23,6 +23,8 @@ void SignalProcessor::allocateMemory(void)
 	matchedImageBuffer  = (double*)malloc(experiment->n_threads*experiment->ncs_padded*sizeof(double));
 	dopplerImageBuffer  = (double*)malloc(experiment->ncs_doppler_cpi*sizeof(double));	
 	
+	//rangePlan = (fftw_plan*)malloc()
+	
 	logger.write("Memory Allocated", timer);		
 }
 

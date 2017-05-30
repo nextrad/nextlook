@@ -38,10 +38,10 @@ class SignalProcessor
 		Window dopplerWindow;
 		
 		//fftw plans
-		fftw_plan rangePlan;
-		fftw_plan refPlan;
-		fftw_plan resultPlan;
-		fftw_plan dopplerPlan;		
+		fftw_plan	rangePlan;
+		fftw_plan  	 refPlan;
+		fftw_plan	resultPlan;
+		fftw_plan	dopplerPlan;		
 		
 		int dopplerDataStart;
 		
