@@ -23,18 +23,32 @@ void SignalProcessor::allocateMemory(void)
 	matchedImageBuffer  = (double*)malloc(experiment->n_threads*experiment->ncs_padded*sizeof(double));
 	dopplerImageBuffer  = (double*)malloc(experiment->ncs_doppler_cpi*sizeof(double));	
 	
-	//rangePlan = (fftw_plan*)malloc()
+	rangePlan = (fftw_plan*)malloc(experiment->n_threads*sizeof(fftw_plan));
+	resultPlan = (fftw_plan*)malloc(experiment->n_threads*sizeof(fftw_plan));
+	
+	dopplerPlan = fftw_plan_dft_1d(experiment->ncs_doppler_cpi, dopplerBuffer, dopplerBuffer, FFTW_FORWARD , FFTW_MEASURE);
 	
 	logger.write("Memory Allocated", timer);		
 }
 
 
-void SignalProcessor::destroyPlans(void)
+void SignalProcessor::createPlans(int thread_id)
 {
-	fftw_destroy_plan(rangePlan);	
-	fftw_destroy_plan(refPlan);	
-	fftw_destroy_plan(resultPlan);	
+	rangePlan[thread_id] = fftw_plan_dft_1d(experiment->ncs_padded, &lineBuffer[thread_id*experiment->ncs_padded], &lineBuffer[thread_id*experiment->ncs_padded], FFTW_FORWARD, FFTW_MEASURE);
+	resultPlan[thread_id] = fftw_plan_dft_1d(experiment->ncs_padded, &resultBuffer[thread_id*experiment->ncs_padded], &lineBuffer[thread_id*experiment->ncs_padded], FFTW_BACKWARD, FFTW_MEASURE);
+}
+
+
+void SignalProcessor::destroyPlans(void)
+{	
+	fftw_destroy_plan(refPlan);			
 	fftw_destroy_plan(dopplerPlan);
+	
+	for (int i = 0; i < experiment->n_threads; i++)
+	{
+		fftw_destroy_plan(rangePlan[i]);	
+		fftw_destroy_plan(resultPlan[i]);
+	}
 }
 
 
@@ -48,23 +62,20 @@ void SignalProcessor::fftRefData(void)
 
 void SignalProcessor::fftRangeData(int thread_id)
 {	
-	rangePlan = fftw_plan_dft_1d(experiment->ncs_padded, &lineBuffer[thread_id*experiment->ncs_padded], &lineBuffer[thread_id*experiment->ncs_padded], FFTW_FORWARD, FFTW_MEASURE);
-	fftw_execute(rangePlan);	
+	fftw_execute(rangePlan[thread_id]);	
 	//gnu_plot.gnuPlot(rangeBuffer, "return waveform frequency domain", FFT_SHIFT);
 }
 
 
 void SignalProcessor::fftDopplerData(void)
 {
-	dopplerPlan = fftw_plan_dft_1d(experiment->ncs_doppler_cpi, dopplerBuffer, dopplerBuffer, FFTW_FORWARD , FFTW_MEASURE);
 	fftw_execute(dopplerPlan);
 }
 
 
 void SignalProcessor::ifftMatchedData(int thread_id)
 {
-	resultPlan  = fftw_plan_dft_1d(experiment->ncs_padded, &resultBuffer[thread_id*experiment->ncs_padded], &lineBuffer[thread_id*experiment->ncs_padded], FFTW_BACKWARD, FFTW_MEASURE);
-	fftw_execute(resultPlan);
+	fftw_execute(resultPlan[thread_id]);
 	//gnu_plot.gnuPlot(rangeBuffer, "matched result time domain", NORMAL, AMPLITUDE);
 }
 

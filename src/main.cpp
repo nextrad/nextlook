@@ -54,6 +54,8 @@ void perThread(int id)
 {
 	int start_index = id*experiment.n_range_lines_per_thread;
 	
+	signalProcessor.createPlans(id);
+	
 	for (int i = start_index; i < start_index + experiment.n_range_lines_per_thread; i++)
 	{
 		signalProcessor.popRangeBuffer(i, id);
