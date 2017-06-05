@@ -19,7 +19,7 @@ NeXtlook is a quicklook processor for generating range-time-intensity and range-
 \end{abstract}
 
 \chapter{Installation}
-\textit{This chapter documents the installation process for the NeXtlook processor. Additional dependencies are required when the editing of source code is required.}
+\textit{This chapter documents the installation process for the NeXtlook processor.}
 \section{Prerequisites}
 \subsection{FFTw}
 Download the latest version of FFTw from their website ensuring that the version number is 3.3.6 or higher. This version introduced thread-safe planners which are vital. 
@@ -58,6 +58,73 @@ If no errors have occurred, the executable can be compiled and run as follows,
 make -j
 ./nextlook
 \end{lstlisting}
+
+\chapter{Usage}
+\section{Experiment Configuration}
+On first run, the program will probably complain about not finding the binary dataset. Do not panic. Within the root folder there should be a textfile called \textbf{experiment.ini} which contains all experiment parameters. This is where the path to the binary dataset and reference waveform, and other options must be configured.
+
+\subsection{Example Parameter File}
+\begin{lstlisting}
+[config]
+debug_mode = false
+
+[dataset]
+data_filename = ../12_12_2016_14_48_59_adc1data.dat
+n_cmplx_samples_range_line = 2048
+n_range_lines = 30000
+ref_filename = ../Ref_PL_Xband_MPALNA_3us.dat
+n_cmplx_samples_ref = 297
+n_cmplx_samples_padded = 2048;
+
+[processing]
+n_threads = 1;
+doppler_enabled = true
+doppler_cpi = 256
+range_window = UNIFORM
+doppler_window = UNIFORM
+
+[visualisation]
+update_rate = 1024
+doppler_colour_map = 1
+rti_colour_map = 2
+histogram_equalization = 1
+slow = 0
+threshold = 50
+\end{lstlisting}
+
+\subsection{Parameter Description}
+\subsubsection{config}
+\begin{itemize}
+  \item \textbf{debug-mode} provides additional information through the command line during processing.
+\end{itemize}
+\subsubsection{dataset}
+\begin{itemize}
+  \item \textbf{data-filename} the path to the binary dataset to be processed. 
+  \item \textbf{n-cmplx-samples-range-line} number of complex samples in each range line.
+  \item \textbf{n-range-lines} total number of range lines to process.
+  \item \textbf{ref-filename} the path to the binary reference to be processed. 
+  \item \textbf{n-cmplx-samples-ref} the number of complex samples in the reference waveform.
+  \item \textbf{n-cmplx-samples-padded} determines the number of complex samples each range line must be zero padded to.
+\end{itemize}
+\subsubsection{processing}
+\begin{itemize}
+  \item \textbf{n-threads} the number of threads which will be launched for pulse compression.
+  \item \textbf{doppler-enabled} toggles Doppler processing.
+  \item \textbf{doppler-cpi} number of range bins used for each Doppler plot.
+  \item \textbf{range-window} tapering function applied to each range line. 
+  \item \textbf{doppler-window} tapering function applied to each Doppler line.
+\end{itemize}
+\subsubsection{visualisation}
+\begin{itemize}
+  \item \textbf{update-rate} number of range lines to be processed before a plot update occurs.
+  \item \textbf{doppler-colour-map} [0 - 11] index of colour map to be applied to range-Doppler plot. 
+  \item \textbf{rti-colour-map} [0 - 11] index of colour map to be applied to RTI plot. 
+  \item \textbf{histogram-equalization} [0 - 1] toggles histogram equalisation for both plots. 
+  \item \textbf{slow} [0 - 500] number of milliseconds processing delay between each plot update. 
+  \item \textbf{threshold} [0 - 255] apply threshold to both plots. 
+\end{itemize}
+
+
 
 
 

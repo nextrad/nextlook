@@ -1,11 +1,25 @@
 ### RDP ###
 nextlook
 
+### LaTeX ###
+*.aux
+*.lof
+*.log
+*.lot
+*.fls
+*.out
+*.toc
+*.fmt
+*.fot
+*.cb
+*.cb2
+*.fdb_latexmk
+*.synctex.gz
+
 ### CMake ###
 CMakeCache.txt
 CMakeFiles
 CMakeScripts
-<<<<<<< HEAD
 Makefile
 cmake_install.cmake
 install_manifest.txt
