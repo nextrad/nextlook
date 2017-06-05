@@ -1,0 +1,64 @@
+\documentclass[a4paper,11pt]{report}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{lmodern}
+\usepackage{listings}
+\usepackage[hidelinks]{hyperref}
+
+
+\title{NeXtlook}
+\author{Darryn Jordan}
+
+\begin{document}
+
+\maketitle
+\tableofcontents
+
+\begin{abstract}
+NeXtlook is a quicklook processor for generating range-time-intensity and range-Doppler plots of NeXtRAD datasets. Multithreading is supported for pulse-compression, but Doppler-processing is currently only supported when using a single thread.
+\end{abstract}
+
+\chapter{Installation}
+\textit{This chapter documents the installation process for the NeXtlook processor. Additional dependencies are required when the editing of source code is required.}
+\section{Prerequisites}
+\subsection{FFTw}
+Download the latest version of FFTw from their website ensuring that the version number is 3.3.6 or higher. This version introduced thread-safe planners which are vital. 
+Extract the files in an arbitrary location and run the following commands,
+\begin{lstlisting}
+./configure --enable-threads
+make -j
+sudo make install
+\end{lstlisting}
+If any problems occur I suggest using the following command to perform a clean before retrying,
+\begin{lstlisting}
+make distclean
+\end{lstlisting}
+The extracted folder can now be deleted.
+\subsection{Misc.}
+\begin{lstlisting}
+sudo apt install cmake
+sudo apt install git
+sudo apt install libopencv-dev
+sudo apt install libboost-all-dev
+\end{lstlisting}
+
+\section{NeXtlook}
+At the time of writing, the NeXtlook source code is located at \url{https://github.com/darrynjordan/nextlook}. The source can be downloaded as a zip folder or cloned from the repo,
+\begin{lstlisting}
+git clone https://github.com/darrynjordan/nextlook.git
+\end{lstlisting}
+Within the cloned folder, create a new folder to hold the built executable and run Cmake,
+\begin{lstlisting}
+mkdir build
+cd build
+cmake ..
+\end{lstlisting}
+If no errors have occurred, the executable can be compiled and run as follows,
+\begin{lstlisting}
+make -j
+./nextlook
+\end{lstlisting}
+
+
+
+\end{document}
