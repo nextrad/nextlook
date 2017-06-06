@@ -75,8 +75,8 @@ void perThread(int id)
 void initTerminal(void)
 {
 	system("clear\n");
-	printf("NeXtRAD Quicklook Processor\n");
-	printf("---------------------------\n");
+	printf("NeXtlook\n");
+	printf("--------\n");
 }
 
 
