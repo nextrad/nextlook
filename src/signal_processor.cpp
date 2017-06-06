@@ -24,9 +24,7 @@ void SignalProcessor::allocateMemory(void)
 	dopplerImageBuffer  = (double*)malloc(experiment->ncs_doppler_cpi*sizeof(double));	
 	
 	rangePlan = (fftw_plan*)malloc(experiment->n_threads*sizeof(fftw_plan));
-	resultPlan = (fftw_plan*)malloc(experiment->n_threads*sizeof(fftw_plan));
-	
-	dopplerPlan = fftw_plan_dft_1d(experiment->ncs_doppler_cpi, dopplerBuffer, dopplerBuffer, FFTW_FORWARD , FFTW_MEASURE);
+	resultPlan = (fftw_plan*)malloc(experiment->n_threads*sizeof(fftw_plan));	
 	
 	logger.write("Memory Allocated", timer);		
 }
@@ -36,6 +34,7 @@ void SignalProcessor::createPlans(int thread_id)
 {
 	rangePlan[thread_id] = fftw_plan_dft_1d(experiment->ncs_padded, &lineBuffer[thread_id*experiment->ncs_padded], &lineBuffer[thread_id*experiment->ncs_padded], FFTW_FORWARD, FFTW_MEASURE);
 	resultPlan[thread_id] = fftw_plan_dft_1d(experiment->ncs_padded, &resultBuffer[thread_id*experiment->ncs_padded], &lineBuffer[thread_id*experiment->ncs_padded], FFTW_BACKWARD, FFTW_MEASURE);
+	dopplerPlan = fftw_plan_dft_1d(experiment->ncs_doppler_cpi, dopplerBuffer, dopplerBuffer, FFTW_FORWARD , FFTW_MEASURE);
 }
 
 
@@ -98,6 +97,7 @@ void SignalProcessor::popDopplerData(int rangeLine)
 
 void SignalProcessor::processDoppler(int rangeLine, OpenCVPlot &plot)
 {
+	
 	popDopplerData(rangeLine); 
 	
 	if ((rangeLine - dopplerDataStart + 1) == experiment->ncs_doppler_cpi)  //check that dopplerData is full
