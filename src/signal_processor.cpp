@@ -184,8 +184,8 @@ void SignalProcessor::popRangeBuffer(int rangeLine, int thread_id)
 	{
 		if (i < experiment->ncs_range_line)
 		{	
-			lineBuffer[i + thread_id*experiment->ncs_padded][0] = binDataset[i*2 + start    ]; //*rangeWindow.getSample(i);     //real component    
-			lineBuffer[i + thread_id*experiment->ncs_padded][1] = binDataset[i*2 + start + 1]; //*rangeWindow.getSample(i);     //complex component
+			lineBuffer[i + thread_id*experiment->ncs_padded][0] = binDataset[i*2 + start    ]*rangeWindow.getSample(i);     //real component    
+			lineBuffer[i + thread_id*experiment->ncs_padded][1] = binDataset[i*2 + start + 1]*rangeWindow.getSample(i);     //complex component
 		}
 		else
 		{
