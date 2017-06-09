@@ -84,7 +84,7 @@ void SignalProcessor::popDopplerData(int rangeLine)
 	if (rangeLine%experiment->update_rate == 0)
 		dopplerDataStart = rangeLine;
 
-	if ((rangeLine + 1 - dopplerDataStart) <= experiment->ncs_doppler_cpi)
+	if ((rangeLine - dopplerDataStart + 1) <= experiment->ncs_doppler_cpi)
 	{
 		for (int j = 0; j < experiment->ncs_padded; j++)
 		{
@@ -117,8 +117,9 @@ void SignalProcessor::popDopplerBuffer(int dopplerLine)
 {
 	for (int j = 0; j < experiment->ncs_doppler_cpi; j++)
 	{	
-		dopplerBuffer[j][0] = dopplerData[dopplerLine*experiment->ncs_doppler_cpi + j][0]*dopplerWindow.getSample(j); 
-		dopplerBuffer[j][1] = dopplerData[dopplerLine*experiment->ncs_doppler_cpi + j][1]*dopplerWindow.getSample(j);
+		float windowCoefficient = dopplerWindow.getSample(j);
+		dopplerBuffer[j][0] = dopplerData[dopplerLine*experiment->ncs_doppler_cpi + j][0]*windowCoefficient; 
+		dopplerBuffer[j][1] = dopplerData[dopplerLine*experiment->ncs_doppler_cpi + j][1]*windowCoefficient;
 	}	
 }
 
