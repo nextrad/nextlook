@@ -178,14 +178,15 @@ void SignalProcessor::complxMulti(int thread_id)
 void SignalProcessor::popRangeBuffer(int rangeLine, int thread_id)
 {
 	int start = rangeLine*2*experiment->ncs_range_line;
-		
+	
 	//populate complex range data and remove offset	
 	for (int i = 0; i < experiment->ncs_padded; i++)
 	{
 		if (i < experiment->ncs_range_line)
 		{	
-			lineBuffer[i + thread_id*experiment->ncs_padded][0] = binDataset[i*2 + start    ]; //*rangeWindow.getSample(i);     //real component    
-			lineBuffer[i + thread_id*experiment->ncs_padded][1] = binDataset[i*2 + start + 1]; //*rangeWindow.getSample(i);     //complex component
+			float windowCoefficient = rangeWindow.getSample(i);
+			lineBuffer[i + thread_id*experiment->ncs_padded][0] = binDataset[i*2 + start    ]*windowCoefficient;     //real component    
+			lineBuffer[i + thread_id*experiment->ncs_padded][1] = binDataset[i*2 + start + 1]*windowCoefficient;     //complex component
 		}
 		else
 		{
@@ -292,8 +293,9 @@ void SignalProcessor::loadReferenceWaveform(void)
 	{
 		if (i < experiment->ncs_reference)
 		{	
-			refBuffer[i][0] = refDataset[i*2    ]*rangeWindow.getSample(i);     //real component    
-			refBuffer[i][1] = refDataset[i*2 + 1]*rangeWindow.getSample(i);  	//complex component
+			float windowCoefficient = refWindow.getSample(i);
+			refBuffer[i][0] = refDataset[i*2    ]*windowCoefficient;   //real component    
+			refBuffer[i][1] = refDataset[i*2 + 1]*windowCoefficient;  	//complex component
 		}
 		else
 		{
