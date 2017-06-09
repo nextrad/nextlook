@@ -1,6 +1,8 @@
 cmake_minimum_required(VERSION 2.8)
 project(nextlook)
 
+set (CMAKE_CXX_STANDARD 11)
+
 find_package(OpenCV REQUIRED)
 find_library(FFTW_LIBRARY NAMES fftw3)
 find_package(Boost COMPONENTS thread date_time program_options filesystem system REQUIRED)

@@ -117,7 +117,7 @@ void GNUPlot::gnuPlot(fftw_complex *array, char const *plotTitle, Experiment* ex
 				fputs("plot '-' using 1:2 with lines notitle\n", pipe_gp);
 				for (int i = 0; i < exp->ncs_padded; i++) 
 				{
-					if (i < (exp->ncs_padded/2 + 1))
+					if (i < (exp->ncs_padded/2 + 1)) 
 					{
 						fprintf(pipe_gp, "%i %f\n", i, (abs(sqrt(array[i + (exp->ncs_padded/2 - 1)][0]*array[i + (exp->ncs_padded/2 - 1)][0] +
 																 array[i + (exp->ncs_padded/2 - 1)][1]*array[i + (exp->ncs_padded/2 - 1)][1]))));
@@ -180,10 +180,7 @@ void OpenCVPlot::initOpenCV(void)
 	cv::createTrackbar( "Threshold Value", "Control Window", &thresholdSlider, thresholdMax);	
 	cv::createTrackbar( "RTI Colour Map", "Control Window", &waterfallColourMapSlider, colourMapMax);
 	cv::createTrackbar( "Slow Processing", "Control Window", &slowSlider, slowMax);
-	cv::createTrackbar( "Histogram Equalisation", "Control Window", &histogramSlider, histogramMax);	
-	
-	
-	
+	cv::createTrackbar( "Histogram Equalisation", "Control Window", &histogramSlider, histogramMax);		
 }
 
 
@@ -238,7 +235,7 @@ void OpenCVPlot::plotDoppler(void)
 	cv::resize(doppImage, resizedDopperImage, doppSize);		
 	doppImage.release();
 	
-	cv::log(resizedDopperImage, resizedDopperImage);
+	//cv::log(resizedDopperImage, resizedDopperImage);
 	cv::normalize(resizedDopperImage, resizedDopperImage, 0.0, 1.0, cv::NORM_MINMAX);
 	
 	resizedDopperImage.convertTo(processedDopplerImage, CV_8U, 255);
