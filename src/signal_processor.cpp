@@ -354,7 +354,8 @@ void SignalProcessor::getExperimentParameters(void)
 	experiment->slow = atoi(ini.GetValue("visualisation", "slow"));
 	experiment->threshold = atoi(ini.GetValue("visualisation", "threshold"));
 	
-	rangeWindow.init(HAMMING, experiment->ncs_reference);		// %TODO use selection from .ini file
+	refWindow.init(HAMMING, experiment->ncs_reference);		// %TODO use selection from .ini file
+	rangeWindow.init(HAMMING, experiment->ncs_range_line);	
 	dopplerWindow.init(HAMMING, experiment->ncs_doppler_cpi);	
 	
 	experiment->n_range_lines_per_thread = experiment->n_range_lines/experiment->n_threads;

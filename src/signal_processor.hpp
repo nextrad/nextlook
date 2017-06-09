@@ -34,6 +34,7 @@ class SignalProcessor
 		
 		Experiment* experiment;
 		
+		Window refWindow;
 		Window rangeWindow;
 		Window dopplerWindow;
 		
