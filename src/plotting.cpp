@@ -277,12 +277,13 @@ void OpenCVPlot::plotDoppler(void)
 	
 	scaledDopplerImage.convertTo(processedDopplerImage, CV_8U, 255);
 	
+	cv::threshold(processedDopplerImage, processedDopplerImage, thresholdSlider, thresholdMax, 3);	
+	
 	if (histogramSlider)
 	{
 		cv::equalizeHist(processedDopplerImage, processedDopplerImage);
 	}
 	
-	cv::threshold(processedDopplerImage, processedDopplerImage, thresholdSlider, thresholdMax, 3);		
 	cv::applyColorMap(processedDopplerImage, processedDopplerImage, dopplerColourMapSlider);
 	
 	cv::flip(processedDopplerImage, processedDopplerImage, 0);
