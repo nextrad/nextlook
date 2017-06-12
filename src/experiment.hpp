@@ -16,6 +16,7 @@ typedef struct
 	int n_range_lines; 		
 	int n_range_lines_per_thread;
 	int ncs_doppler_cpi; 	
+	int n_plot_average;
 	
 	int update_rate;	
 	int cm_doppler;

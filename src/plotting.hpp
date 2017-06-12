@@ -33,13 +33,17 @@ class OpenCVPlot
 		int histogramSlider;
 		int slowSlider;
 		
+		//holds the index of the current doppler plot 
+		int doppler_plot_index;
+		
 		cv::Mat waterImage;
 		cv::Mat doppImage;
 		
 		cv::Mat resizedWaterImage;
 		cv::Mat processedWaterImage;	
 		
-		cv::Mat resizedDopperImage;
+		std::vector<cv::Mat> dopplerMatrix;
+		cv::Mat averagedDopplerImage;
 		cv::Mat processedDopplerImage;
 		
 		cv::Size waterSize;

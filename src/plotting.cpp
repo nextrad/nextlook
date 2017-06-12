@@ -181,6 +181,11 @@ void OpenCVPlot::initOpenCV(void)
 	cv::createTrackbar( "RTI Colour Map", "Control Window", &waterfallColourMapSlider, colourMapMax);
 	cv::createTrackbar( "Slow Processing", "Control Window", &slowSlider, slowMax);
 	cv::createTrackbar( "Histogram Equalisation", "Control Window", &histogramSlider, histogramMax);		
+	
+	experiment->n_plot_average = 1;	
+	//cv::Mat dopperMatrix[experiment->n_plot_average];	
+	//allocate memory for array of doppler images
+	doppler_plot_index = 0;		
 }
 
 
@@ -232,15 +237,18 @@ void OpenCVPlot::plotWaterfall(void)
 
 void OpenCVPlot::plotDoppler(void)
 {
-	cv::resize(doppImage, resizedDopperImage, doppSize);		
+	//add new dummy doppler plot to the vector
+	dopplerMatrix.push_back(cv::Mat::ones(1, 1, CV_64F));
+	
+	cv::resize(doppImage, dopplerMatrix[doppler_plot_index], doppSize);		
 	doppImage.release();
 	
-	//cv::log(resizedDopperImage, resizedDopperImage);
-	cv::normalize(resizedDopperImage, resizedDopperImage, 0.0, 1.0, cv::NORM_MINMAX);
+	//averagedDopplerImage
 	
-	resizedDopperImage.convertTo(processedDopplerImage, CV_8U, 255);
+	cv::log(dopplerMatrix[doppler_plot_index], dopplerMatrix[doppler_plot_index]);
+	cv::normalize(dopplerMatrix[doppler_plot_index], dopplerMatrix[doppler_plot_index], 0.0, 1.0, cv::NORM_MINMAX);
 	
-	resizedDopperImage.release();
+	dopplerMatrix[doppler_plot_index].convertTo(processedDopplerImage, CV_8U, 255);
 	
 	if (histogramSlider)
 	{
@@ -251,8 +259,13 @@ void OpenCVPlot::plotDoppler(void)
 	cv::applyColorMap(processedDopplerImage, processedDopplerImage, dopplerColourMapSlider);
 	
 	cv::flip(processedDopplerImage, processedDopplerImage, 0);
+	
+	//average doppler plots
 
 	cv::imshow("Doppler Plot", processedDopplerImage);
+	
+	//increment the doppler plot index
+	doppler_plot_index++;	
 }
 
 void OpenCVPlot::savePlots(void)
@@ -260,10 +273,14 @@ void OpenCVPlot::savePlots(void)
 	std::string doppler_path = experiment->save_path + "/Range-Doppler.jpg";
 	std::string water_path = experiment->save_path + "/Range-Time-Intensity.jpg";
 	
-	cv::imwrite(doppler_path.c_str(), processedDopplerImage); 
+	//cv::imwrite(doppler_path.c_str(), processedDopplerImage); 
 	cv::imwrite(water_path.c_str(), processedWaterImage);	
 	
-	processedDopplerImage.release();	
+	for (int i = 0; i < experiment->n_plot_average; i++)
+	{
+		//processedDopplerImage[i].release();	
+	}
+	
 	processedWaterImage.release();
 }
 
