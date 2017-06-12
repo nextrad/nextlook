@@ -156,6 +156,7 @@ void OpenCVPlot::initOpenCV(void)
 	thresholdSlider = experiment->threshold;
 	slowSlider = experiment->slow;
 	histogramSlider = experiment->hist_equal;
+	averagingSlider = experiment->n_plot_average;
 	
 	waterSize = cv::Size(500, 500);
 	doppSize = cv::Size(250, 500);
@@ -181,10 +182,8 @@ void OpenCVPlot::initOpenCV(void)
 	cv::createTrackbar( "RTI Colour Map", "Control Window", &waterfallColourMapSlider, colourMapMax);
 	cv::createTrackbar( "Slow Processing", "Control Window", &slowSlider, slowMax);
 	cv::createTrackbar( "Histogram Equalisation", "Control Window", &histogramSlider, histogramMax);		
+	cv::createTrackbar( "Doppler Averaging", "Control Window", &averagingSlider, averagingMax);
 	
-	experiment->n_plot_average = 1;	
-	//cv::Mat dopperMatrix[experiment->n_plot_average];	
-	//allocate memory for array of doppler images
 	doppler_plot_index = 0;		
 }
 
@@ -243,12 +242,19 @@ void OpenCVPlot::plotDoppler(void)
 	cv::resize(doppImage, dopplerMatrix[doppler_plot_index], doppSize);		
 	doppImage.release();
 	
-	//averagedDopplerImage
+	averagedDopplerImage = dopplerMatrix[0];
 	
-	cv::log(dopplerMatrix[doppler_plot_index], dopplerMatrix[doppler_plot_index]);
-	cv::normalize(dopplerMatrix[doppler_plot_index], dopplerMatrix[doppler_plot_index], 0.0, 1.0, cv::NORM_MINMAX);
+	for (int i = 1; i <= doppler_plot_index; i++)
+	{
+		averagedDopplerImage = averagedDopplerImage + dopplerMatrix[i];		
+	}
 	
-	dopplerMatrix[doppler_plot_index].convertTo(processedDopplerImage, CV_8U, 255);
+	averagedDopplerImage = averagedDopplerImage/(1 + doppler_plot_index);
+
+	cv::log(averagedDopplerImage, averagedDopplerImage);
+	cv::normalize(averagedDopplerImage, averagedDopplerImage, 0.0, 1.0, cv::NORM_MINMAX);
+	
+	averagedDopplerImage.convertTo(processedDopplerImage, CV_8U, 255);
 	
 	if (histogramSlider)
 	{

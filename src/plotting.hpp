@@ -22,16 +22,18 @@ class OpenCVPlot
 		const int cmap_width = 30;
 		const char* cmap_path = "../colour_maps/";	
 		
-		const int thresholdMax = 255;
-		const int colourMapMax = 11;
+		const int slowMax = 500;		
 		const int histogramMax = 1;
-		const int slowMax = 500;	
-		
-		int waterfallColourMapSlider;
-		int dopplerColourMapSlider;
+		const int colourMapMax = 11;	
+		const int thresholdMax = 255;
+		const int averagingMax = 100;
+
+		int slowSlider;		
 		int	thresholdSlider;
-		int histogramSlider;
-		int slowSlider;
+		int histogramSlider;	
+		int	averagingSlider;	
+		int dopplerColourMapSlider;
+		int waterfallColourMapSlider;
 		
 		//holds the index of the current doppler plot 
 		int doppler_plot_index;
