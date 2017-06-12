@@ -42,6 +42,8 @@ int main(int argc, char *argv[])
 	
 	opencvPlot.plotWaterfall();
 	
+	opencvPlot.savePlots();
+	
 	signalProcessor.freeMemory();
 	cv::waitKey(0);
 

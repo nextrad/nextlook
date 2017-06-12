@@ -4,6 +4,7 @@
 #include <opencv2/opencv.hpp>
 #include <boost/thread.hpp>
 #include <fftw3.h>
+#include <string.h>
 
 #include "logger.hpp"
 #include "experiment.hpp" 
@@ -52,6 +53,7 @@ class OpenCVPlot
 		void addToWaterPlot(int rangeLine, double  *imageValues);
 		void addToDopplerPlot(int dopplerLine, double *imageValues);
 		void initOpenCV(void);
+		void savePlots(void);
 		static void updatePlots(int, void*);
 };
 

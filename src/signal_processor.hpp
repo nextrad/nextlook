@@ -4,6 +4,7 @@
 #include <fftw3.h>
 #include <fstream>
 #include <boost/thread.hpp>
+#include <boost/filesystem.hpp>
 #include "SimpleIni.hpp"
 
 #include "plotting.hpp"

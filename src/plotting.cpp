@@ -225,7 +225,7 @@ void OpenCVPlot::plotWaterfall(void)
 	cv::flip(processedWaterImage, processedWaterImage, 0);		
 	
 	cv::imshow("RTI Plot", processedWaterImage);
-	//cv::imwrite("../results/waterfall_plot.jpg", processedWaterImage);	//%TODO - Append dataset name to waterfall title
+
 	cv::waitKey(1 + slowSlider);	
 }
 
@@ -240,6 +240,8 @@ void OpenCVPlot::plotDoppler(void)
 	
 	resizedDopperImage.convertTo(processedDopplerImage, CV_8U, 255);
 	
+	resizedDopperImage.release();
+	
 	if (histogramSlider)
 	{
 		cv::equalizeHist(processedDopplerImage, processedDopplerImage);
@@ -251,11 +253,17 @@ void OpenCVPlot::plotDoppler(void)
 	cv::flip(processedDopplerImage, processedDopplerImage, 0);
 
 	cv::imshow("Doppler Plot", processedDopplerImage);
+}
 
-	//cv::imwrite("../results/doppler_plot.jpg", resizedDopperImage); //%TODO - Append dataset name to Doppler title
-	//cv::waitKey(1);
-	resizedDopperImage.release();
+void OpenCVPlot::savePlots(void)
+{
+	std::string doppler_path = experiment->save_path + "/Range-Doppler.jpg";
+	std::string water_path = experiment->save_path + "/Range-Time-Intensity.jpg";
+	
+	cv::imwrite(doppler_path.c_str(), processedDopplerImage); 
+	cv::imwrite(water_path.c_str(), processedWaterImage);	
+	
 	processedDopplerImage.release();	
-	doppImage.release();
+	processedWaterImage.release();
 }
 

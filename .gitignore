@@ -1,6 +1,9 @@
 ### RDP ###
 nextlook
 
+### Output Images ###
+*.jpg
+
 ### LaTeX ###
 *.aux
 *.lof

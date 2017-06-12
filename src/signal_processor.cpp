@@ -363,6 +363,26 @@ void SignalProcessor::getExperimentParameters(void)
 	
 	experiment->n_range_lines_per_thread = experiment->n_range_lines/experiment->n_threads;
 	
+	//extract path from dataset location
+	boost::filesystem::path experiment_filepath(experiment->dataset_filename);
+	boost::filesystem::path filename(experiment_filepath.filename());	
+	boost::filesystem::path path("../results");
+	
+	if(!boost::filesystem::exists(path))
+	{
+		std::string command = "mkdir " + path.string();
+		system(command.c_str());
+	}
+	
+	filename = path / filename.stem();
+	
+	if(!boost::filesystem::exists(filename.string()))
+	{
+		std::string command = "mkdir " + filename.string();
+		system(command.c_str());
+	}
+	
+	experiment->save_path = filename.string();
 }
 
 

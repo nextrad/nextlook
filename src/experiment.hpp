@@ -1,6 +1,9 @@
 #ifndef EXPERIMENT_HPP
 #define EXPERIMENT_HPP
 
+#include <boost/thread.hpp>
+#include <string.h>
+
 typedef struct
 {
 	bool is_doppler;	
@@ -23,6 +26,7 @@ typedef struct
 
 	char* dataset_filename; 	
 	char* reference_filename; 	
+	std::string save_path;
 	
 	boost::mutex mutex;
 	
