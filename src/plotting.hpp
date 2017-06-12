@@ -26,7 +26,9 @@ class OpenCVPlot
 		const int histogramMax = 1;
 		const int colourMapMax = 11;	
 		const int thresholdMax = 255;
-		const int averagingMax = 100;
+		
+		//set by n_range_lines/update_rate i.e. max number of updates possible.
+		int averagingMax;
 
 		int slowSlider;		
 		int	thresholdSlider;

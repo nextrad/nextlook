@@ -165,28 +165,28 @@ void OpenCVPlot::initOpenCV(void)
 	cv::moveWindow("RTI Plot", 0, 0);	
 	waterImage = cv::Mat::ones(experiment->n_range_lines, experiment->ncs_padded, CV_64F);
 	
+	cv::namedWindow("Control Window", cv::WINDOW_NORMAL);	
+	cv::moveWindow("Control Window", 750, 0); 
+	//cv::resizeWindow("Control Window", 300, 100);
+	
 	if (experiment->is_doppler)
 	{
 		cv::namedWindow("Doppler Plot");
 		cv::moveWindow("Doppler Plot", 500, 0); 
 		cv::createTrackbar( "Doppler Colour Map", "Control Window", &dopplerColourMapSlider, colourMapMax);
 		doppImage = cv::Mat::ones(experiment->n_range_lines, experiment->ncs_doppler_cpi, CV_64F);
-	}
-	
-	cv::namedWindow("Control Window", cv::WINDOW_NORMAL);	
-	cv::moveWindow("Control Window", 750, 0); 
-
-	//cv::resizeWindow("Control Window", 300, 100);
+		
+		averagingMax = (experiment->n_range_lines)/(experiment->update_rate);
+		cv::createTrackbar( "Doppler Averaging", "Control Window", &averagingSlider, averagingMax);
+		
+		doppler_plot_index = 0;			
+		averagedDopplerImage = cv::Mat(500, 250, CV_64F, cv::Scalar::all(0));	
+	}	
 
 	cv::createTrackbar( "Threshold Value", "Control Window", &thresholdSlider, thresholdMax);	
 	cv::createTrackbar( "RTI Colour Map", "Control Window", &waterfallColourMapSlider, colourMapMax);
 	cv::createTrackbar( "Slow Processing", "Control Window", &slowSlider, slowMax);
-	cv::createTrackbar( "Histogram Equalisation", "Control Window", &histogramSlider, histogramMax);		
-	cv::createTrackbar( "Doppler Averaging", "Control Window", &averagingSlider, averagingMax);
-	
-	doppler_plot_index = 0;		
-	
-	averagedDopplerImage = cv::Mat(500, 250, CV_64F, cv::Scalar::all(0));
+	cv::createTrackbar( "Histogram Equalisation", "Control Window", &histogramSlider, histogramMax);
 }
 
 
