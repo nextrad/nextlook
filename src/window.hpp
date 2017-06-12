@@ -4,7 +4,7 @@
 #include <stdlib.h>
 #include <math.h>
 
-enum WindowFunction{HANNING, HAMMING, UNIFORM, BLACKMAN};
+enum WindowFunction {HANNING, HAMMING, UNIFORM, BLACKMAN};
 
 class Window
 {

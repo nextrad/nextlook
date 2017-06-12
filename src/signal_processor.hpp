@@ -80,7 +80,7 @@ class SignalProcessor
 		void popRangeBuffer(int rangeLine, int thread_id);	
 		
 		void getExperimentParameters(void);
-		
+		WindowFunction parseWindowOption(char* option);		
 		
 		double mag(fftw_complex value){return sqrt(pow(value[0], 2) + pow(value[1], 2));};
 };

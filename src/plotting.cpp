@@ -238,7 +238,7 @@ void OpenCVPlot::plotWaterfall(void)
 
 void OpenCVPlot::plotDoppler(void)
 {
-	int averaging_terms = 0;
+	int summable_plots = 0;
 	
 	//add new dummy doppler plot to the vector
 	dopplerMatrix.push_back(cv::Mat::ones(1, 1, CV_64F));
@@ -246,23 +246,21 @@ void OpenCVPlot::plotDoppler(void)
 	cv::resize(doppImage, dopplerMatrix[doppler_plot_index], doppSize);		
 	doppImage.release();
 	
-	averagedDopplerImage = dopplerMatrix[doppler_plot_index];
-
 	//init average as latest plot
-	//averagedDopplerImage = averagedDopplerImage + dopplerMatrix[doppler_plot_index];
+	averagedDopplerImage = dopplerMatrix[doppler_plot_index];
 	
-	//calculate possible number of terms to average
+	//determine the number of plots available for averaging
 	if (averagingSlider >= doppler_plot_index)
 	{
-		averaging_terms = doppler_plot_index;
+		summable_plots = doppler_plot_index;
 	}
 	else
 	{
-		averaging_terms = averagingSlider;
+		summable_plots = averagingSlider;
 	}
 		
 	//sum all appropriate plots
-	for (int i = (doppler_plot_index - 1); i > (doppler_plot_index - averaging_terms); i--)
+	for (int i = (doppler_plot_index - 1); i > (doppler_plot_index - summable_plots); i--)
 	{
 		if (i > 0)
 		{
@@ -270,7 +268,7 @@ void OpenCVPlot::plotDoppler(void)
 		}
 	}
 	
-	averagedDopplerImage = averagedDopplerImage/(averaging_terms + 1);
+	averagedDopplerImage = averagedDopplerImage/(summable_plots + 1);
 
 	cv::log(averagedDopplerImage, scaledDopplerImage);
 	cv::normalize(scaledDopplerImage, scaledDopplerImage, 0.0, 1.0, cv::NORM_MINMAX);

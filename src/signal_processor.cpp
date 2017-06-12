@@ -326,11 +326,9 @@ void SignalProcessor::getExperimentParameters(void)
 	
 	experiment->dataset_filename = (char *)ini.GetValue("dataset", "data_filename");
 	experiment->ncs_range_line = atoi(ini.GetValue("dataset", "n_cmplx_samples_range_line"));
-	experiment->n_range_lines = atoi(ini.GetValue("dataset", "n_range_lines"));
-	
+	experiment->n_range_lines = atoi(ini.GetValue("dataset", "n_range_lines"));	
 	experiment->reference_filename = (char *)ini.GetValue("dataset", "ref_filename");
-	experiment->ncs_reference = atoi(ini.GetValue("dataset", "n_cmplx_samples_ref"));
-	
+	experiment->ncs_reference = atoi(ini.GetValue("dataset", "n_cmplx_samples_ref"));	
 	experiment->ncs_padded = atoi(ini.GetValue("dataset", "n_cmplx_samples_padded"));
 	
 	experiment->n_threads = atoi(ini.GetValue("processing", "n_threads"));	
@@ -356,11 +354,14 @@ void SignalProcessor::getExperimentParameters(void)
 	experiment->hist_equal = atoi(ini.GetValue("visualisation", "histogram_equalization"));
 	experiment->slow = atoi(ini.GetValue("visualisation", "slow"));
 	experiment->threshold = atoi(ini.GetValue("visualisation", "threshold"));
+	experiment->n_plot_average = atoi(ini.GetValue("visualisation", "doppler_averaging"));	
 	
-	refWindow.init(HAMMING, experiment->ncs_reference);		// %TODO use selection from .ini file
-	rangeWindow.init(HAMMING, experiment->ncs_range_line);	
-	dopplerWindow.init(HAMMING, experiment->ncs_doppler_cpi);	
+	//extract and set windowing functions
+	refWindow.init((WindowFunction)atoi(ini.GetValue("processing", "ref_window")), experiment->ncs_reference);	
+	rangeWindow.init((WindowFunction)atoi(ini.GetValue("processing", "range_window")), experiment->ncs_range_line);	
+	dopplerWindow.init((WindowFunction)atoi(ini.GetValue("processing", "doppler_window")), experiment->ncs_doppler_cpi);	
 	
+	//calculate the number of range lines each thread is responsible for.
 	experiment->n_range_lines_per_thread = experiment->n_range_lines/experiment->n_threads;
 	
 	//extract path from dataset location
@@ -368,12 +369,14 @@ void SignalProcessor::getExperimentParameters(void)
 	boost::filesystem::path filename(experiment_filepath.filename());	
 	boost::filesystem::path path("../results");
 	
+	//make the results folder
 	if(!boost::filesystem::exists(path))
 	{
 		std::string command = "mkdir " + path.string();
 		system(command.c_str());
 	}
 	
+	//make the dataset specific folder
 	filename = path / filename.stem();
 	
 	if(!boost::filesystem::exists(filename.string()))
@@ -382,9 +385,25 @@ void SignalProcessor::getExperimentParameters(void)
 		system(command.c_str());
 	}
 	
-	experiment->save_path = filename.string();
-	
-	experiment->n_plot_average = atoi(ini.GetValue("visualisation", "doppler_averaging"));	
+	experiment->save_path = filename.string();	
+}
+
+
+WindowFunction SignalProcessor::parseWindowOption(char* option)
+{
+	if (option == "HANNING")
+		return HANNING;
+	else if (option == "HAMMING")
+		return HAMMING;
+	else if (option == "UNIFORM")
+		return UNIFORM;
+	else if (option == "BLACKMAN")
+		return BLACKMAN;
+	else
+	{
+		printf("Unknown windowing function: '%s' requested, defaulting to UNIFORM.\n", option);
+		return UNIFORM;
+	}
 }
 
 

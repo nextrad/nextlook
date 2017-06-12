@@ -19,10 +19,10 @@ void Window::init(WindowFunction windowFunction, int windowSize)
 
         switch(windowFunction)
 		{
-        case HANNING  : window[i] = 0.50 - 0.50*cos(common); break;
-        case HAMMING  : window[i] = 0.54 - 0.46*cos(common); break;
-        case BLACKMAN : window[i] = 0.42659 - 0.49656*cos(common) + 0.076849*cos(2*common); break;
-        case UNIFORM  : window[i] = 1;
+			case HANNING  : window[i] = 0.50 - 0.50*cos(common); break;
+			case HAMMING  : window[i] = 0.54 - 0.46*cos(common); break;
+			case BLACKMAN : window[i] = 0.42659 - 0.49656*cos(common) + 0.076849*cos(2*common); break;
+			case UNIFORM  : window[i] = 1;
 		}	
 	}
 }
