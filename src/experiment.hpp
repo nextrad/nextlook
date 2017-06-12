@@ -24,6 +24,8 @@ typedef struct
 	char* dataset_filename; 	
 	char* reference_filename; 	
 	
+	boost::mutex mutex;
+	
 } Experiment;
 
 #endif

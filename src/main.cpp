@@ -11,7 +11,6 @@ Experiment experiment;
 SignalProcessor signalProcessor(&experiment);
 OpenCVPlot opencvPlot(&experiment);
 GNUPlot gnuPlot(&experiment);
-boost::mutex mutex;
 
 int main(int argc, char *argv[])
 {
@@ -62,7 +61,7 @@ void perThread(int id)
 		signalProcessor.fftRangeData(id);		
 		signalProcessor.complxMulti(id);			
 		signalProcessor.ifftMatchedData(id);								
-		signalProcessor.addToWaterPlot(i, opencvPlot, id, mutex);
+		signalProcessor.addToWaterPlot(i, opencvPlot, id);
 		
 		if ((experiment.is_doppler) && (experiment.n_threads == 1))
 		{

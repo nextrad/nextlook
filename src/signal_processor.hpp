@@ -74,7 +74,7 @@ class SignalProcessor
 		
 		void complxConjRef(void);
 		void complxMulti(int thread_id);		
-		void addToWaterPlot(int rangeLine, OpenCVPlot &plot, int thread_id, boost::mutex &mutex);
+		void addToWaterPlot(int rangeLine, OpenCVPlot &plot, int thread_id);
 		void addToDopplerPlot(int dopplerLine, OpenCVPlot &plot);
 		void popRangeBuffer(int rangeLine, int thread_id);	
 		

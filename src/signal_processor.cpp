@@ -220,14 +220,14 @@ void SignalProcessor::freeMemory(void)
 
 
 //pulse compressed range lines are normalized and converted to 8 bit for image generation. 
-void SignalProcessor::addToWaterPlot(int rangeLine, OpenCVPlot &plot, int thread_id, boost::mutex &mutex)
+void SignalProcessor::addToWaterPlot(int rangeLine, OpenCVPlot &plot, int thread_id)
 {
 	for (int j = 0; j < experiment->ncs_padded; j++)
 	{
 		matchedImageBuffer[j + thread_id*experiment->ncs_padded] = mag(lineBuffer[j + thread_id*experiment->ncs_padded]);
 	}	
 	
-	plot.addToWaterPlot(rangeLine, &matchedImageBuffer[thread_id*experiment->ncs_padded], mutex);
+	plot.addToWaterPlot(rangeLine, &matchedImageBuffer[thread_id*experiment->ncs_padded]);
 	
 	//plot.gnuPlot(matchedImageBuffer, "matched image buffer");
 }
