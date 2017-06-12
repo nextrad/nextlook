@@ -185,6 +185,8 @@ void OpenCVPlot::initOpenCV(void)
 	cv::createTrackbar( "Doppler Averaging", "Control Window", &averagingSlider, averagingMax);
 	
 	doppler_plot_index = 0;		
+	
+	averagedDopplerImage = cv::Mat(500, 250, CV_64F, cv::Scalar::all(0));
 }
 
 
@@ -236,25 +238,44 @@ void OpenCVPlot::plotWaterfall(void)
 
 void OpenCVPlot::plotDoppler(void)
 {
+	int averaging_terms = 0;
+	
 	//add new dummy doppler plot to the vector
 	dopplerMatrix.push_back(cv::Mat::ones(1, 1, CV_64F));
 	
 	cv::resize(doppImage, dopplerMatrix[doppler_plot_index], doppSize);		
 	doppImage.release();
 	
-	averagedDopplerImage = dopplerMatrix[0];
+	averagedDopplerImage = dopplerMatrix[doppler_plot_index];
+
+	//init average as latest plot
+	//averagedDopplerImage = averagedDopplerImage + dopplerMatrix[doppler_plot_index];
 	
-	for (int i = 1; i <= doppler_plot_index; i++)
+	//calculate possible number of terms to average
+	if (averagingSlider >= doppler_plot_index)
 	{
-		averagedDopplerImage = averagedDopplerImage + dopplerMatrix[i];		
+		averaging_terms = doppler_plot_index;
+	}
+	else
+	{
+		averaging_terms = averagingSlider;
+	}
+		
+	//sum all appropriate plots
+	for (int i = (doppler_plot_index - 1); i > (doppler_plot_index - averaging_terms); i--)
+	{
+		if (i > 0)
+		{
+			averagedDopplerImage = averagedDopplerImage + dopplerMatrix[i];		
+		}
 	}
 	
-	averagedDopplerImage = averagedDopplerImage/(1 + doppler_plot_index);
+	averagedDopplerImage = averagedDopplerImage/(averaging_terms + 1);
 
-	cv::log(averagedDopplerImage, averagedDopplerImage);
-	cv::normalize(averagedDopplerImage, averagedDopplerImage, 0.0, 1.0, cv::NORM_MINMAX);
+	cv::log(averagedDopplerImage, scaledDopplerImage);
+	cv::normalize(scaledDopplerImage, scaledDopplerImage, 0.0, 1.0, cv::NORM_MINMAX);
 	
-	averagedDopplerImage.convertTo(processedDopplerImage, CV_8U, 255);
+	scaledDopplerImage.convertTo(processedDopplerImage, CV_8U, 255);
 	
 	if (histogramSlider)
 	{
@@ -266,8 +287,6 @@ void OpenCVPlot::plotDoppler(void)
 	
 	cv::flip(processedDopplerImage, processedDopplerImage, 0);
 	
-	//average doppler plots
-
 	cv::imshow("Doppler Plot", processedDopplerImage);
 	
 	//increment the doppler plot index

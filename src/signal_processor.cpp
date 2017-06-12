@@ -384,7 +384,7 @@ void SignalProcessor::getExperimentParameters(void)
 	
 	experiment->save_path = filename.string();
 	
-	experiment->n_plot_average = 10;	
+	experiment->n_plot_average = 0;	
 }
 
 

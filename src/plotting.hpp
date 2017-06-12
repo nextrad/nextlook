@@ -46,6 +46,7 @@ class OpenCVPlot
 		
 		std::vector<cv::Mat> dopplerMatrix;
 		cv::Mat averagedDopplerImage;
+		cv::Mat scaledDopplerImage;
 		cv::Mat processedDopplerImage;
 		
 		cv::Size waterSize;
