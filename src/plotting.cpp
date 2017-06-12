@@ -299,12 +299,12 @@ void OpenCVPlot::savePlots(void)
 	std::string doppler_path = experiment->save_path + "/Range-Doppler.jpg";
 	std::string water_path = experiment->save_path + "/Range-Time-Intensity.jpg";
 	
-	//cv::imwrite(doppler_path.c_str(), processedDopplerImage); 
+	cv::imwrite(doppler_path.c_str(), processedDopplerImage); 
 	cv::imwrite(water_path.c_str(), processedWaterImage);	
 	
 	for (int i = 0; i < experiment->n_plot_average; i++)
 	{
-		//processedDopplerImage[i].release();	
+		dopplerMatrix[i].release();	
 	}
 	
 	processedWaterImage.release();
