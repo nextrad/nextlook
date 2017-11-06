@@ -141,7 +141,8 @@ void SignalProcessor::addToDopplerPlot(int dopplerLine, OpenCVPlot &plot)
 
 	for (int i = 0; i < experiment->ncs_doppler_cpi; i++)
 	{
-		processed = (((sqrt(dopplerBuffer[i][0]*dopplerBuffer[i][0] + dopplerBuffer[i][1]*dopplerBuffer[i][1]))/maxResult)*255);
+		//need to stream line - removed redundant uint8 scaling
+		processed = sqrt(dopplerBuffer[i][0]*dopplerBuffer[i][0] + dopplerBuffer[i][1]*dopplerBuffer[i][1]);
 
 		//perform fft shift
 		if (i < (experiment->ncs_doppler_cpi/2 + 1))		
