@@ -9,9 +9,9 @@
 #include "logger.hpp"
 #include "experiment.hpp" 
 
-/*
-#define COLOUR_MAP_WIDTH 30
-#define COLOUR_MAP_PATH "../colour_maps/"*/
+// Abbreviations List
+// rt: range-time
+// rd: range-doppler
 
 enum plotType {NORMAL, FFT_SHIFT};
 enum plotStyle {AMPLITUDE, IQ};
@@ -34,14 +34,14 @@ class OpenCVPlot
 		int	thresholdSlider;
 		int histogramSlider;	
 		int	averagingSlider;	
-		int dopplerColourMapSlider;
-		int waterfallColourMapSlider;
+		int rdColourMapSlider;
+		int rtColourMapSlider;
 		
 		//holds the index of the current doppler plot 
-		int doppler_plot_index;
+		int rdIndex;
 		
-		cv::Mat waterImage;
-		cv::Mat doppImage;
+		cv::Mat rtImage;
+		cv::Mat rdImage;
 		
 		cv::Mat resizedWaterImage;
 		cv::Mat processedWaterImage;	
