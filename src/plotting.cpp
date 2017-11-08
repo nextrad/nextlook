@@ -268,9 +268,8 @@ void OpenCVPlot::plotDoppler(void)
 		}
 	}
 	
-	averagedDopplerImage = averagedDopplerImage/(summable_plots + 1);
-
 	cv::log(averagedDopplerImage, scaledDopplerImage);
+	
 	cv::normalize(scaledDopplerImage, scaledDopplerImage, 0.0, 1.0, cv::NORM_MINMAX);
 	
 	scaledDopplerImage.convertTo(processedDopplerImage, CV_8U, 255);
