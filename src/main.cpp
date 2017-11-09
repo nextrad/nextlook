@@ -76,7 +76,7 @@ void perThread(int id)
 void initTerminal(void)
 {
 	system("clear\n");
-	printf("NeXtlook\n");
+	printf("NeXtLook\n");
 	printf("--------\n");
 }
 

@@ -310,16 +310,15 @@ void SignalProcessor::getExperimentParameters(void)
 	CSimpleIniA ini;
 	ini.LoadFile(EXP_FILE);	
 	
-	experiment->dataset_filename = (char *)ini.GetValue("dataset", "data_filename");
-	experiment->ncs_range_line = atoi(ini.GetValue("dataset", "n_cmplx_samples_range_line"));
-	experiment->n_range_lines = atoi(ini.GetValue("dataset", "n_range_lines"));	
-	experiment->reference_filename = (char *)ini.GetValue("dataset", "ref_filename");
-	experiment->ncs_reference = atoi(ini.GetValue("dataset", "n_cmplx_samples_ref"));	
-	experiment->ncs_padded = atoi(ini.GetValue("dataset", "n_cmplx_samples_padded"));
+	experiment->dataset_filename 	= (char *)ini.GetValue("dataset", "data_filename");
+	experiment->ncs_range_line 		= atoi(ini.GetValue("dataset", "n_cmplx_samples_range_line"));
+	experiment->n_range_lines 		= atoi(ini.GetValue("dataset", "n_range_lines"));	
+	experiment->reference_filename 	= (char *)ini.GetValue("dataset", "ref_filename");
+	experiment->ncs_reference 		= atoi(ini.GetValue("dataset", "n_cmplx_samples_ref"));	
+	experiment->ncs_padded 			= atoi(ini.GetValue("dataset", "n_cmplx_samples_padded"));	
+	experiment->n_threads 			= atoi(ini.GetValue("processing", "n_threads"));	
+	experiment->ncs_doppler_cpi 	= atoi(ini.GetValue("processing", "doppler_cpi"));	
 	
-	experiment->n_threads = atoi(ini.GetValue("processing", "n_threads"));	
-	experiment->ncs_doppler_cpi = atoi(ini.GetValue("processing", "doppler_cpi"));		
-		
 	std::string doppler_flag = ini.GetValue("processing", "doppler_enabled");	
 		
 	if ((doppler_flag == "1") || (doppler_flag == "true") || (doppler_flag == "TRUE") || (doppler_flag == "True"))
@@ -334,13 +333,13 @@ void SignalProcessor::getExperimentParameters(void)
 	else
 		experiment->is_debug = false;
 		
-	experiment->update_rate = atoi(ini.GetValue("visualisation", "update_rate"));
-	experiment->cm_doppler = atoi(ini.GetValue("visualisation", "doppler_colour_map"));
-	experiment->cm_rti = atoi(ini.GetValue("visualisation", "rti_colour_map"));
-	experiment->hist_equal = atoi(ini.GetValue("visualisation", "histogram_equalization"));
-	experiment->slow = atoi(ini.GetValue("visualisation", "slow"));
-	experiment->threshold = atoi(ini.GetValue("visualisation", "threshold"));
-	experiment->n_plot_average = atoi(ini.GetValue("visualisation", "doppler_averaging"));	
+	experiment->update_rate 	= atoi(ini.GetValue("visualisation", "update_rate"));
+	experiment->cm_doppler 		= atoi(ini.GetValue("visualisation", "doppler_colour_map"));
+	experiment->cm_rti 			= atoi(ini.GetValue("visualisation", "rti_colour_map"));
+	experiment->hist_equal 		= atoi(ini.GetValue("visualisation", "histogram_equalization"));
+	experiment->slow 			= atoi(ini.GetValue("visualisation", "slow"));
+	experiment->threshold 		= atoi(ini.GetValue("visualisation", "threshold"));
+	experiment->n_plot_average 	= atoi(ini.GetValue("visualisation", "doppler_averaging"));	
 	
 	//extract and set windowing functions
 	refWindow.init((WindowFunction)atoi(ini.GetValue("processing", "ref_window")), experiment->ncs_reference);	
