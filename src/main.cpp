@@ -42,7 +42,7 @@ int main(int argc, char *argv[])
 	
 	opencvPlot.plotRTI();
 	
-	opencvPlot.savePlots();
+	//opencvPlot.savePlots();
 	
 	signalProcessor.freeMemory();
 	cv::waitKey(0);

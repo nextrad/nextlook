@@ -159,34 +159,37 @@ void OpenCVPlot::initOpenCV(void)
 	avrgSldr = experiment->n_plot_average;
 	
 	rtSize = cv::Size(500, 500);
-	rdSize = cv::Size(250, 500);
+	rdSize = cv::Size(200, 500);
 	
-	cv::namedWindow("RTI Plot");
+	cv::namedWindow("RTI Plot", cv::WINDOW_AUTOSIZE);
 	cv::moveWindow("RTI Plot", 0, 0);	
-	rtImage = cv::Mat::ones(experiment->n_range_lines, experiment->ncs_padded, CV_64F);
+	rtImage = cv::Mat(experiment->n_range_lines, experiment->ncs_padded, CV_64F, cv::Scalar::all(0));	
 	
-	cv::namedWindow("Control Window", cv::WINDOW_NORMAL);	
-	cv::moveWindow("Control Window", rtSize.width + rdSize.width, 0); 
-	//cv::resizeWindow("Control Window", 300, 100);
+	cv::namedWindow("Control", cv::WINDOW_AUTOSIZE);	
+	cv::moveWindow("Control", rtSize.width + rdSize.width, 0); 
+	
+	std::string rtCMapPath = cMapRoot + std::to_string(rtCMapSldr) + ".jpg";
+	cv::Mat rtCMap = cv::imread(rtCMapPath);
+	cv::imshow("Control", rtCMap);
 	
 	if (experiment->is_doppler)
 	{
-		cv::namedWindow("Doppler Plot");
-		cv::moveWindow("Doppler Plot", rtSize.width, 0); 
-		cv::createTrackbar( "Doppler Colour Map", "Control Window", &rdCMapSldr, cMapMax);
+		cv::namedWindow("RD Plot");
+		cv::moveWindow("RD Plot", rtSize.width, 0); 
+		cv::createTrackbar( "RD Colour Map", "Control", &rdCMapSldr, cMapMax);
 		rdImage = cv::Mat::ones(experiment->n_range_lines, experiment->ncs_doppler_cpi, CV_64F);
 		
 		avrgMax = (experiment->n_range_lines)/(experiment->update_rate);
-		cv::createTrackbar( "Doppler Averaging", "Control Window", &avrgSldr, avrgMax);
+		cv::createTrackbar( "RD Averaging", "Control", &avrgSldr, avrgMax);
 		
 		rdIndex = 0;			
 		rdImageAvg = cv::Mat(rdSize.height, rdSize.width, CV_64F, cv::Scalar::all(0));	
 	}	
 
-	cv::createTrackbar( "Threshold Value", "Control Window", &thrsSldr, thrsMax);	
-	cv::createTrackbar( "RTI Colour Map", "Control Window", &rtCMapSldr, cMapMax);
-	cv::createTrackbar( "Slow Processing", "Control Window", &slowSldr, slowMax);
-	cv::createTrackbar( "Histogram Equalisation", "Control Window", &histSldr, histMax);
+	cv::createTrackbar( "Threshold Value", "Control", &thrsSldr, thrsMax);	
+	cv::createTrackbar( "RTI Colour Map", "Control", &rtCMapSldr, cMapMax);
+	cv::createTrackbar( "Slow Processing", "Control", &slowSldr, slowMax);
+	cv::createTrackbar( "Histogram Equalisation", "Control", &histSldr, histMax);
 }
 
 
@@ -214,7 +217,7 @@ void OpenCVPlot::addRD(int dopplerLine, double *imageValues)
 
 void OpenCVPlot::plotRTI(void)
 {
-	// uses bilinear interpolation to reduce number of pixels (decimation)
+	//use bilinear interpolation to reduce number of pixels (decimation)
 	cv::resize(rtImage, rtImageResize, rtSize);		
 	
 	cv::normalize(rtImageResize, rtImageResize, 0.0, 1.0, cv::NORM_MINMAX);
@@ -239,19 +242,7 @@ void OpenCVPlot::plotRTI(void)
 
 void OpenCVPlot::plotRD(void)
 {
-	int summable_plots = 0;
-	
-	//add new dummy doppler plot to the vector
-	rdVector.push_back(cv::Mat::ones(1, 1, CV_64F));
-	
-	cv::resize(rdImage, rdVector[rdIndex], rdSize);		
-	rdImage.release();
-	
-	//init average as latest plot
-	rdImageAvg = rdVector[rdIndex];
-	
-	//clear the average
-	rdImageAvg = cv::Mat(rdSize.height, rdSize.width, CV_64F, cv::Scalar::all(0));
+	int summable_plots;
 	
 	//determine the number of plots available for averaging
 	if (avrgSldr >= rdIndex)
@@ -262,6 +253,21 @@ void OpenCVPlot::plotRD(void)
 	{
 		summable_plots = avrgSldr;
 	}
+	
+	//add new dummy doppler plot to the vector
+	rdVector.push_back(cv::Mat::ones(1, 1, CV_64F));
+	
+	//use bilinear interpolation to reduce number of pixels (decimation)
+	cv::resize(rdImage, rdVector[rdIndex], rdSize);		
+	
+	//original range-Doppler plot now stored in vector
+	rdImage.release();
+	
+	//clear the average
+	rdImageAvg = cv::Mat(rdSize.height, rdSize.width, CV_64F, cv::Scalar::all(0));
+	
+	//init average as the current range-Doppler plot
+	cv::add(rdImageAvg, rdVector[rdIndex], rdImageAvg);	
 	
 	//sum all appropriate plots
 	for (int i = (rdIndex - 1); i > (rdIndex - summable_plots); i--)
@@ -287,7 +293,7 @@ void OpenCVPlot::plotRD(void)
 	//vertical flip through x-axis
 	cv::flip(rdImage8bit, rdImage8bit, 0);
 	
-	cv::imshow("Doppler Plot", rdImage8bit);
+	cv::imshow("RD Plot", rdImage8bit);
 	
 	//increment the doppler plot index
 	rdIndex++;
