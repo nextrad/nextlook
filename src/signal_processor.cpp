@@ -108,7 +108,7 @@ void SignalProcessor::processDoppler(int rangeLine, OpenCVPlot &plot)
 			fftDopplerData();
 			addToDopplerPlot(i, plot);
 		}
-		plot.plotDoppler();
+		plot.plotRD();
 	}
 }
 
@@ -151,7 +151,7 @@ void SignalProcessor::addToDopplerPlot(int dopplerLine, OpenCVPlot &plot)
 			dopplerImageBuffer[i - (experiment->ncs_doppler_cpi/2 + 1)] = processed;
 	}	
 	
-	plot.addToDopplerPlot(dopplerLine, dopplerImageBuffer);
+	plot.addRD(dopplerLine, dopplerImageBuffer);
 }
 
 
@@ -228,7 +228,7 @@ void SignalProcessor::addToWaterPlot(int rangeLine, OpenCVPlot &plot, int thread
 		matchedImageBuffer[j + thread_id*experiment->ncs_padded] = mag(lineBuffer[j + thread_id*experiment->ncs_padded]);
 	}	
 	
-	plot.addToWaterPlot(rangeLine, &matchedImageBuffer[thread_id*experiment->ncs_padded]);
+	plot.addRTI(rangeLine, &matchedImageBuffer[thread_id*experiment->ncs_padded]);
 	
 	//plot.gnuPlot(matchedImageBuffer, "matched image buffer");
 }

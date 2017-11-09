@@ -40,7 +40,7 @@ int main(int argc, char *argv[])
 	
 	threadGroup.join_all();	
 	
-	opencvPlot.plotWaterfall();
+	opencvPlot.plotRTI();
 	
 	opencvPlot.savePlots();
 	

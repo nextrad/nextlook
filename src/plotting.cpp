@@ -151,141 +151,140 @@ OpenCVPlot::OpenCVPlot(Experiment* exp)
 
 void OpenCVPlot::initOpenCV(void)
 {	
-	rtColourMapSlider = experiment->cm_rti;
-	rdColourMapSlider = experiment->cm_doppler;
-	thresholdSlider = experiment->threshold;
-	slowSlider = experiment->slow;
-	histogramSlider = experiment->hist_equal;
-	averagingSlider = experiment->n_plot_average;
+	rtCMapSldr = experiment->cm_rti;
+	rdCMapSldr = experiment->cm_doppler;
+	thrsSldr = experiment->threshold;
+	slowSldr = experiment->slow;
+	histSldr = experiment->hist_equal;
+	avrgSldr = experiment->n_plot_average;
 	
-	waterSize = cv::Size(500, 500);
-	doppSize = cv::Size(250, 500);
+	rtSize = cv::Size(500, 500);
+	rdSize = cv::Size(250, 500);
 	
 	cv::namedWindow("RTI Plot");
 	cv::moveWindow("RTI Plot", 0, 0);	
 	rtImage = cv::Mat::ones(experiment->n_range_lines, experiment->ncs_padded, CV_64F);
 	
 	cv::namedWindow("Control Window", cv::WINDOW_NORMAL);	
-	cv::moveWindow("Control Window", 750, 0); 
+	cv::moveWindow("Control Window", rtSize.width + rdSize.width, 0); 
 	//cv::resizeWindow("Control Window", 300, 100);
 	
 	if (experiment->is_doppler)
 	{
 		cv::namedWindow("Doppler Plot");
-		cv::moveWindow("Doppler Plot", 500, 0); 
-		cv::createTrackbar( "Doppler Colour Map", "Control Window", &rdColourMapSlider, colourMapMax);
+		cv::moveWindow("Doppler Plot", rtSize.width, 0); 
+		cv::createTrackbar( "Doppler Colour Map", "Control Window", &rdCMapSldr, cMapMax);
 		rdImage = cv::Mat::ones(experiment->n_range_lines, experiment->ncs_doppler_cpi, CV_64F);
 		
-		averagingMax = (experiment->n_range_lines)/(experiment->update_rate);
-		cv::createTrackbar( "Doppler Averaging", "Control Window", &averagingSlider, averagingMax);
+		avrgMax = (experiment->n_range_lines)/(experiment->update_rate);
+		cv::createTrackbar( "Doppler Averaging", "Control Window", &avrgSldr, avrgMax);
 		
 		rdIndex = 0;			
-		averagedDopplerImage = cv::Mat(500, 250, CV_64F, cv::Scalar::all(0));	
+		rdImageAvg = cv::Mat(rdSize.height, rdSize.width, CV_64F, cv::Scalar::all(0));	
 	}	
 
-	cv::createTrackbar( "Threshold Value", "Control Window", &thresholdSlider, thresholdMax);	
-	cv::createTrackbar( "RTI Colour Map", "Control Window", &rtColourMapSlider, colourMapMax);
-	cv::createTrackbar( "Slow Processing", "Control Window", &slowSlider, slowMax);
-	cv::createTrackbar( "Histogram Equalisation", "Control Window", &histogramSlider, histogramMax);
+	cv::createTrackbar( "Threshold Value", "Control Window", &thrsSldr, thrsMax);	
+	cv::createTrackbar( "RTI Colour Map", "Control Window", &rtCMapSldr, cMapMax);
+	cv::createTrackbar( "Slow Processing", "Control Window", &slowSldr, slowMax);
+	cv::createTrackbar( "Histogram Equalisation", "Control Window", &histSldr, histMax);
 }
 
 
-void OpenCVPlot::addToWaterPlot(int rangeLine, double  *imageValues)
+void OpenCVPlot::addRTI(int rangeLine, double  *imageValues)
 {
 	cv::Mat matchedRow = cv::Mat(1, experiment->ncs_padded, CV_64F, imageValues);	
-	//cv::abs(matchedRow);		
+	cv::log(matchedRow, matchedRow);
 	matchedRow.copyTo(rtImage(cv::Rect(0, rangeLine, matchedRow.cols, matchedRow.rows)));
 	
 	if (((rangeLine%(experiment->update_rate - 1) == 0) || rangeLine == (experiment->n_range_lines - 1)) && rangeLine != 0)
 	{
 		experiment->mutex.lock();
-		plotWaterfall();
+		plotRTI();
 		experiment->mutex.unlock();
 	}
 }
 
 
-void OpenCVPlot::addToDopplerPlot(int dopplerLine, double *imageValues)
+void OpenCVPlot::addRD(int dopplerLine, double *imageValues)
 {
 	cv::Mat row = cv::Mat(1, experiment->ncs_doppler_cpi, CV_64F, imageValues);
 	rdImage.push_back(row);
 }
 
 
-void OpenCVPlot::plotWaterfall(void)
+void OpenCVPlot::plotRTI(void)
 {
-	cv::resize(rtImage, resizedWaterImage, waterSize);	
-	cv::log(resizedWaterImage, resizedWaterImage);
-	cv::normalize(resizedWaterImage, resizedWaterImage, 0.0, 1.0, cv::NORM_MINMAX);
+	// uses bilinear interpolation to reduce number of pixels (decimation)
+	cv::resize(rtImage, rtImageResize, rtSize);		
+	
+	cv::normalize(rtImageResize, rtImageResize, 0.0, 1.0, cv::NORM_MINMAX);
 
-	resizedWaterImage.convertTo(processedWaterImage, CV_8U, 255);	
+	rtImageResize.convertTo(rtImage8bit, CV_8U, 255);	
 
-	if (histogramSlider)
+	if (histSldr)
 	{
-		cv::equalizeHist(processedWaterImage, processedWaterImage);
+		cv::equalizeHist(rtImage8bit, rtImage8bit);
 	}
 	
-	cv::threshold(processedWaterImage, processedWaterImage, thresholdSlider, thresholdMax, 3);	
-	cv::applyColorMap(processedWaterImage, processedWaterImage, rtColourMapSlider);	
-	cv::transpose(processedWaterImage, processedWaterImage);
-	cv::flip(processedWaterImage, processedWaterImage, 0);		
+	cv::threshold(rtImage8bit, rtImage8bit, thrsSldr, thrsMax, cv::THRESH_TOZERO);	
+	cv::applyColorMap(rtImage8bit, rtImage8bit, rtCMapSldr);	
+	cv::transpose(rtImage8bit, rtImage8bit);
+	cv::flip(rtImage8bit, rtImage8bit, 0);		
 	
-	cv::imshow("RTI Plot", processedWaterImage);
+	cv::imshow("RTI Plot", rtImage8bit);
 
-	cv::waitKey(1 + slowSlider);	
+	cv::waitKey(1 + slowSldr);	
 }
 
 
-void OpenCVPlot::plotDoppler(void)
+void OpenCVPlot::plotRD(void)
 {
 	int summable_plots = 0;
 	
 	//add new dummy doppler plot to the vector
-	dopplerMatrix.push_back(cv::Mat::ones(1, 1, CV_64F));
+	rdVector.push_back(cv::Mat::ones(1, 1, CV_64F));
 	
-	cv::resize(rdImage, dopplerMatrix[rdIndex], doppSize);		
+	cv::resize(rdImage, rdVector[rdIndex], rdSize);		
 	rdImage.release();
 	
 	//init average as latest plot
-	averagedDopplerImage = dopplerMatrix[rdIndex];
-	
-	//clear the average
-	averagedDopplerImage = cv::Mat(500, 250, CV_64F, cv::Scalar::all(0));
+	rdImageAvg = rdVector[rdIndex];
 	
 	//determine the number of plots available for averaging
-	if (averagingSlider >= rdIndex)
+	if (avrgSldr >= rdIndex)
 	{
 		summable_plots = rdIndex;
 	}
 	else
 	{
-		summable_plots = averagingSlider;
+		summable_plots = avrgSldr;
 	}
-		
+	
 	//sum all appropriate plots
 	for (int i = (rdIndex - 1); i > (rdIndex - summable_plots); i--)
 	{
-		cv::add(averagedDopplerImage, dopplerMatrix[i], averagedDopplerImage);
+		cv::add(rdImageAvg, rdVector[i], rdImageAvg);
 	}
 	
-	cv::log(averagedDopplerImage, scaledDopplerImage);
+	cv::log(rdImageAvg, rdImageAvg);
 	
-	cv::normalize(scaledDopplerImage, scaledDopplerImage, 0.0, 1.0, cv::NORM_MINMAX);
+	cv::normalize(rdImageAvg, rdImageAvg, 0.0, 1.0, cv::NORM_MINMAX);
 	
-	scaledDopplerImage.convertTo(processedDopplerImage, CV_8U, 255);
+	rdImageAvg.convertTo(rdImage8bit, CV_8U, 255);
 	
-	cv::threshold(processedDopplerImage, processedDopplerImage, thresholdSlider, thresholdMax, 3);	
+	cv::threshold(rdImage8bit, rdImage8bit, thrsSldr, thrsMax, cv::THRESH_TOZERO);	
 	
-	if (histogramSlider)
+	if (histSldr)
 	{
-		cv::equalizeHist(processedDopplerImage, processedDopplerImage);
+		cv::equalizeHist(rdImage8bit, rdImage8bit);
 	}
 	
-	cv::applyColorMap(processedDopplerImage, processedDopplerImage, rdColourMapSlider);
+	cv::applyColorMap(rdImage8bit, rdImage8bit, rdCMapSldr);
 	
-	cv::flip(processedDopplerImage, processedDopplerImage, 0);
+	//vertical flip through x-axis
+	cv::flip(rdImage8bit, rdImage8bit, 0);
 	
-	cv::imshow("Doppler Plot", processedDopplerImage);
+	cv::imshow("Doppler Plot", rdImage8bit);
 	
 	//increment the doppler plot index
 	rdIndex++;
@@ -296,14 +295,14 @@ void OpenCVPlot::savePlots(void)
 	std::string doppler_path = experiment->save_path + "/Range-Doppler.jpg";
 	std::string water_path = experiment->save_path + "/Range-Time-Intensity.jpg";
 	
-	cv::imwrite(doppler_path.c_str(), processedDopplerImage); 
-	cv::imwrite(water_path.c_str(), processedWaterImage);	
+	cv::imwrite(doppler_path.c_str(), rdImage8bit); 
+	cv::imwrite(water_path.c_str(), rtImage8bit);	
 	
 	for (int i = 0; i < experiment->n_plot_average; i++)
 	{
-		dopplerMatrix[i].release();	
+		rdVector[i].release();	
 	}
 	
-	processedWaterImage.release();
+	rtImage8bit.release();
 }
 

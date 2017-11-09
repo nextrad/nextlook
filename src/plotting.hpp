@@ -19,48 +19,46 @@ enum plotStyle {AMPLITUDE, IQ};
 class OpenCVPlot 
 {
 	private:
-		const int cmap_width = 30;
-		const char* cmap_path = "../colour_maps/";	
+		const int cMapWidth = 30;
+		const char* cMapPath = "../colour_maps/";	
 		
 		const int slowMax = 500;		
-		const int histogramMax = 1;
-		const int colourMapMax = 11;	
-		const int thresholdMax = 255;
+		const int histMax = 1;
+		const int cMapMax = 11;	
+		const int thrsMax = 255;
 		
 		//set by n_range_lines/update_rate i.e. max number of updates possible.
-		int averagingMax;
+		int avrgMax;
 
-		int slowSlider;		
-		int	thresholdSlider;
-		int histogramSlider;	
-		int	averagingSlider;	
-		int rdColourMapSlider;
-		int rtColourMapSlider;
+		int slowSldr;		
+		int	thrsSldr;
+		int histSldr;	
+		int	avrgSldr;	
+		int rdCMapSldr;
+		int rtCMapSldr;
 		
 		//holds the index of the current doppler plot 
 		int rdIndex;
 		
 		cv::Mat rtImage;
+		cv::Mat rtImageResize;
+		cv::Mat rtImage8bit;	
+		
 		cv::Mat rdImage;
+		cv::Mat rdImageAvg;
+		cv::Mat rdImage8bit;
+		std::vector<cv::Mat> rdVector;
 		
-		cv::Mat resizedWaterImage;
-		cv::Mat processedWaterImage;	
-		
-		std::vector<cv::Mat> dopplerMatrix;
-		cv::Mat averagedDopplerImage;
-		cv::Mat scaledDopplerImage;
-		cv::Mat processedDopplerImage;
-		
-		cv::Size waterSize;
-		cv::Size doppSize;
+		cv::Size rtSize;
+		cv::Size rdSize;
 
 		Experiment* experiment;
 	public:
 		OpenCVPlot(Experiment* exp);
-		void plotWaterfall(void);
-		void plotDoppler(void);
-		void addToWaterPlot(int rangeLine, double  *imageValues);
-		void addToDopplerPlot(int dopplerLine, double *imageValues);
+		void plotRTI(void);
+		void plotRD(void);
+		void addRTI(int rangeLine, double  *imageValues);
+		void addRD(int dopplerLine, double *imageValues);
 		void initOpenCV(void);
 		void savePlots(void);
 		static void updatePlots(int, void*);
