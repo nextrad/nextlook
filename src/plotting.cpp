@@ -250,6 +250,9 @@ void OpenCVPlot::plotRD(void)
 	//init average as latest plot
 	rdImageAvg = rdVector[rdIndex];
 	
+	//clear the average
+	rdImageAvg = cv::Mat(rdSize.height, rdSize.width, CV_64F, cv::Scalar::all(0));
+	
 	//determine the number of plots available for averaging
 	if (avrgSldr >= rdIndex)
 	{
