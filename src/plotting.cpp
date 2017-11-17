@@ -165,12 +165,12 @@ void OpenCVPlot::initOpenCV(void)
 	cv::moveWindow("RTI Plot", 0, 0);	
 	rtImage = cv::Mat(experiment->n_range_lines, experiment->ncs_padded, CV_64F, cv::Scalar::all(0));	
 	
-	cv::namedWindow("Control", cv::WINDOW_AUTOSIZE);	
+	cv::namedWindow("Control", cv::WINDOW_NORMAL);	
 	cv::moveWindow("Control", rtSize.width + rdSize.width, 0); 
 	
-	std::string rtCMapPath = cMapRoot + std::to_string(rtCMapSldr) + ".jpg";
+	/*std::string rtCMapPath = cMapRoot + std::to_string(rtCMapSldr) + ".jpg";
 	cv::Mat rtCMap = cv::imread(rtCMapPath);
-	cv::imshow("Control", rtCMap);
+	cv::imshow("Control", rtCMap);*/
 	
 	if (experiment->is_doppler)
 	{
@@ -283,10 +283,10 @@ void OpenCVPlot::plotRD(void)
 	
 	cv::threshold(rdImage8bit, rdImage8bit, thrsSldr, thrsMax, cv::THRESH_TOZERO);	
 	
-	if (histSldr)
+	/*if (histSldr)
 	{
 		cv::equalizeHist(rdImage8bit, rdImage8bit);
-	}
+	}*/
 	
 	cv::applyColorMap(rdImage8bit, rdImage8bit, rdCMapSldr);
 	
