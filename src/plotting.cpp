@@ -119,12 +119,12 @@ void GNUPlot::gnuPlot(fftw_complex *array, char const *plotTitle, Experiment* ex
 				{
 					if (i < (exp->ncs_padded/2 + 1)) 
 					{
-						fprintf(pipe_gp, "%i %f\n", i, (abs(sqrt(array[i + (exp->ncs_padded/2 - 1)][0]*array[i + (exp->ncs_padded/2 - 1)][0] +
+						fprintf(pipe_gp, "%i %i\n", i, (abs(sqrt(array[i + (exp->ncs_padded/2 - 1)][0]*array[i + (exp->ncs_padded/2 - 1)][0] +
 																 array[i + (exp->ncs_padded/2 - 1)][1]*array[i + (exp->ncs_padded/2 - 1)][1]))));
 					}
 					else
 					{
-						fprintf(pipe_gp, "%i %f\n", i, (abs(sqrt(array[i - (exp->ncs_padded/2 + 1)][0]*array[i - (exp->ncs_padded/2 + 1)][0] + 
+						fprintf(pipe_gp, "%i %i\n", i, (abs(sqrt(array[i - (exp->ncs_padded/2 + 1)][0]*array[i - (exp->ncs_padded/2 + 1)][0] + 
 																 array[i - (exp->ncs_padded/2 + 1)][1]*array[i - (exp->ncs_padded/2 + 1)][1]))));
 					}
 				}
@@ -165,12 +165,8 @@ void OpenCVPlot::initOpenCV(void)
 	cv::moveWindow("RTI Plot", 0, 0);	
 	rtImage = cv::Mat(experiment->n_range_lines, experiment->ncs_padded, CV_64F, cv::Scalar::all(0));	
 	
-	cv::namedWindow("Control", cv::WINDOW_NORMAL);	
+	cv::namedWindow("Control", cv::WINDOW_AUTOSIZE);	
 	cv::moveWindow("Control", rtSize.width + rdSize.width, 0); 
-	
-	/*std::string rtCMapPath = cMapRoot + std::to_string(rtCMapSldr) + ".jpg";
-	cv::Mat rtCMap = cv::imread(rtCMapPath);
-	cv::imshow("Control", rtCMap);*/
 	
 	if (experiment->is_doppler)
 	{
@@ -289,6 +285,10 @@ void OpenCVPlot::plotRD(void)
 	}*/
 	
 	cv::applyColorMap(rdImage8bit, rdImage8bit, rdCMapSldr);
+	
+	std::string rtCMapPath = cMapRoot + std::to_string(rtCMapSldr) + ".jpg";
+	cv::Mat rtCMap = cv::imread(rtCMapPath);
+	cv::imshow("Control", rtCMap);	
 	
 	//vertical flip through x-axis
 	cv::flip(rdImage8bit, rdImage8bit, 0);

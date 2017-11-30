@@ -2,7 +2,7 @@
 nextlook
 
 ### Output Images ###
-*.jpg
+results/
 
 ### LaTeX ###
 *.aux
@@ -37,7 +37,6 @@ CTestTestfile.cmake
 */Makefile
 */cmake_install.cmake
 .DS_Store
-*.jpg
 
 ### Geany ###
 nextlook.geany
