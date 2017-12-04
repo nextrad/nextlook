@@ -18,6 +18,7 @@ typedef struct
 	int ncs_doppler_cpi; 	
 	int n_plot_average;
 	
+	int doppler_padding_factor;
 	int update_rate;	
 	int cm_doppler;
 	int cm_rti;

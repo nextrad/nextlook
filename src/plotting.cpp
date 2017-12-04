@@ -173,7 +173,7 @@ void OpenCVPlot::initOpenCV(void)
 		cv::namedWindow("RD Plot");
 		cv::moveWindow("RD Plot", rtSize.width, 0); 
 		cv::createTrackbar( "RD Colour Map", "Control", &rdCMapSldr, cMapMax);
-		rdImage = cv::Mat::ones(experiment->n_range_lines, experiment->ncs_doppler_cpi, CV_64F);
+		rdImage = cv::Mat::ones(experiment->n_range_lines, experiment->ncs_doppler_cpi*experiment->doppler_padding_factor, CV_64F);
 		
 		avrgMax = (experiment->n_range_lines)/(experiment->update_rate);
 		cv::createTrackbar( "RD Averaging", "Control", &avrgSldr, avrgMax);
@@ -206,7 +206,7 @@ void OpenCVPlot::addRTI(int rangeLine, double  *imageValues)
 
 void OpenCVPlot::addRD(int dopplerLine, double *imageValues)
 {
-	cv::Mat row = cv::Mat(1, experiment->ncs_doppler_cpi, CV_64F, imageValues);
+	cv::Mat row = cv::Mat(1, experiment->ncs_doppler_cpi*experiment->doppler_padding_factor, CV_64F, imageValues);
 	rdImage.push_back(row);
 }
 

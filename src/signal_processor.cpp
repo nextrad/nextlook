@@ -16,12 +16,12 @@ void SignalProcessor::allocateMemory(void)
 	refBuffer 		= (fftw_complex*)malloc(experiment->ncs_padded*sizeof(fftw_complex));
 	
 	resultBuffer 	= (fftw_complex*)malloc(experiment->n_threads*experiment->ncs_padded*sizeof(fftw_complex));
-	dopplerBuffer   = (fftw_complex*)malloc(experiment->ncs_doppler_cpi*sizeof(fftw_complex));
+	dopplerBuffer   = (fftw_complex*)malloc(experiment->ncs_doppler_cpi*experiment->doppler_padding_factor*sizeof(fftw_complex));
 
 	dopplerData     = (fftw_complex*)malloc(experiment->ncs_padded*experiment->ncs_doppler_cpi*sizeof(fftw_complex));
 	
 	matchedImageBuffer  = (double*)malloc(experiment->n_threads*experiment->ncs_padded*sizeof(double));
-	dopplerImageBuffer  = (double*)malloc(experiment->ncs_doppler_cpi*sizeof(double));	
+	dopplerImageBuffer  = (double*)malloc(experiment->ncs_doppler_cpi*experiment->doppler_padding_factor*sizeof(double));	
 	
 	rangePlan = (fftw_plan*)malloc(experiment->n_threads*sizeof(fftw_plan));
 	resultPlan = (fftw_plan*)malloc(experiment->n_threads*sizeof(fftw_plan));	
@@ -34,7 +34,7 @@ void SignalProcessor::createPlans(int thread_id)
 {
 	rangePlan[thread_id] = fftw_plan_dft_1d(experiment->ncs_padded, &lineBuffer[thread_id*experiment->ncs_padded], &lineBuffer[thread_id*experiment->ncs_padded], FFTW_FORWARD, FFTW_MEASURE);
 	resultPlan[thread_id] = fftw_plan_dft_1d(experiment->ncs_padded, &resultBuffer[thread_id*experiment->ncs_padded], &lineBuffer[thread_id*experiment->ncs_padded], FFTW_BACKWARD, FFTW_MEASURE);
-	dopplerPlan = fftw_plan_dft_1d(experiment->ncs_doppler_cpi, dopplerBuffer, dopplerBuffer, FFTW_FORWARD , FFTW_MEASURE);
+	dopplerPlan = fftw_plan_dft_1d(experiment->ncs_doppler_cpi*experiment->doppler_padding_factor, dopplerBuffer, dopplerBuffer, FFTW_FORWARD , FFTW_MEASURE);
 }
 
 
@@ -115,25 +115,33 @@ void SignalProcessor::processDoppler(int rangeLine, OpenCVPlot &plot)
 
 void SignalProcessor::popDopplerBuffer(int dopplerLine)
 {
-	for (int j = 0; j < experiment->ncs_doppler_cpi; j++)
+	for (int j = 0; j < experiment->ncs_doppler_cpi*experiment->doppler_padding_factor; j++)
 	{	
-		float windowCoefficient = dopplerWindow.getSample(j);
-		dopplerBuffer[j][0] = dopplerData[dopplerLine*experiment->ncs_doppler_cpi + j][0]*windowCoefficient; 
-		dopplerBuffer[j][1] = dopplerData[dopplerLine*experiment->ncs_doppler_cpi + j][1]*windowCoefficient;
+		if (j < experiment->ncs_doppler_cpi)
+		{
+			float windowCoefficient = dopplerWindow.getSample(j);
+			dopplerBuffer[j][0] = dopplerData[dopplerLine*experiment->ncs_doppler_cpi + j][0]*windowCoefficient; 
+			dopplerBuffer[j][1] = dopplerData[dopplerLine*experiment->ncs_doppler_cpi + j][1]*windowCoefficient;
+		}
+		else
+		{
+			dopplerBuffer[j][0] = 0; 
+			dopplerBuffer[j][1] = 0;
+		}
 	}	
 }
 
 
 void SignalProcessor::addToDopplerPlot(int dopplerLine, OpenCVPlot &plot)
 {
-	for (int i = 0; i < experiment->ncs_doppler_cpi; i++)
+	for (int i = 0; i < experiment->ncs_doppler_cpi*experiment->doppler_padding_factor; i++)
 	{
 
 		//perform fft shift
-		if (i < (experiment->ncs_doppler_cpi/2 + 1))		
-			dopplerImageBuffer[i + (experiment->ncs_doppler_cpi/2 - 1)] = mag(dopplerBuffer[i]);
+		if (i < ((experiment->ncs_doppler_cpi*experiment->doppler_padding_factor)/2 + 1))		
+			dopplerImageBuffer[i + ((experiment->ncs_doppler_cpi*experiment->doppler_padding_factor)/2 - 1)] = mag(dopplerBuffer[i]);
 		else
-			dopplerImageBuffer[i - (experiment->ncs_doppler_cpi/2 + 1)] = mag(dopplerBuffer[i]);
+			dopplerImageBuffer[i - ((experiment->ncs_doppler_cpi*experiment->doppler_padding_factor)/2 + 1)] = mag(dopplerBuffer[i]);
 	}	
 	
 	plot.addRD(dopplerLine, dopplerImageBuffer);
@@ -318,6 +326,7 @@ void SignalProcessor::getExperimentParameters(void)
 	experiment->ncs_padded 			= atoi(ini.GetValue("dataset", "n_cmplx_samples_padded"));	
 	experiment->n_threads 			= atoi(ini.GetValue("processing", "n_threads"));	
 	experiment->ncs_doppler_cpi 	= atoi(ini.GetValue("processing", "doppler_cpi"));	
+	experiment->doppler_padding_factor = atoi(ini.GetValue("processing", "doppler_padding_factor"));
 	
 	std::string doppler_flag = ini.GetValue("processing", "doppler_enabled");	
 		
