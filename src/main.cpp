@@ -6,6 +6,7 @@
 
 void perThread(int id);
 void initTerminal(void); 
+void parse_options(int argc, char *argv[]);
 
 Experiment experiment;
 SignalProcessor signalProcessor(&experiment);
@@ -17,6 +18,8 @@ int main(int argc, char *argv[])
 	boost::thread_group threadGroup;	
 	
 	initTerminal();	
+	
+	parse_options(argc, argv);
 	
 	signalProcessor.getExperimentParameters();			
 	
@@ -80,4 +83,28 @@ void initTerminal(void)
 	printf("--------\n");
 }
 
+
+void parse_options(int argc, char *argv[])
+{
+	int opt;
+
+    while ((opt = getopt(argc, argv, "d:r:p:")) != -1 )
+    {
+        switch (opt)
+        {
+            case 'd':
+                experiment.dataset_filename = optarg;
+                break;
+			case 'r':
+                experiment.reference_filename = optarg;
+                break;
+            case 'p':
+                experiment.n_range_lines = atoi(optarg);
+                break;            
+            case '?':
+				printf("Unknown command line option.\n");
+				exit(EXIT_FAILURE);
+        }        
+    }
+}
 

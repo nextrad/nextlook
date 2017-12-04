@@ -5,6 +5,17 @@ SignalProcessor::SignalProcessor(Experiment* exp)
 	timer.start();
 	dopplerDataStart = 0;
 	experiment = exp;
+	
+	experiment->dataset_filename = (char*)"-1";
+	experiment->reference_filename = (char*)"-1";	
+	experiment->n_range_lines = -1;		
+	experiment->ncs_range_line = -1;	
+	experiment->ncs_reference = -1;	
+	experiment->ncs_padded = -1;			
+	experiment->ncs_doppler_cpi = -1;		
+	experiment->doppler_padding_factor = -1;		
+	experiment->specro_range_bin = -1;	
+	experiment->n_threads = -1;		
 }
 
 void SignalProcessor::allocateMemory(void)
@@ -324,16 +335,36 @@ void SignalProcessor::getExperimentParameters(void)
 	CSimpleIniA ini;
 	ini.LoadFile(EXP_FILE);	
 	
-	experiment->dataset_filename 	= (char *)ini.GetValue("dataset", "data_filename");
-	experiment->ncs_range_line 		= atoi(ini.GetValue("dataset", "n_cmplx_samples_range_line"));
-	experiment->n_range_lines 		= atoi(ini.GetValue("dataset", "n_range_lines"));	
-	experiment->reference_filename 	= (char *)ini.GetValue("dataset", "ref_filename");
-	experiment->ncs_reference 		= atoi(ini.GetValue("dataset", "n_cmplx_samples_ref"));	
-	experiment->ncs_padded 			= atoi(ini.GetValue("dataset", "n_cmplx_samples_padded"));	
-	experiment->n_threads 			= atoi(ini.GetValue("processing", "n_threads"));	
-	experiment->ncs_doppler_cpi 	= atoi(ini.GetValue("processing", "doppler_cpi"));	
-	experiment->doppler_padding_factor = atoi(ini.GetValue("processing", "doppler_padding_factor"));
-	experiment->specro_range_bin = atoi(ini.GetValue("processing", "spectrogram_range_bin"));
+	if (experiment->dataset_filename == "-1")
+		experiment->dataset_filename 	= (char *)ini.GetValue("dataset", "data_filename");
+		
+	if (experiment->reference_filename == "-1")
+		experiment->reference_filename 	= (char *)ini.GetValue("dataset", "ref_filename");
+	
+	if (experiment->n_range_lines == -1)	
+		experiment->n_range_lines 		= atoi(ini.GetValue("dataset", "n_range_lines"));	
+		
+	if (experiment->ncs_range_line == -1)
+		experiment->ncs_range_line 		= atoi(ini.GetValue("dataset", "n_cmplx_samples_range_line"));
+	
+	if (experiment->ncs_reference == -1)
+		experiment->ncs_reference 		= atoi(ini.GetValue("dataset", "n_cmplx_samples_ref"));	
+	
+	if (experiment->ncs_padded == -1)
+		experiment->ncs_padded 			= atoi(ini.GetValue("dataset", "n_cmplx_samples_padded"));	
+		
+	if (experiment->ncs_doppler_cpi == -1)
+		experiment->ncs_doppler_cpi 	= atoi(ini.GetValue("processing", "doppler_cpi"));	
+		
+	if (experiment->doppler_padding_factor == -1)
+		experiment->doppler_padding_factor = atoi(ini.GetValue("processing", "doppler_padding_factor"));
+		
+	if (experiment->specro_range_bin == -1)
+		experiment->specro_range_bin = atoi(ini.GetValue("processing", "spectrogram_range_bin"));
+	
+	if (experiment->n_threads == -1)		
+		experiment->n_threads 			= atoi(ini.GetValue("processing", "n_threads"));		
+
 	
 	std::string doppler_flag = ini.GetValue("processing", "doppler_enabled");	
 		
