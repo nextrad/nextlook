@@ -19,6 +19,7 @@ typedef struct
 	int n_plot_average;
 	
 	int doppler_padding_factor;
+	int specro_range_bin;
 	int update_rate;	
 	int cm_doppler;
 	int cm_rti;

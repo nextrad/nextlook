@@ -29,6 +29,7 @@ class SignalProcessor
 		
 		double  		*matchedImageBuffer;
 		double  		*dopplerImageBuffer;
+		double  		*spectroImageBuffer;
 		
 		Timer timer;
 		Logger logger;
@@ -76,7 +77,7 @@ class SignalProcessor
 		void complxConjRef(void);
 		void complxMulti(int thread_id);		
 		void addToWaterPlot(int rangeLine, OpenCVPlot &plot, int thread_id);
-		void addToDopplerPlot(int dopplerLine, OpenCVPlot &plot);
+		void addToDopplerPlot(OpenCVPlot &plot);
 		void popRangeBuffer(int rangeLine, int thread_id);	
 		
 		void getExperimentParameters(void);

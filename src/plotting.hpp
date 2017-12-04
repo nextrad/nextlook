@@ -49,16 +49,23 @@ class OpenCVPlot
 		cv::Mat rdImage8bit;
 		std::vector<cv::Mat> rdVector;
 		
+		cv::Mat spImage;
+		cv::Mat spImageResize;
+		cv::Mat spImage8bit;
+		
 		cv::Size rtSize;
 		cv::Size rdSize;
+		cv::Size spSize;
 
 		Experiment* experiment;
 	public:
 		OpenCVPlot(Experiment* exp);
 		void plotRTI(void);
 		void plotRD(void);
+		void plotSP(void);
 		void addRTI(int rangeLine, double  *imageValues);
-		void addRD(int dopplerLine, double *imageValues);
+		void addRD(double *imageValues);
+		void addSP(double *imageValues);
 		void initOpenCV(void);
 		void savePlots(void);
 		static void updatePlots(int, void*);

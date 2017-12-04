@@ -22,6 +22,7 @@ void SignalProcessor::allocateMemory(void)
 	
 	matchedImageBuffer  = (double*)malloc(experiment->n_threads*experiment->ncs_padded*sizeof(double));
 	dopplerImageBuffer  = (double*)malloc(experiment->ncs_doppler_cpi*experiment->doppler_padding_factor*sizeof(double));	
+	spectroImageBuffer  = (double*)malloc(experiment->ncs_doppler_cpi*experiment->doppler_padding_factor*sizeof(double));
 	
 	rangePlan = (fftw_plan*)malloc(experiment->n_threads*sizeof(fftw_plan));
 	resultPlan = (fftw_plan*)malloc(experiment->n_threads*sizeof(fftw_plan));	
@@ -106,7 +107,13 @@ void SignalProcessor::processDoppler(int rangeLine, OpenCVPlot &plot)
 		{
 			popDopplerBuffer(i);	
 			fftDopplerData();
-			addToDopplerPlot(i, plot);
+			addToDopplerPlot(plot);
+			
+			if (i == experiment->specro_range_bin)
+			{
+				plot.addSP(dopplerImageBuffer);
+				plot.plotSP();
+			}			
 		}
 		plot.plotRD();
 	}
@@ -132,11 +139,10 @@ void SignalProcessor::popDopplerBuffer(int dopplerLine)
 }
 
 
-void SignalProcessor::addToDopplerPlot(int dopplerLine, OpenCVPlot &plot)
+void SignalProcessor::addToDopplerPlot(OpenCVPlot &plot)
 {
 	for (int i = 0; i < experiment->ncs_doppler_cpi*experiment->doppler_padding_factor; i++)
 	{
-
 		//perform fft shift
 		if (i < ((experiment->ncs_doppler_cpi*experiment->doppler_padding_factor)/2 + 1))		
 			dopplerImageBuffer[i + ((experiment->ncs_doppler_cpi*experiment->doppler_padding_factor)/2 - 1)] = mag(dopplerBuffer[i]);
@@ -144,7 +150,7 @@ void SignalProcessor::addToDopplerPlot(int dopplerLine, OpenCVPlot &plot)
 			dopplerImageBuffer[i - ((experiment->ncs_doppler_cpi*experiment->doppler_padding_factor)/2 + 1)] = mag(dopplerBuffer[i]);
 	}	
 	
-	plot.addRD(dopplerLine, dopplerImageBuffer);
+	plot.addRD(dopplerImageBuffer);
 }
 
 
@@ -327,6 +333,7 @@ void SignalProcessor::getExperimentParameters(void)
 	experiment->n_threads 			= atoi(ini.GetValue("processing", "n_threads"));	
 	experiment->ncs_doppler_cpi 	= atoi(ini.GetValue("processing", "doppler_cpi"));	
 	experiment->doppler_padding_factor = atoi(ini.GetValue("processing", "doppler_padding_factor"));
+	experiment->specro_range_bin = atoi(ini.GetValue("processing", "spectrogram_range_bin"));
 	
 	std::string doppler_flag = ini.GetValue("processing", "doppler_enabled");	
 		

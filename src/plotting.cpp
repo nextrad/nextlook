@@ -160,13 +160,18 @@ void OpenCVPlot::initOpenCV(void)
 	
 	rtSize = cv::Size(500, 500);
 	rdSize = cv::Size(200, 500);
+	spSize = cv::Size(200, 400);
 	
 	cv::namedWindow("RTI Plot", cv::WINDOW_AUTOSIZE);
 	cv::moveWindow("RTI Plot", 0, 0);	
 	rtImage = cv::Mat(experiment->n_range_lines, experiment->ncs_padded, CV_64F, cv::Scalar::all(0));	
 	
+	cv::namedWindow("SP Plot", cv::WINDOW_AUTOSIZE);
+	cv::moveWindow("SP Plot", rtSize.width + rdSize.width, 0);	
+	//spImage = cv::Mat::ones(1, experiment->ncs_doppler_cpi*experiment->doppler_padding_factor, CV_64F);
+	
 	cv::namedWindow("Control", cv::WINDOW_AUTOSIZE);	
-	cv::moveWindow("Control", rtSize.width + rdSize.width, 0); 
+	cv::moveWindow("Control", (rtSize.width + rdSize.width)*1.1, rdSize.width*1.5); 
 	
 	if (experiment->is_doppler)
 	{
@@ -204,10 +209,16 @@ void OpenCVPlot::addRTI(int rangeLine, double  *imageValues)
 }
 
 
-void OpenCVPlot::addRD(int dopplerLine, double *imageValues)
+void OpenCVPlot::addRD(double *imageValues)
 {
 	cv::Mat row = cv::Mat(1, experiment->ncs_doppler_cpi*experiment->doppler_padding_factor, CV_64F, imageValues);
 	rdImage.push_back(row);
+}
+
+void OpenCVPlot::addSP(double *imageValues)
+{
+	cv::Mat row = cv::Mat(1, experiment->ncs_doppler_cpi*experiment->doppler_padding_factor, CV_64F, imageValues);
+	spImage.push_back(row);
 }
 
 
@@ -233,6 +244,32 @@ void OpenCVPlot::plotRTI(void)
 	cv::imshow("RTI Plot", rtImage8bit);
 
 	cv::waitKey(1 + slowSldr);	
+}
+
+
+void OpenCVPlot::plotSP(void)
+{
+	//use bilinear interpolation to reduce number of pixels (decimation)
+	cv::resize(spImage, spImageResize, spSize);		
+	
+	//spImage.release();
+	
+	cv::log(spImageResize, spImageResize);
+	
+	cv::normalize(spImageResize, spImageResize, 0.0, 1.0, cv::NORM_MINMAX);
+	
+	spImageResize.convertTo(spImage8bit, CV_8U, 255);
+	
+	cv::threshold(spImage8bit, spImage8bit, thrsSldr, thrsMax, cv::THRESH_TOZERO);	
+	
+	cv::applyColorMap(spImage8bit, spImage8bit, rdCMapSldr);
+	
+	//vertical flip through x-axis
+	cv::flip(spImage8bit, spImage8bit, 0);
+	
+	cv::transpose(spImage8bit, spImage8bit);
+	
+	cv::imshow("SP Plot", spImage8bit);
 }
 
 
