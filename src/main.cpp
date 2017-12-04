@@ -4,6 +4,7 @@
 #include "plotting.hpp"
 #include "signal_processor.hpp"
 
+void help(void);
 void perThread(int id);
 void initTerminal(void); 
 void parse_options(int argc, char *argv[]);
@@ -88,10 +89,13 @@ void parse_options(int argc, char *argv[])
 {
 	int opt;
 
-    while ((opt = getopt(argc, argv, "d:r:p:")) != -1 )
+    while ((opt = getopt(argc, argv, "hd:r:p:s:k:z:")) != -1 )
     {
         switch (opt)
         {
+            case 'h':
+				help();
+				break;
             case 'd':
                 experiment.dataset_filename = optarg;
                 break;
@@ -100,11 +104,33 @@ void parse_options(int argc, char *argv[])
                 break;
             case 'p':
                 experiment.n_range_lines = atoi(optarg);
-                break;            
+                break; 
+            case 's':
+                experiment.ncs_range_line = atoi(optarg);
+                break; 
+            case 'z':
+                experiment.ncs_padded = atoi(optarg);
+                break;
+            case 'k':
+                experiment.ncs_reference = atoi(optarg);
+                break;                             
             case '?':
 				printf("Unknown command line option.\n");
 				exit(EXIT_FAILURE);
         }        
     }
+}
+
+
+void help(void)
+{
+	printf(" -h: display this help screen\n");
+	printf(" -d: dataset_filename\n");
+	printf(" -r: reference_filename\n");
+	printf(" -p: n_range_lines (pulses)\n");
+	printf(" -s: ncs_range_line (complex range bins)\n");
+	printf(" -z: ncs_padded (complex range bins padded)\n");
+	printf(" -k: ncs_reference (complex samples in reference)\n");
+	exit(EXIT_SUCCESS);	
 }
 
