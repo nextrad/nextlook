@@ -273,6 +273,8 @@ void OpenCVPlot::plotRD(void)
 	
 	cv::log(rdImageAvg, rdImageAvg);
 	
+	rdImageAvg = 20*rdImageAvg;
+	
 	cv::normalize(rdImageAvg, rdImageAvg, 0.0, 1.0, cv::NORM_MINMAX);
 	
 	rdImageAvg.convertTo(rdImage8bit, CV_8U, 255);
