@@ -162,15 +162,11 @@ void OpenCVPlot::initOpenCV(void)
 	
 	rtSize = cv::Size(500, 500);
 	rdSize = cv::Size(200, 500);
-	spSize = cv::Size(200, 400);
+	spSize = cv::Size(200, 500);
 	
 	cv::namedWindow("RTI Plot", cv::WINDOW_AUTOSIZE);
 	cv::moveWindow("RTI Plot", 0, 0);	
 	rtImage = cv::Mat(experiment->n_range_lines, experiment->ncs_padded, CV_64F, cv::Scalar::all(0));	
-	
-	cv::namedWindow("SP Plot", cv::WINDOW_AUTOSIZE);
-	cv::moveWindow("SP Plot", rtSize.width + rdSize.width, 0);	
-	//spImage = cv::Mat::ones(1, experiment->ncs_doppler_cpi*experiment->doppler_padding_factor, CV_64F);
 	
 	cv::namedWindow("Control", cv::WINDOW_AUTOSIZE);	
 	cv::moveWindow("Control", (rtSize.width + rdSize.width)*1.1, rdSize.width*1.5); 
@@ -181,6 +177,10 @@ void OpenCVPlot::initOpenCV(void)
 		cv::moveWindow("RD Plot", rtSize.width, 0); 
 		cv::createTrackbar( "RD Colour Map", "Control", &rdCMapSldr, cMapMax);
 		rdImage = cv::Mat::ones(experiment->n_range_lines, experiment->ncs_doppler_cpi*experiment->doppler_padding_factor, CV_64F);
+		
+		cv::namedWindow("SP Plot", cv::WINDOW_AUTOSIZE);
+		cv::moveWindow("SP Plot", rtSize.width + rdSize.width, 0);	
+		//spImage = cv::Mat::ones(1, experiment->ncs_doppler_cpi*experiment->doppler_padding_factor, CV_64F);
 		
 		avrgMax = (experiment->n_range_lines)/(experiment->update_rate);
 		cv::createTrackbar( "RD Averaging", "Control", &avrgSldr, avrgMax);
@@ -251,6 +251,9 @@ void OpenCVPlot::plotRTI(void)
 	}
 	
 	cv::threshold(rtImage8bit, rtImage8bit, thrsSldr, thrsMax, cv::THRESH_TOZERO);	
+	
+	cv::normalize(rtImage8bit, rtImage8bit, 0, 255, cv::NORM_MINMAX);
+	
 	cv::applyColorMap(rtImage8bit, rtImage8bit, rtCMapSldr);	
 	cv::transpose(rtImage8bit, rtImage8bit);
 	cv::flip(rtImage8bit, rtImage8bit, 0);		
@@ -274,6 +277,11 @@ void OpenCVPlot::plotSP(void)
 	cv::normalize(spImageResize, spImageResize, 0.0, 1.0, cv::NORM_MINMAX);
 	
 	spImageResize.convertTo(spImage8bit, CV_8U, 255);
+	
+	if (histSldr)
+	{
+		cv::equalizeHist(spImage8bit, spImage8bit);
+	}
 	
 	cv::threshold(spImage8bit, spImage8bit, thrsSldr, thrsMax, cv::THRESH_TOZERO);	
 	
@@ -334,10 +342,10 @@ void OpenCVPlot::plotRD(void)
 	
 	cv::threshold(rdImage8bit, rdImage8bit, thrsSldr, thrsMax, cv::THRESH_TOZERO);	
 	
-	/*if (histSldr)
+	if (histSldr)
 	{
 		cv::equalizeHist(rdImage8bit, rdImage8bit);
-	}*/
+	}
 	
 	cv::applyColorMap(rdImage8bit, rdImage8bit, rdCMapSldr);
 	
@@ -356,17 +364,22 @@ void OpenCVPlot::plotRD(void)
 
 void OpenCVPlot::savePlots(void)
 {
-	std::string doppler_path = experiment->save_path + "/Range-Doppler.jpg";
-	std::string water_path = experiment->save_path + "/Range-Time-Intensity.jpg";
 	
-	cv::imwrite(doppler_path.c_str(), rdImage8bit); 
+	std::string water_path = experiment->save_path + "/Range-Time-Intensity.jpg";	
+	
 	cv::imwrite(water_path.c_str(), rtImage8bit);	
 	
-	for (int i = 0; i < experiment->n_plot_average; i++)
-	{
-		rdVector[i].release();	
-	}
-	
 	rtImage8bit.release();
+	
+	if (experiment->is_doppler)
+	{
+		std::string doppler_path = experiment->save_path + "/Range-Doppler.jpg";
+		cv::imwrite(doppler_path.c_str(), rdImage8bit); 
+		
+		for (int i = 0; i < experiment->n_plot_average; i++)
+		{
+			rdVector[i].release();	
+		}
+	}
 }
 
