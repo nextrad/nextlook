@@ -166,7 +166,7 @@ void OpenCVPlot::initOpenCV(void)
 	
 	cv::namedWindow("RTI Plot", cv::WINDOW_AUTOSIZE);
 	cv::moveWindow("RTI Plot", 0, 0);	
-	rtImage = cv::Mat(experiment->n_range_lines, experiment->ncs_padded, CV_64F, cv::Scalar::all(0));	
+	rtImage = cv::Mat(experiment->n_range_lines, experiment->ncs_padded, CV_64F, cv::Scalar::all(1));	
 	
 	cv::namedWindow("Control", cv::WINDOW_AUTOSIZE);	
 	cv::moveWindow("Control", (rtSize.width + rdSize.width)*1.1, rdSize.width*1.5); 
@@ -249,6 +249,10 @@ void OpenCVPlot::plotRTI(void)
 	{
 		cv::equalizeHist(rtImage8bit, rtImage8bit);
 	}
+	
+	std::string rtCMapPath = cMapRoot + std::to_string(rtCMapSldr) + ".jpg";
+	cv::Mat rtCMap = cv::imread(rtCMapPath);
+	cv::imshow("Control", rtCMap);
 	
 	cv::threshold(rtImage8bit, rtImage8bit, thrsSldr, thrsMax, cv::THRESH_TOZERO);	
 	
@@ -347,11 +351,7 @@ void OpenCVPlot::plotRD(void)
 		cv::equalizeHist(rdImage8bit, rdImage8bit);
 	}
 	
-	cv::applyColorMap(rdImage8bit, rdImage8bit, rdCMapSldr);
-	
-	std::string rtCMapPath = cMapRoot + std::to_string(rtCMapSldr) + ".jpg";
-	cv::Mat rtCMap = cv::imread(rtCMapPath);
-	cv::imshow("Control", rtCMap);	
+	cv::applyColorMap(rdImage8bit, rdImage8bit, rdCMapSldr);	
 	
 	//vertical flip through x-axis
 	cv::flip(rdImage8bit, rdImage8bit, 0);
