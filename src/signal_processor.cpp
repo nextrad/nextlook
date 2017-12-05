@@ -385,8 +385,7 @@ void SignalProcessor::getExperimentParameters(void)
 		experiment->is_debug = false;
 		
 	experiment->update_rate 	= atoi(ini.GetValue("visualisation", "update_rate"));
-	experiment->cm_doppler 		= atoi(ini.GetValue("visualisation", "doppler_colour_map"));
-	experiment->cm_rti 			= atoi(ini.GetValue("visualisation", "rti_colour_map"));
+	experiment->cm 				= atoi(ini.GetValue("visualisation", "colour_map"));
 	experiment->hist_equal 		= atoi(ini.GetValue("visualisation", "histogram_equalization"));
 	experiment->slow 			= atoi(ini.GetValue("visualisation", "slow"));
 	experiment->threshold 		= atoi(ini.GetValue("visualisation", "threshold"));
@@ -394,7 +393,7 @@ void SignalProcessor::getExperimentParameters(void)
 	
 	//extract and set windowing functions
 	refWindow.init((WindowFunction)atoi(ini.GetValue("processing", "ref_window")), experiment->ncs_reference);	
-	rangeWindow.init((WindowFunction)atoi(ini.GetValue("processing", "range_window")), experiment->ncs_range_line);	
+	rangeWindow.init((WindowFunction)atoi(ini.GetValue("processing", "range_window")), (experiment->ncs_range_line - experiment->pulse_blanking));	
 	dopplerWindow.init((WindowFunction)atoi(ini.GetValue("processing", "doppler_window")), experiment->ncs_doppler_cpi);	
 	
 	//calculate the number of range lines each thread is responsible for.
@@ -426,7 +425,7 @@ void SignalProcessor::getExperimentParameters(void)
 	if (experiment->n_threads != 1)
 	{
 		experiment->is_doppler = false;
-		printf("Doppler processing not available with multiple threads.\n");
+		printf("---> Doppler processing not available with multiple threads.\n");
 	}
 }
 

@@ -153,8 +153,7 @@ OpenCVPlot::OpenCVPlot(Experiment* exp)
 
 void OpenCVPlot::initOpenCV(void)
 {	
-	rtCMapSldr = experiment->cm_rti;
-	rdCMapSldr = experiment->cm_doppler;
+	cmapSldr = experiment->cm;
 	thrsSldr = experiment->threshold;
 	slowSldr = experiment->slow;
 	histSldr = experiment->hist_equal;
@@ -166,20 +165,19 @@ void OpenCVPlot::initOpenCV(void)
 	
 	cv::namedWindow("RTI Plot", cv::WINDOW_AUTOSIZE);
 	cv::moveWindow("RTI Plot", 0, 0);	
-	rtImage = cv::Mat(experiment->n_range_lines, experiment->ncs_padded, CV_64F, cv::Scalar::all(1));	
+	rtImage = cv::Mat(experiment->n_range_lines, experiment->ncs_padded, CV_64F, cv::Scalar::all(10));	
 	
 	cv::namedWindow("Control", cv::WINDOW_AUTOSIZE);
 	cv::moveWindow("Control", rtSize.width, 0);	
 	
-	cv::createTrackbar( "RTI Colour Map", "Control", &rtCMapSldr, cMapMax);
+	cv::createTrackbar( "Colour Map", "Control", &cmapSldr, cMapMax);
 	
 	if (experiment->is_doppler)
 	{
-		cv::moveWindow("Control", (rtSize.width + rdSize.width)*1.1, rdSize.width*1.5); 
+		cv::moveWindow("Control", (rtSize.width + rdSize.width), rdSize.width + 65); 
 		
 		cv::namedWindow("RD Plot");
 		cv::moveWindow("RD Plot", rtSize.width, 0); 
-		cv::createTrackbar( "RD Colour Map", "Control", &rdCMapSldr, cMapMax);
 		rdImage = cv::Mat::ones(experiment->n_range_lines, experiment->ncs_doppler_cpi*experiment->doppler_padding_factor, CV_64F);
 		
 		cv::namedWindow("SP Plot", cv::WINDOW_AUTOSIZE);
@@ -204,14 +202,6 @@ void OpenCVPlot::addRTI(int rangeLine, double  *imageValues)
 	cv::Mat matchedRow = cv::Mat(1, experiment->ncs_padded, CV_64F, imageValues);	
 	cv::log(matchedRow, matchedRow);
 	matchedRow = matchedRow/LOG10;
-	
-	for (int i = 0; i < experiment->ncs_padded; i++)
-	{
-		if (matchedRow.at<double>(0,i) < 5)
-			matchedRow.at<double>(0,i) = 5;
-			
-		//printf("values: %f\n", matchedRow.at<double>(0,i));
-	}
 	
 	matchedRow.copyTo(rtImage(cv::Rect(0, rangeLine, matchedRow.cols, matchedRow.rows)));
 	
@@ -251,15 +241,13 @@ void OpenCVPlot::plotRTI(void)
 		cv::equalizeHist(rtImage8bit, rtImage8bit);
 	}
 	
-	std::string rtCMapPath = cMapRoot + std::to_string(rtCMapSldr) + ".jpg";
+	std::string rtCMapPath = cMapRoot + boost::to_string(cmapSldr) + ".jpg";
 	cv::Mat rtCMap = cv::imread(rtCMapPath);
 	cv::imshow("Control", rtCMap);
 	
-	cv::threshold(rtImage8bit, rtImage8bit, thrsSldr, thrsMax, cv::THRESH_TOZERO);	
+	cv::threshold(rtImage8bit, rtImage8bit, thrsSldr, thrsMax, cv::THRESH_TOZERO);
 	
-	cv::normalize(rtImage8bit, rtImage8bit, 0, 255, cv::NORM_MINMAX);
-	
-	cv::applyColorMap(rtImage8bit, rtImage8bit, rtCMapSldr);	
+	cv::applyColorMap(rtImage8bit, rtImage8bit, cmapSldr);	
 	cv::transpose(rtImage8bit, rtImage8bit);
 	cv::flip(rtImage8bit, rtImage8bit, 0);		
 	
@@ -290,7 +278,7 @@ void OpenCVPlot::plotSP(void)
 	
 	cv::threshold(spImage8bit, spImage8bit, thrsSldr, thrsMax, cv::THRESH_TOZERO);	
 	
-	cv::applyColorMap(spImage8bit, spImage8bit, rdCMapSldr);
+	cv::applyColorMap(spImage8bit, spImage8bit, cmapSldr);
 	
 	//vertical flip through x-axis
 	cv::flip(spImage8bit, spImage8bit, 0);
@@ -339,8 +327,6 @@ void OpenCVPlot::plotRD(void)
 	cv::log(rdImageAvg, rdImageAvg);
 	rdImageAvg = rdImageAvg/LOG10;
 	
-	rdImageAvg = 20*rdImageAvg;
-	
 	cv::normalize(rdImageAvg, rdImageAvg, 0.0, 1.0, cv::NORM_MINMAX);
 	
 	rdImageAvg.convertTo(rdImage8bit, CV_8U, 255);
@@ -352,7 +338,7 @@ void OpenCVPlot::plotRD(void)
 		cv::equalizeHist(rdImage8bit, rdImage8bit);
 	}
 	
-	cv::applyColorMap(rdImage8bit, rdImage8bit, rdCMapSldr);	
+	cv::applyColorMap(rdImage8bit, rdImage8bit, cmapSldr);	
 	
 	//vertical flip through x-axis
 	cv::flip(rdImage8bit, rdImage8bit, 0);

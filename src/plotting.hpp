@@ -34,8 +34,7 @@ class OpenCVPlot
 		int	thrsSldr;
 		int histSldr;	
 		int	avrgSldr;	
-		int rdCMapSldr;
-		int rtCMapSldr;
+		int cmapSldr;
 		
 		//holds the index of the current doppler plot 
 		int rdIndex;

@@ -22,8 +22,7 @@ typedef struct
 	int specro_range_bin;
 	int pulse_blanking;
 	int update_rate;	
-	int cm_doppler;
-	int cm_rti;
+	int cm;
 	int hist_equal;
 	int slow;
 	int threshold;
