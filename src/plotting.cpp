@@ -232,6 +232,8 @@ void OpenCVPlot::plotRTI(void)
 	//use bilinear interpolation to reduce number of pixels (decimation)
 	cv::resize(rtImage, rtImageResize, rtSize);		
 	
+	//rtImageResize(cv::Rect(0, 0, experiment->pulse_blanking, rtSize.width)) = cv::Scalar(5);
+	
 	cv::normalize(rtImageResize, rtImageResize, 0.0, 1.0, cv::NORM_MINMAX);
 
 	rtImageResize.convertTo(rtImage8bit, CV_8U, 255);	
