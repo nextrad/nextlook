@@ -168,11 +168,15 @@ void OpenCVPlot::initOpenCV(void)
 	cv::moveWindow("RTI Plot", 0, 0);	
 	rtImage = cv::Mat(experiment->n_range_lines, experiment->ncs_padded, CV_64F, cv::Scalar::all(1));	
 	
-	cv::namedWindow("Control", cv::WINDOW_AUTOSIZE);	
-	cv::moveWindow("Control", (rtSize.width + rdSize.width)*1.1, rdSize.width*1.5); 
+	cv::namedWindow("Control", cv::WINDOW_AUTOSIZE);
+	cv::moveWindow("Control", rtSize.width, 0);	
+	
+	cv::createTrackbar( "RTI Colour Map", "Control", &rtCMapSldr, cMapMax);
 	
 	if (experiment->is_doppler)
 	{
+		cv::moveWindow("Control", (rtSize.width + rdSize.width)*1.1, rdSize.width*1.5); 
+		
 		cv::namedWindow("RD Plot");
 		cv::moveWindow("RD Plot", rtSize.width, 0); 
 		cv::createTrackbar( "RD Colour Map", "Control", &rdCMapSldr, cMapMax);
@@ -190,7 +194,6 @@ void OpenCVPlot::initOpenCV(void)
 	}	
 
 	cv::createTrackbar( "Threshold Value", "Control", &thrsSldr, thrsMax);	
-	cv::createTrackbar( "RTI Colour Map", "Control", &rtCMapSldr, cMapMax);
 	cv::createTrackbar( "Slow Processing", "Control", &slowSldr, slowMax);
 	cv::createTrackbar( "Histogram Equalisation", "Control", &histSldr, histMax);
 }
@@ -238,8 +241,6 @@ void OpenCVPlot::plotRTI(void)
 {
 	//use bilinear interpolation to reduce number of pixels (decimation)
 	cv::resize(rtImage, rtImageResize, rtSize);		
-	
-	//rtImageResize(cv::Rect(0, 0, experiment->pulse_blanking, rtSize.width)) = cv::Scalar(0);
 	
 	cv::normalize(rtImageResize, rtImageResize, 0.0, 1.0, cv::NORM_MINMAX);
 

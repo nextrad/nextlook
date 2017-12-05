@@ -422,6 +422,12 @@ void SignalProcessor::getExperimentParameters(void)
 	}
 	
 	experiment->save_path = filename.string();	
+	
+	if (experiment->n_threads != 1)
+	{
+		experiment->is_doppler = false;
+		printf("Doppler processing not available with multiple threads.\n");
+	}
 }
 
 
