@@ -1,5 +1,7 @@
 #include "plotting.hpp"
 
+double LOG10 = log(10);
+
 GNUPlot::GNUPlot(Experiment* exp)
 {
 	experiment = exp;
@@ -198,6 +200,16 @@ void OpenCVPlot::addRTI(int rangeLine, double  *imageValues)
 {
 	cv::Mat matchedRow = cv::Mat(1, experiment->ncs_padded, CV_64F, imageValues);	
 	cv::log(matchedRow, matchedRow);
+	matchedRow = matchedRow/LOG10;
+	
+	for (int i = 0; i < experiment->ncs_padded; i++)
+	{
+		if (matchedRow.at<double>(0,i) < 5)
+			matchedRow.at<double>(0,i) = 5;
+			
+		//printf("values: %f\n", matchedRow.at<double>(0,i));
+	}
+	
 	matchedRow.copyTo(rtImage(cv::Rect(0, rangeLine, matchedRow.cols, matchedRow.rows)));
 	
 	if (((rangeLine%(experiment->update_rate - 1) == 0) || rangeLine == (experiment->n_range_lines - 1)) && rangeLine != 0)
@@ -211,7 +223,7 @@ void OpenCVPlot::addRTI(int rangeLine, double  *imageValues)
 
 void OpenCVPlot::addRD(double *imageValues)
 {
-	cv::Mat row = cv::Mat(1, experiment->ncs_doppler_cpi*experiment->doppler_padding_factor, CV_64F, imageValues);
+	cv::Mat row = cv::Mat(1, experiment->ncs_doppler_cpi*experiment->doppler_padding_factor, CV_64F, imageValues);	
 	rdImage.push_back(row);
 }
 
@@ -226,6 +238,8 @@ void OpenCVPlot::plotRTI(void)
 {
 	//use bilinear interpolation to reduce number of pixels (decimation)
 	cv::resize(rtImage, rtImageResize, rtSize);		
+	
+	//rtImageResize(cv::Rect(0, 0, experiment->pulse_blanking, rtSize.width)) = cv::Scalar(0);
 	
 	cv::normalize(rtImageResize, rtImageResize, 0.0, 1.0, cv::NORM_MINMAX);
 
@@ -255,6 +269,7 @@ void OpenCVPlot::plotSP(void)
 	//spImage.release();
 	
 	cv::log(spImageResize, spImageResize);
+	spImageResize = spImageResize/LOG10;
 	
 	cv::normalize(spImageResize, spImageResize, 0.0, 1.0, cv::NORM_MINMAX);
 	
@@ -309,6 +324,7 @@ void OpenCVPlot::plotRD(void)
 	}
 	
 	cv::log(rdImageAvg, rdImageAvg);
+	rdImageAvg = rdImageAvg/LOG10;
 	
 	rdImageAvg = 20*rdImageAvg;
 	

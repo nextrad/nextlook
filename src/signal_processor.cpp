@@ -16,6 +16,7 @@ SignalProcessor::SignalProcessor(Experiment* exp)
 	experiment->doppler_padding_factor = -1;		
 	experiment->specro_range_bin = -1;	
 	experiment->n_threads = -1;		
+	experiment->pulse_blanking = -1;
 }
 
 void SignalProcessor::allocateMemory(void)
@@ -194,7 +195,7 @@ void SignalProcessor::popRangeBuffer(int rangeLine, int thread_id)
 	//populate complex range data and remove offset	
 	for (int i = 0; i < experiment->ncs_padded; i++)
 	{
-		if (i < experiment->ncs_range_line)
+		if ((i > experiment->pulse_blanking) && (i < experiment->ncs_range_line))
 		{	
 			float windowCoefficient = rangeWindow.getSample(i);
 			lineBuffer[i + thread_id*experiment->ncs_padded][0] = binDataset[i*2 + start    ]*windowCoefficient;     //real component    
@@ -363,9 +364,12 @@ void SignalProcessor::getExperimentParameters(void)
 		experiment->specro_range_bin = atoi(ini.GetValue("processing", "spectrogram_range_bin"));
 	
 	if (experiment->n_threads == -1)		
-		experiment->n_threads 			= atoi(ini.GetValue("processing", "n_threads"));		
+		experiment->n_threads 			= atoi(ini.GetValue("processing", "n_threads"));	
+		
+	if (experiment->pulse_blanking == -1)
+		experiment->pulse_blanking 	= atoi(ini.GetValue("visualisation", "pulse_blanking"));	
 
-	
+
 	std::string doppler_flag = ini.GetValue("processing", "doppler_enabled");	
 		
 	if ((doppler_flag == "1") || (doppler_flag == "true") || (doppler_flag == "TRUE") || (doppler_flag == "True"))
