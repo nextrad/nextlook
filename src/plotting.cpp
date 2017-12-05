@@ -37,8 +37,6 @@ void GNUPlot::plot(double *array, int ncs_padded, char const *plotTitle, std::st
 	strcat(writeMessage, plotTitle);	
 	
 	logger.write(writeMessage);
-	
-	printf("%s\n", writeFileName);
 }
 
 
