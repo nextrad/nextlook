@@ -9,12 +9,13 @@
 #include "logger.hpp"
 #include "experiment.hpp" 
 
+
 // Abbreviations List
 // rt: range-time
 // rd: range-doppler
 
 enum plotType {NORMAL, FFT_SHIFT};
-enum plotStyle {AMPLITUDE, IQ};
+enum plotStyle {LOG, MAG, IQ};
 
 class OpenCVPlot 
 {
@@ -76,11 +77,11 @@ class GNUPlot
 		std::string title;
 		std::string xlable, ylable;
 		Logger logger;		
-		Experiment* experiment;
 	public:
-		GNUPlot(Experiment* exp);
-		void gnuPlot(fftw_complex *array, char const *plotTitle, Experiment* exp, plotType type = NORMAL, plotStyle style = AMPLITUDE);	
-		void gnuPlot(uint8_t *array, char const *plotTitle, Experiment* exp);
+		void plot(fftw_complex *array, int ncs_padded, char const *plotTitle, plotType type = NORMAL, plotStyle style = MAG, std::string storDir = "");	
+		void plot(double *array, int ncs_padded, char const *plotTitle, std::string storDir = "");
+		
+		double mag(fftw_complex value){return sqrt(pow(value[0], 2) + pow(value[1], 2));};
 };
 
 #endif

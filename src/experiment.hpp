@@ -21,6 +21,7 @@ typedef struct
 	int doppler_padding_factor;
 	int specro_range_bin;
 	int pulse_blanking;
+	int blanking_threshold;
 	int update_rate;	
 	int cm;
 	int hist_equal;

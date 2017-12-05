@@ -35,6 +35,7 @@ class SignalProcessor
 		Logger logger;
 		
 		Experiment* experiment;
+		GNUPlot gPlot;
 		
 		Window refWindow;
 		Window rangeWindow;

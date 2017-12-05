@@ -12,7 +12,6 @@ void parse_options(int argc, char *argv[]);
 Experiment experiment;
 SignalProcessor signalProcessor(&experiment);
 OpenCVPlot opencvPlot(&experiment);
-GNUPlot gnuPlot(&experiment);
 
 int main(int argc, char *argv[])
 {
@@ -63,7 +62,7 @@ void perThread(int id)
 	
 	for (int i = start_index; i < start_index + experiment.n_range_lines_per_thread; i++)
 	{
-		signalProcessor.popRangeBuffer(i, id);
+		signalProcessor.popRangeBuffer(i, id);		
 		signalProcessor.fftRangeData(id);		
 		signalProcessor.complxMulti(id);			
 		signalProcessor.ifftMatchedData(id);								

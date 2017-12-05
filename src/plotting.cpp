@@ -2,147 +2,151 @@
 
 double LOG10 = log(10);
 
-GNUPlot::GNUPlot(Experiment* exp)
+void GNUPlot::plot(double *array, int ncs_padded, char const *plotTitle, std::string storDir)
 {
-	experiment = exp;
+	FILE *pipe_gp = popen("gnuplot", "w");	
+
+	char writeTitle[100];
+	strcpy(writeTitle, "set title '");
+	strcat(writeTitle, plotTitle);
+	strcat(writeTitle, "'\n");
+	
+	char writeFileName[200];
+	strcpy(writeFileName, "set output '");
+	strcat(writeFileName, storDir.c_str());
+	strcat(writeFileName, "/");
+	strcat(writeFileName, plotTitle);
+	strcat(writeFileName, ".eps'\n");	
+
+	fputs("set terminal postscript eps enhanced color font 'Helvetica,20' linewidth 0.5\n", pipe_gp);
+	fputs(writeTitle, pipe_gp);	
+	fputs(writeFileName, pipe_gp);
+	
+	fputs("plot '-' using 1:2 with lines notitle\n", pipe_gp);
+	for (int i = 0; i < ncs_padded; i++) 
+	{
+		//float magnitude = 10*log(sqrt(pow(array[i][0], 2) + pow(array[i][1], 2)));							
+		fprintf(pipe_gp, "%i %f\n", i, array[i]);
+	}
+	
+	fputs("e\n", pipe_gp);
+	pclose(pipe_gp);	
+	
+	char writeMessage[100];
+	strcpy(writeMessage, "Generated Plot: ");
+	strcat(writeMessage, plotTitle);	
+	
+	logger.write(writeMessage);
+	
+	printf("%s\n", writeFileName);
 }
 
-void GNUPlot::gnuPlot(uint8_t *array, char const *plotTitle, Experiment* exp)
-{
-	if (exp->is_debug)
-	{
-		FILE *pipe_gp = popen("gnuplot", "w");	
-	
-		char writeTitle[100];
-		strcpy(writeTitle, "set title '");
-		strcat(writeTitle, plotTitle);
-		strcat(writeTitle, "'\n");
-		
-		char writeFileName[100];
-		strcpy(writeFileName, "set output '");
-		strcat(writeFileName, plotTitle);
-		strcat(writeFileName, ".eps'\n");	
 
-		fputs("set terminal postscript eps enhanced color font 'Helvetica,20' linewidth 0.5\n", pipe_gp);
-		fputs(writeTitle, pipe_gp);	
-		fputs(writeFileName, pipe_gp);
-		
-		fputs("plot '-' using 1:2 with lines notitle\n", pipe_gp);
-		for (int i = 0; i < exp->ncs_padded; i++) 
+
+void GNUPlot::plot(fftw_complex *array, int ncs_padded, char const *plotTitle, plotType type, plotStyle style, std::string storDir)
+{	
+	FILE *pipe_gp = popen("gnuplot", "w");	
+	
+	char writeTitle[100];
+	strcpy(writeTitle, "set title '");
+	strcat(writeTitle, plotTitle);
+	strcat(writeTitle, "'\n");
+	
+	char writeFileName[200];
+	strcpy(writeFileName, "set output '");
+	strcat(writeFileName, storDir.c_str());
+	strcat(writeFileName, "/");
+	strcat(writeFileName, plotTitle);
+	strcat(writeFileName, ".eps'\n");	
+	
+	fputs("set terminal postscript eps enhanced color font 'Helvetica,20' linewidth 0.5\n", pipe_gp);
+	fputs(writeTitle, pipe_gp);	
+	//fputs("set yrange [-1:1] \n", pipe_gp);
+	//fputs("set xrange[500:600] \n", pipe_gp);
+	//fputs("set bmargin at screen 0.13 \n", pipe_gp);
+	//fputs("set lmargin at screen 0.13 \n", pipe_gp);
+	//fputs("set xtics ('0' 0, '10' 205, '20' 410, '30' 615, '40' 820, '50' 1024) \n", pipe_gp);
+	//fputs("set xtics ('-500' 0, '-376' 32, '-252' 64, '-128' 96, '0' 128, '128' 160, '252' 192, '376' 224, '500' 255) \n", pipe_gp);
+	//fputs("set xlabel 'Frequency [Hz]' \n", pipe_gp);
+	//fputs("set xlabel 'Sample Number' \n", pipe_gp);
+	//fputs("set ylabel 'Magnitude' \n", pipe_gp);
+	fputs(writeFileName, pipe_gp);
+	
+	switch(type)
+	{
+		case NORMAL:
 		{
-			//float magnitude = 10*log(sqrt(pow(array[i][0], 2) + pow(array[i][1], 2)));							
-			fprintf(pipe_gp, "%i %i\n", i, array[i]);
+			switch (style)
+			{	
+				case MAG: 
+				{
+					fputs("plot '-' using 1:2 with lines notitle\n", pipe_gp);
+					for (int i = 0; i < ncs_padded; i++) 
+					{
+						fprintf(pipe_gp, "%i %f\n", i, mag(array[i]));
+					}
+					break;
+				}
+				
+				case LOG: 
+				{
+					fputs("plot '-' using 1:2 with lines notitle\n", pipe_gp);
+					for (int i = 0; i < ncs_padded; i++) 
+					{
+						fprintf(pipe_gp, "%i %f\n", i, log10(mag(array[i])));
+					}
+					break;
+				}
+				
+				case IQ:
+				{
+					fputs("plot '-' title 'I Samples' with lines, '-' title 'Q Samples' with lines\n", pipe_gp);
+					
+					for (int i = 0; i < ncs_padded; i++) 
+					{
+						fprintf(pipe_gp, "%i %f\n", i, array[i][0]);
+					}
+					fflush(pipe_gp);
+					fprintf(pipe_gp, "e\n");						
+
+					for (int i = 0; i < ncs_padded; i++) 
+					{
+						fprintf(pipe_gp, "%i %f\n", i, array[i][1]);
+					}
+					break;
+				}										
+			}	
+			break;
 		}
 		
-		fputs("e\n", pipe_gp);
-		pclose(pipe_gp);	
-		
-		char writeMessage[100];
-		strcpy(writeMessage, "Generated Plot: ");
-		strcat(writeMessage, plotTitle);	
-		
-		logger.write(writeMessage);
-	}
-}
-
-
-
-void GNUPlot::gnuPlot(fftw_complex *array, char const *plotTitle, Experiment* exp, plotType type, plotStyle style)
-{
-	if (exp->is_debug)
-	{
-		FILE *pipe_gp = popen("gnuplot", "w");	
-	
-		char writeTitle[100];
-		strcpy(writeTitle, "set title '");
-		strcat(writeTitle, plotTitle);
-		strcat(writeTitle, "'\n");
-		
-		char writeFileName[100];
-		strcpy(writeFileName, "set output '");
-		strcat(writeFileName, plotTitle);
-		strcat(writeFileName, ".eps'\n");	
-
-		fputs("set terminal postscript eps enhanced color font 'Helvetica,20' linewidth 0.5\n", pipe_gp);
-		fputs(writeTitle, pipe_gp);	
-		//fputs("set yrange [-1:1] \n", pipe_gp);
-		//fputs("set xrange[500:600] \n", pipe_gp);
-		//fputs("set bmargin at screen 0.13 \n", pipe_gp);
-		//fputs("set lmargin at screen 0.13 \n", pipe_gp);
-		//fputs("set xtics ('0' 0, '10' 205, '20' 410, '30' 615, '40' 820, '50' 1024) \n", pipe_gp);
-		//fputs("set xtics ('-500' 0, '-376' 32, '-252' 64, '-128' 96, '0' 128, '128' 160, '252' 192, '376' 224, '500' 255) \n", pipe_gp);
-		//fputs("set xlabel 'Frequency [Hz]' \n", pipe_gp);
-		//fputs("set xlabel 'Sample Number' \n", pipe_gp);
-		//fputs("set ylabel 'Magnitude' \n", pipe_gp);
-		fputs(writeFileName, pipe_gp);
-		
-		switch(type)
+		case FFT_SHIFT:
 		{
-			case NORMAL:
+			fputs("plot '-' using 1:2 with lines notitle\n", pipe_gp);
+			for (int i = 0; i < ncs_padded; i++) 
 			{
-				switch (style)
-				{	
-					case AMPLITUDE: 
-					{
-						fputs("plot '-' using 1:2 with lines notitle\n", pipe_gp);
-						for (int i = 0; i < exp->ncs_padded; i++) 
-						{
-							float magnitude = 10*log(sqrt(pow(array[i][0], 2) + pow(array[i][1], 2)));							
-							fprintf(pipe_gp, "%i %f\n", i, magnitude);
-						}
-						break;
-					}
-					
-					case IQ:
-					{
-						fputs("plot '-' title 'I Samples' with lines, '-' title 'Q Samples' with lines\n", pipe_gp);
-						
-						for (int i = 0; i < exp->ncs_padded; i++) 
-						{
-							fprintf(pipe_gp, "%i %f\n", i, array[i][0]);
-						}
-						fflush(pipe_gp);
-						fprintf(pipe_gp, "e\n");						
-
-						for (int i = 0; i < exp->ncs_padded; i++) 
-						{
-							fprintf(pipe_gp, "%i %f\n", i, array[i][1]);
-						}
-						break;
-					}										
-				}	
-				break;
-			}
-			
-			case FFT_SHIFT:
-			{
-				fputs("plot '-' using 1:2 with lines notitle\n", pipe_gp);
-				for (int i = 0; i < exp->ncs_padded; i++) 
+				if (i < (ncs_padded/2 + 1)) 
 				{
-					if (i < (exp->ncs_padded/2 + 1)) 
-					{
-						fprintf(pipe_gp, "%i %i\n", i, (abs(sqrt(array[i + (exp->ncs_padded/2 - 1)][0]*array[i + (exp->ncs_padded/2 - 1)][0] +
-																 array[i + (exp->ncs_padded/2 - 1)][1]*array[i + (exp->ncs_padded/2 - 1)][1]))));
-					}
-					else
-					{
-						fprintf(pipe_gp, "%i %i\n", i, (abs(sqrt(array[i - (exp->ncs_padded/2 + 1)][0]*array[i - (exp->ncs_padded/2 + 1)][0] + 
-																 array[i - (exp->ncs_padded/2 + 1)][1]*array[i - (exp->ncs_padded/2 + 1)][1]))));
-					}
+					fprintf(pipe_gp, "%i %f\n", i, (abs(sqrt(array[i + (ncs_padded/2 - 1)][0]*array[i + (ncs_padded/2 - 1)][0] +
+															 array[i + (ncs_padded/2 - 1)][1]*array[i + (ncs_padded/2 - 1)][1]))));
 				}
-				break;	
+				else
+				{
+					fprintf(pipe_gp, "%i %f\n", i, (abs(sqrt(array[i - (ncs_padded/2 + 1)][0]*array[i - (ncs_padded/2 + 1)][0] + 
+															 array[i - (ncs_padded/2 + 1)][1]*array[i - (ncs_padded/2 + 1)][1]))));
+				}
 			}
-		}	
-
-		fputs("e\n", pipe_gp);
-		pclose(pipe_gp);	
-		
-		char writeMessage[100];
-		strcpy(writeMessage, "Generated Plot: ");
-		strcat(writeMessage, plotTitle);	
-		
-		logger.write(writeMessage);
+			break;	
+		}
 	}	
+
+	fputs("e\n", pipe_gp);
+	pclose(pipe_gp);	
+	
+	char writeMessage[100];
+	strcpy(writeMessage, "Generated Plot: ");
+	strcat(writeMessage, plotTitle);	
+	
+	logger.write(writeMessage);	
 }
 
 OpenCVPlot::OpenCVPlot(Experiment* exp)
@@ -161,28 +165,28 @@ void OpenCVPlot::initOpenCV(void)
 	
 	rtSize = cv::Size(500, 500);
 	rdSize = cv::Size(200, 500);
-	spSize = cv::Size(200, 500);
+	spSize = cv::Size(200, 200);
 	
-	cv::namedWindow("RTI Plot", cv::WINDOW_AUTOSIZE);
-	cv::moveWindow("RTI Plot", 0, 0);	
-	rtImage = cv::Mat(experiment->n_range_lines, experiment->ncs_padded, CV_64F, cv::Scalar::all(10));	
+	cv::namedWindow("Range-Time-Intensity", cv::WINDOW_AUTOSIZE);
+	cv::moveWindow("Range-Time-Intensity", 0, 0);	
+	rtImage = cv::Mat(experiment->n_range_lines, experiment->ncs_padded, CV_64F, cv::Scalar::all(experiment->blanking_threshold));	
 	
 	cv::namedWindow("Control", cv::WINDOW_AUTOSIZE);
-	cv::moveWindow("Control", rtSize.width, 0);	
+	cv::moveWindow("Control", (rtSize.width + 2), 0);	
 	
 	cv::createTrackbar( "Colour Map", "Control", &cmapSldr, cMapMax);
 	
 	if (experiment->is_doppler)
 	{
-		cv::moveWindow("Control", (rtSize.width + rdSize.width), rdSize.width + 65); 
-		
-		cv::namedWindow("RD Plot");
-		cv::moveWindow("RD Plot", rtSize.width, 0); 
+		cv::namedWindow("Range-Doppler");
+		cv::moveWindow("Range-Doppler", (rtSize.width + 2), 0); 
 		rdImage = cv::Mat::ones(experiment->n_range_lines, experiment->ncs_doppler_cpi*experiment->doppler_padding_factor, CV_64F);
 		
-		cv::namedWindow("SP Plot", cv::WINDOW_AUTOSIZE);
-		cv::moveWindow("SP Plot", rtSize.width + rdSize.width, 0);	
+		cv::namedWindow("Spectrogram", cv::WINDOW_AUTOSIZE);
+		cv::moveWindow("Spectrogram", (rtSize.width + rdSize.width + 2*2), 0);	
 		//spImage = cv::Mat::ones(1, experiment->ncs_doppler_cpi*experiment->doppler_padding_factor, CV_64F);
+		
+		cv::moveWindow("Control", (rtSize.width + rdSize.width + spSize.height + 3*2), 0); 
 		
 		avrgMax = (experiment->n_range_lines)/(experiment->update_rate);
 		cv::createTrackbar( "RD Averaging", "Control", &avrgSldr, avrgMax);
@@ -192,16 +196,14 @@ void OpenCVPlot::initOpenCV(void)
 	}	
 
 	cv::createTrackbar( "Threshold Value", "Control", &thrsSldr, thrsMax);	
-	cv::createTrackbar( "Slow Processing", "Control", &slowSldr, slowMax);
-	cv::createTrackbar( "Histogram Equalisation", "Control", &histSldr, histMax);
+	cv::createTrackbar( "Slow [ms]", "Control", &slowSldr, slowMax);
+	cv::createTrackbar( "Histogram Eqn", "Control", &histSldr, histMax);
 }
 
 
 void OpenCVPlot::addRTI(int rangeLine, double  *imageValues)
 {
 	cv::Mat matchedRow = cv::Mat(1, experiment->ncs_padded, CV_64F, imageValues);	
-	cv::log(matchedRow, matchedRow);
-	matchedRow = matchedRow/LOG10;
 	
 	matchedRow.copyTo(rtImage(cv::Rect(0, rangeLine, matchedRow.cols, matchedRow.rows)));
 	
@@ -235,6 +237,8 @@ void OpenCVPlot::plotRTI(void)
 	//rtImageResize(cv::Rect(0, 0, experiment->pulse_blanking, rtSize.width)) = cv::Scalar(5);
 	
 	cv::normalize(rtImageResize, rtImageResize, 0.0, 1.0, cv::NORM_MINMAX);
+	
+	//gPlot.plot(matchedImageBuffer, experiment->ncs_padded, "Matched Image Buffer Pulse #1");	
 
 	rtImageResize.convertTo(rtImage8bit, CV_8U, 255);	
 
@@ -253,7 +257,7 @@ void OpenCVPlot::plotRTI(void)
 	cv::transpose(rtImage8bit, rtImage8bit);
 	cv::flip(rtImage8bit, rtImage8bit, 0);		
 	
-	cv::imshow("RTI Plot", rtImage8bit);
+	cv::imshow("Range-Time-Intensity", rtImage8bit);
 
 	cv::waitKey(1 + slowSldr);	
 }
@@ -287,7 +291,7 @@ void OpenCVPlot::plotSP(void)
 	
 	cv::transpose(spImage8bit, spImage8bit);
 	
-	cv::imshow("SP Plot", spImage8bit);
+	cv::imshow("Spectrogram", spImage8bit);
 }
 
 
@@ -345,7 +349,7 @@ void OpenCVPlot::plotRD(void)
 	//vertical flip through x-axis
 	cv::flip(rdImage8bit, rdImage8bit, 0);
 	
-	cv::imshow("RD Plot", rdImage8bit);
+	cv::imshow("Range-Doppler", rdImage8bit);
 	
 	//increment the doppler plot index
 	rdIndex++;
@@ -369,6 +373,9 @@ void OpenCVPlot::savePlots(void)
 		{
 			rdVector[i].release();	
 		}
+		
+		std::string spectro_path = experiment->save_path + "/Spectrogram.jpg";
+		cv::imwrite(spectro_path.c_str(), spImage8bit); 
 	}
 }
 

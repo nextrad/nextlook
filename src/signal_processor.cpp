@@ -17,6 +17,7 @@ SignalProcessor::SignalProcessor(Experiment* exp)
 	experiment->specro_range_bin = -1;	
 	experiment->n_threads = -1;		
 	experiment->pulse_blanking = -1;
+	experiment->blanking_threshold = -1;
 }
 
 void SignalProcessor::allocateMemory(void)
@@ -162,6 +163,12 @@ void SignalProcessor::addToDopplerPlot(OpenCVPlot &plot)
 			dopplerImageBuffer[i - ((experiment->ncs_doppler_cpi*experiment->doppler_padding_factor)/2 + 1)] = mag(dopplerBuffer[i]);
 	}	
 	
+	/*if (experiment->is_debug) 
+	{
+		gPlot.plot(dopplerImageBuffer, experiment->ncs_doppler_cpi*experiment->doppler_padding_factor, "Doppler Spectrum");	
+		exit(0);
+	}*/
+	
 	plot.addRD(dopplerImageBuffer);
 }
 
@@ -206,8 +213,12 @@ void SignalProcessor::popRangeBuffer(int rangeLine, int thread_id)
 			lineBuffer[i + thread_id*experiment->ncs_padded][0] = 0;
 			lineBuffer[i + thread_id*experiment->ncs_padded][1] = 0; 
 		}
+	}
+	
+	if ((experiment->is_debug) && (rangeLine == 1))
+	{
+		gPlot.plot(lineBuffer, experiment->ncs_padded, "Time Domain Pulse #1", NORMAL, IQ, experiment->save_path);	
 	}	
-	//plot.gnuPlot(rangeBuffer, "return waveform time domain", NORMAL, IQ);
 }
 
 
@@ -236,12 +247,20 @@ void SignalProcessor::addToWaterPlot(int rangeLine, OpenCVPlot &plot, int thread
 {
 	for (int j = 0; j < experiment->ncs_padded; j++)
 	{
-		matchedImageBuffer[j + thread_id*experiment->ncs_padded] = mag(lineBuffer[j + thread_id*experiment->ncs_padded]);
+		double pixel = 20*log10(mag(lineBuffer[j + thread_id*experiment->ncs_padded]));
+		
+		if (pixel < experiment->blanking_threshold)
+			matchedImageBuffer[j + thread_id*experiment->ncs_padded] = experiment->blanking_threshold;
+		else
+			matchedImageBuffer[j + thread_id*experiment->ncs_padded] = pixel;		
 	}	
 	
-	plot.addRTI(rangeLine, &matchedImageBuffer[thread_id*experiment->ncs_padded]);
+	if ((experiment->is_debug) && (rangeLine == 1))
+	{
+		gPlot.plot(matchedImageBuffer, experiment->ncs_padded, "Pulse Compressed Pulse #1", experiment->save_path);	
+	}
 	
-	//plot.gnuPlot(matchedImageBuffer, "matched image buffer");
+	plot.addRTI(rangeLine, &matchedImageBuffer[thread_id*experiment->ncs_padded]);
 }
 
 
@@ -318,7 +337,11 @@ void SignalProcessor::loadReferenceWaveform(void)
 	}	
 
 	logger.write("Reference Data Loaded", timer);	
-	//gnu_plot.gnuPlot(refBuffer, "reference waveform time domain", NORMAL, IQ);		
+	
+	if (experiment->is_debug) 
+	{
+		gPlot.plot(refBuffer, experiment->ncs_reference, "Reference Waveform IQ", NORMAL, IQ, experiment->save_path);	
+	}
 }
 
 
@@ -368,6 +391,9 @@ void SignalProcessor::getExperimentParameters(void)
 		
 	if (experiment->pulse_blanking == -1)
 		experiment->pulse_blanking 	= atoi(ini.GetValue("visualisation", "pulse_blanking"));	
+		
+	if (experiment->blanking_threshold == -1)
+		experiment->blanking_threshold 	= atoi(ini.GetValue("visualisation", "plot_baseline"));
 
 
 	std::string doppler_flag = ini.GetValue("processing", "doppler_enabled");	
@@ -393,7 +419,7 @@ void SignalProcessor::getExperimentParameters(void)
 	
 	//extract and set windowing functions
 	refWindow.init((WindowFunction)atoi(ini.GetValue("processing", "ref_window")), experiment->ncs_reference);	
-	rangeWindow.init((WindowFunction)atoi(ini.GetValue("processing", "range_window")), (experiment->ncs_range_line - experiment->pulse_blanking));	
+	rangeWindow.init((WindowFunction)atoi(ini.GetValue("processing", "range_window")), (experiment->ncs_range_line));	
 	dopplerWindow.init((WindowFunction)atoi(ini.GetValue("processing", "doppler_window")), experiment->ncs_doppler_cpi);	
 	
 	//calculate the number of range lines each thread is responsible for.
