@@ -35,8 +35,7 @@ int main(int argc, char *argv[])
 	signalProcessor.fftRefData();		
 	signalProcessor.complxConjRef();
 	
-	calcThreshold(1);
-	
+	calcThreshold(1);	
 	opencvPlot.initOpenCV();
 	
 	for (int i = 0; i < experiment.n_threads; i++)
@@ -82,7 +81,8 @@ void perThread(int id)
 		signalProcessor.popRangeBuffer(i, id);		
 		signalProcessor.fftRangeData(id);		
 		signalProcessor.complxMulti(id);			
-		signalProcessor.ifftMatchedData(id);							
+		signalProcessor.ifftMatchedData(id);	
+								
 		signalProcessor.addToWaterPlot(i, opencvPlot, id);
 		
 		if ((experiment.is_doppler) && (experiment.n_threads == 1))

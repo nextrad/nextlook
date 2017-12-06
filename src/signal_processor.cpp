@@ -136,7 +136,9 @@ void SignalProcessor::processDoppler(int rangeLine, OpenCVPlot &plot)
 	
 	if ((rangeLine - dopplerDataStart + 1) == experiment->ncs_doppler_cpi)  //check that dopplerData is full
 	{
-		for (int i = 0; i < experiment->ncs_padded; i++)		
+		// experiment->pulse_blanking - experiment->ncs_reference corresponds to the resultant 
+		// zero range after pulse compression
+		for (int i = (experiment->pulse_blanking - experiment->ncs_reference); i < experiment->ncs_padded; i++)		
 		{
 			popDopplerBuffer(i);	
 			fftDopplerData();
@@ -182,12 +184,6 @@ void SignalProcessor::addToDopplerPlot(OpenCVPlot &plot)
 		else
 			dopplerImageBuffer[i - ((experiment->ncs_doppler_cpi*experiment->doppler_padding_factor)/2 + 1)] = mag(dopplerBuffer[i]);
 	}	
-	
-	/*if (experiment->is_debug) 
-	{
-		gPlot.plot(dopplerImageBuffer, experiment->ncs_doppler_cpi*experiment->doppler_padding_factor, "Doppler Spectrum");	
-		exit(0);
-	}*/
 	
 	plot.addRD(dopplerImageBuffer);
 }
