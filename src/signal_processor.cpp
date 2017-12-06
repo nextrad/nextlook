@@ -18,6 +18,7 @@ SignalProcessor::SignalProcessor(Experiment* exp)
 	experiment->n_threads = -1;		
 	experiment->pulse_blanking = -1;
 	experiment->blanking_threshold = -1;
+	experiment->dynamic_range = -1;
 }
 
 void SignalProcessor::allocateMemory(void)
@@ -41,6 +42,25 @@ void SignalProcessor::allocateMemory(void)
 	resultPlan = (fftw_plan*)malloc(experiment->n_threads*sizeof(fftw_plan));	
 	
 	logger.write("Memory Allocated", timer);		
+}
+
+
+int SignalProcessor::getBlankedPeak(int thread_id)
+{
+	double max = 0;
+	double value = 0;
+	
+	for (int j = 0; j < experiment->ncs_padded; j++)
+	{
+		value = 20*log10(mag(lineBuffer[j + thread_id*experiment->ncs_padded]));
+		
+		if (j == 0)
+			max = value;
+		else if (value > max)
+			max = value;
+	}
+	
+	return max;
 }
 
 
@@ -394,6 +414,9 @@ void SignalProcessor::getExperimentParameters(void)
 		
 	if (experiment->blanking_threshold == -1)
 		experiment->blanking_threshold 	= atoi(ini.GetValue("visualisation", "plot_baseline"));
+		
+	if (experiment->dynamic_range == -1)
+		experiment->dynamic_range 	= atoi(ini.GetValue("visualisation", "dynamic_range"));
 
 
 	std::string doppler_flag = ini.GetValue("processing", "doppler_enabled");	

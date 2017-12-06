@@ -17,6 +17,7 @@ typedef struct
 	int n_range_lines_per_thread;
 	int ncs_doppler_cpi; 	
 	int n_plot_average;
+	int dynamic_range;
 	
 	int doppler_padding_factor;
 	int specro_range_bin;

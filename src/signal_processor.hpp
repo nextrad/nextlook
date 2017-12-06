@@ -80,6 +80,7 @@ class SignalProcessor
 		void addToWaterPlot(int rangeLine, OpenCVPlot &plot, int thread_id);
 		void addToDopplerPlot(OpenCVPlot &plot);
 		void popRangeBuffer(int rangeLine, int thread_id);	
+		int getBlankedPeak(int thread_id);
 		
 		void getExperimentParameters(void);
 		WindowFunction parseWindowOption(char* option);		

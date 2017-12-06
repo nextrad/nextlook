@@ -6,6 +6,7 @@
 
 void help(void);
 void perThread(int id);
+void calcThreshold(int pulse_number);
 void initTerminal(void); 
 void parse_options(int argc, char *argv[]);
 
@@ -34,6 +35,8 @@ int main(int argc, char *argv[])
 	signalProcessor.fftRefData();		
 	signalProcessor.complxConjRef();
 	
+	calcThreshold(1);
+	
 	opencvPlot.initOpenCV();
 	
 	for (int i = 0; i < experiment.n_threads; i++)
@@ -54,6 +57,20 @@ int main(int argc, char *argv[])
 }
 
 
+void calcThreshold(int pulse_number)
+{	
+	//pulse compress the first range line and get the peak value after
+	//blanking. The threshold = blanked_peak - dynamic_range
+	signalProcessor.createPlans(0);	
+	signalProcessor.popRangeBuffer(pulse_number, 0);		
+	signalProcessor.fftRangeData(0);		
+	signalProcessor.complxMulti(0);			
+	signalProcessor.ifftMatchedData(0);	
+	
+	experiment.blanking_threshold = signalProcessor.getBlankedPeak(0) - experiment.dynamic_range;				
+}
+
+
 void perThread(int id)
 {
 	int start_index = id*experiment.n_range_lines_per_thread;
@@ -65,7 +82,7 @@ void perThread(int id)
 		signalProcessor.popRangeBuffer(i, id);		
 		signalProcessor.fftRangeData(id);		
 		signalProcessor.complxMulti(id);			
-		signalProcessor.ifftMatchedData(id);								
+		signalProcessor.ifftMatchedData(id);							
 		signalProcessor.addToWaterPlot(i, opencvPlot, id);
 		
 		if ((experiment.is_doppler) && (experiment.n_threads == 1))
