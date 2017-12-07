@@ -136,9 +136,9 @@ void SignalProcessor::processDoppler(int rangeLine, OpenCVPlot &plot)
 	
 	if ((rangeLine - dopplerDataStart + 1) == experiment->ncs_doppler_cpi)  //check that dopplerData is full
 	{
-		// experiment->pulse_blanking - experiment->ncs_reference corresponds to the resultant 
-		// zero range after pulse compression
-		for (int i = (experiment->pulse_blanking - experiment->ncs_reference); i < experiment->ncs_padded; i++)		
+		// doppler plot chopped to have number of samples in pulse less in the front and half
+		//of that from the back
+		for (int i = experiment->ncs_reference; i < experiment->ncs_padded - experiment->ncs_reference/2; i++)		
 		{
 			popDopplerBuffer(i);	
 			fftDopplerData();

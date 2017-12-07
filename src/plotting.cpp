@@ -167,7 +167,11 @@ void OpenCVPlot::initOpenCV(void)
 	
 	cv::namedWindow("Range-Time-Intensity", cv::WINDOW_AUTOSIZE);
 	cv::moveWindow("Range-Time-Intensity", 0, 0);	
-	rtImage = cv::Mat(experiment->n_range_lines, experiment->ncs_padded - (experiment->pulse_blanking - experiment->ncs_reference), CV_64F, cv::Scalar::all(experiment->blanking_threshold));	
+	
+	//init the range-time image with n_range_lines rows
+	//the number of columns is equal to ncs_padded - ncs_reference off the front and ncs_reference/2 off the back of the image
+	//all values are init to the blanking threshold 
+	rtImage = cv::Mat(experiment->n_range_lines, experiment->ncs_padded - (experiment->ncs_reference + experiment->ncs_reference/2), CV_64F, cv::Scalar::all(experiment->blanking_threshold));	
 	
 	cv::namedWindow("Control", cv::WINDOW_AUTOSIZE);
 	cv::moveWindow("Control", (rtSize.width + 2), 0);	
@@ -201,7 +205,9 @@ void OpenCVPlot::initOpenCV(void)
 
 void OpenCVPlot::addRTI(int rangeLine, double  *imageValues)
 {
-	cv::Mat matchedRow = cv::Mat(1, experiment->ncs_padded - (experiment->pulse_blanking - experiment->ncs_reference), CV_64F, &imageValues[experiment->pulse_blanking - experiment->ncs_reference]);	
+	//similarly to the init, the number of samples in the row equals
+	//ncs_padded - ncs_reference off the front and ncs_reference/2 off the back of the image
+	cv::Mat matchedRow = cv::Mat(1, experiment->ncs_padded - (experiment->ncs_reference + experiment->ncs_reference/2), CV_64F, &imageValues[experiment->ncs_reference]);	
 	
 	matchedRow.copyTo(rtImage(cv::Rect(0, rangeLine, matchedRow.cols, matchedRow.rows)));
 	
