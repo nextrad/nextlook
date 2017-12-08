@@ -50,7 +50,11 @@ int main(int argc, char *argv[])
 	opencvPlot.savePlots();
 	
 	signalProcessor.freeMemory();
+	
+	std::cout << "Press any key to exit..." << std::endl;
+	
 	cv::waitKey(0);
+	
 
 	return 0;
 }
@@ -61,10 +65,11 @@ void calcThreshold(int pulse_number)
 	//pulse compress the first range line and get the peak value after
 	//blanking. The threshold = blanked_peak - dynamic_range
 	signalProcessor.createPlans(0);	
-	signalProcessor.popRangeBuffer(pulse_number, 0);		
+	signalProcessor.popRangeBuffer(pulse_number, 0, true);		
 	signalProcessor.fftRangeData(0);		
 	signalProcessor.complxMulti(0);			
 	signalProcessor.ifftMatchedData(0);	
+	//signalProcessor.destroyPlans();
 	
 	experiment.blanking_threshold = signalProcessor.getBlankedPeak(0) - experiment.dynamic_range;				
 }

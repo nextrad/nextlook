@@ -41,6 +41,8 @@ class SignalProcessor
 		Window rangeWindow;
 		Window dopplerWindow;
 		
+		FILE *outFile;
+		
 		//fftw plans
 		fftw_plan	*rangePlan;
 		fftw_plan  	 refPlan;
@@ -79,7 +81,7 @@ class SignalProcessor
 		void complxMulti(int thread_id);		
 		void addToWaterPlot(int rangeLine, OpenCVPlot &plot, int thread_id);
 		void addToDopplerPlot(OpenCVPlot &plot);
-		void popRangeBuffer(int rangeLine, int thread_id);	
+		void popRangeBuffer(int rangeLine, int thread_id, bool is_once_off = false);	
 		int getBlankedPeak(int thread_id);
 		
 		void getExperimentParameters(void);

@@ -8,6 +8,7 @@ typedef struct
 {
 	bool is_doppler;	
 	bool is_debug;		
+	bool is_move_file;
 	
 	int n_threads;
 	int ncs_reference;		
@@ -29,8 +30,9 @@ typedef struct
 	int slow;
 	int threshold;
 
-	char* dataset_filename; 	
-	char* reference_filename; 	
+	std::string dataset_filename; 	
+	std::string reference_filename; 	
+	std::string output_filename;
 	std::string save_path;
 	
 	boost::mutex mutex;

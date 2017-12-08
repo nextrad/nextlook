@@ -8,6 +8,7 @@ SignalProcessor::SignalProcessor(Experiment* exp)
 	
 	experiment->dataset_filename = (char*)"-1";
 	experiment->reference_filename = (char*)"-1";	
+	experiment->output_filename = "-1";
 	experiment->n_range_lines = -1;		
 	experiment->ncs_range_line = -1;	
 	experiment->ncs_reference = -1;	
@@ -19,6 +20,7 @@ SignalProcessor::SignalProcessor(Experiment* exp)
 	experiment->pulse_blanking = -1;
 	experiment->blanking_threshold = -1;
 	experiment->dynamic_range = -1;
+	experiment->is_move_file = false;		
 }
 
 void SignalProcessor::allocateMemory(void)
@@ -211,11 +213,11 @@ void SignalProcessor::complxMulti(int thread_id)
 
 
 //process data extracted from the bin file into the complex lineBuffer line by line.
-void SignalProcessor::popRangeBuffer(int rangeLine, int thread_id)
-{
+void SignalProcessor::popRangeBuffer(int rangeLine, int thread_id, bool is_once_off)
+{	
 	int start = rangeLine*2*experiment->ncs_range_line;
 	
-	//populate complex range data and remove offset	
+	//populate complex range data and window
 	for (int i = 0; i < experiment->ncs_padded; i++)
 	{
 		if ((i > experiment->pulse_blanking) && (i < experiment->ncs_range_line))
@@ -231,10 +233,69 @@ void SignalProcessor::popRangeBuffer(int rangeLine, int thread_id)
 		}
 	}
 	
-	if ((experiment->is_debug) && (rangeLine == 1))
+	if ((experiment->is_debug) && (rangeLine == 0))
 	{
 		gPlot.plot(lineBuffer, experiment->ncs_padded, "Time Domain Pulse #1", NORMAL, IQ, experiment->save_path);	
 	}	
+	
+	if ((experiment->is_move_file) && (experiment->n_threads == 1))
+	{				
+		if (!is_once_off)
+		{
+			if (rangeLine == 0)
+			{
+				logger.write("Opening Output File", timer);
+				//std::cout << "Moving file to: " << experiment->output_filename.c_str() << std::endl;
+				outFile = fopen(experiment->output_filename.c_str(), "wb");
+			}
+			
+			//check that file exists in the location specified
+			if (outFile != NULL)
+			{			
+				//read from binary file into buffer
+				fwrite(&binDataset[start], sizeof(int16_t), experiment->ncs_range_line*2, outFile);
+
+				if (rangeLine == experiment->n_range_lines - 1)
+				{
+					logger.write("Finished Copying Dataset.", timer);
+					fclose(outFile);
+					
+					logger.write("Checking That Copy and Original are Identical.", timer);
+					std::stringstream command;
+					command << "diff " << experiment->dataset_filename << " " << experiment->output_filename << "\n";
+					
+					int ret = system(command.str().c_str());
+					if (WEXITSTATUS(ret) == 0)
+					{						
+						//clear the stringstream
+						command.str(std::string());
+						
+						command << "rm " << experiment->dataset_filename << "\n";
+						//std::cout << "Deleting original file: " << command.str();
+						system(command.str().c_str());
+						logger.write("Original Dataset Deleted.", timer);
+					}
+					else
+					{
+						std::cout << "Copied Dataset is NOT Identical to the Original Dataset." << std::endl;
+						std::cout << "Original Dataset will NOT be Deleted." << std::endl;
+					}
+				}
+					
+			}
+			//file does not exist in the specified location
+			else
+			{
+				logger.write("Output File Location Cannot Be Written To.");
+				exit(EXIT_FAILURE);
+			}
+		}
+	}
+	else
+	{
+		logger.write("File moving is not supported with multithreading, either disable file moving or specify one thread.");
+		exit(EXIT_FAILURE);
+	}
 }
 
 
@@ -286,7 +347,7 @@ void SignalProcessor::loadBinaryDataset(void)
 	FILE *binFile;	
 	
 	//assign pointer to file location
-	binFile = fopen(experiment->dataset_filename, "rb");			
+	binFile = fopen(experiment->dataset_filename.c_str(), "rb");			
 	
 	//check that file exists in the location specified
 	if (binFile != NULL)
@@ -314,7 +375,7 @@ void SignalProcessor::loadReferenceWaveform(void)
 	FILE *refFile;	
 	
 	//assign pointer to file location
-	refFile = fopen(experiment->reference_filename, "rb");
+	refFile = fopen(experiment->reference_filename.c_str(), "rb");
 	
 	//check that file exists in the location specified
 	if (refFile != NULL)
@@ -376,25 +437,28 @@ void SignalProcessor::getExperimentParameters(void)
 	ini.LoadFile(EXP_FILE);	
 	
 	if (experiment->dataset_filename == "-1")
-		experiment->dataset_filename 	= (char *)ini.GetValue("dataset", "data_filename");
+		experiment->dataset_filename = (std::string)ini.GetValue("dataset", "data_filename");
 		
 	if (experiment->reference_filename == "-1")
-		experiment->reference_filename 	= (char *)ini.GetValue("dataset", "ref_filename");
+		experiment->reference_filename = (std::string)ini.GetValue("dataset", "ref_filename");
+		
+	if (experiment->output_filename == "-1")
+		experiment->output_filename = (std::string)ini.GetValue("dataset", "output_filename");
 	
 	if (experiment->n_range_lines == -1)	
-		experiment->n_range_lines 		= atoi(ini.GetValue("dataset", "n_range_lines"));	
+		experiment->n_range_lines = atoi(ini.GetValue("dataset", "n_range_lines"));	
 		
 	if (experiment->ncs_range_line == -1)
-		experiment->ncs_range_line 		= atoi(ini.GetValue("dataset", "n_cmplx_samples_range_line"));
+		experiment->ncs_range_line = atoi(ini.GetValue("dataset", "n_cmplx_samples_range_line"));
 	
 	if (experiment->ncs_reference == -1)
-		experiment->ncs_reference 		= atoi(ini.GetValue("dataset", "n_cmplx_samples_ref"));	
+		experiment->ncs_reference = atoi(ini.GetValue("dataset", "n_cmplx_samples_ref"));	
 	
 	if (experiment->ncs_padded == -1)
-		experiment->ncs_padded 			= atoi(ini.GetValue("dataset", "n_cmplx_samples_padded"));	
+		experiment->ncs_padded = atoi(ini.GetValue("dataset", "n_cmplx_samples_padded"));	
 		
 	if (experiment->ncs_doppler_cpi == -1)
-		experiment->ncs_doppler_cpi 	= atoi(ini.GetValue("processing", "doppler_cpi"));	
+		experiment->ncs_doppler_cpi = atoi(ini.GetValue("processing", "doppler_cpi"));	
 		
 	if (experiment->doppler_padding_factor == -1)
 		experiment->doppler_padding_factor = atoi(ini.GetValue("processing", "doppler_padding_factor"));
@@ -403,17 +467,23 @@ void SignalProcessor::getExperimentParameters(void)
 		experiment->specro_range_bin = atoi(ini.GetValue("processing", "spectrogram_range_bin"));
 	
 	if (experiment->n_threads == -1)		
-		experiment->n_threads 			= atoi(ini.GetValue("processing", "n_threads"));	
+		experiment->n_threads = atoi(ini.GetValue("processing", "n_threads"));	
 		
 	if (experiment->pulse_blanking == -1)
-		experiment->pulse_blanking 	= atoi(ini.GetValue("visualisation", "pulse_blanking"));	
+		experiment->pulse_blanking = atoi(ini.GetValue("visualisation", "pulse_blanking"));	
 		
 	if (experiment->blanking_threshold == -1)
 		experiment->blanking_threshold 	= atoi(ini.GetValue("visualisation", "plot_baseline"));
 		
 	if (experiment->dynamic_range == -1)
-		experiment->dynamic_range 	= atoi(ini.GetValue("visualisation", "dynamic_range"));
-
+		experiment->dynamic_range = atoi(ini.GetValue("visualisation", "dynamic_range"));
+	
+	std::string move_flag = ini.GetValue("config", "is_move_file");	
+		
+	if ((move_flag == "1") || (move_flag == "true") || (move_flag == "TRUE") || (move_flag == "True"))
+		experiment->is_move_file = true;
+	else
+		experiment->is_move_file = false;
 
 	std::string doppler_flag = ini.GetValue("processing", "doppler_enabled");	
 		
