@@ -14,6 +14,10 @@
 #include "experiment.hpp" 
 
 #define EXP_FILE "../experiment.ini"
+#define HDR_FILE "../NeXtRAD.ini"
+#define COBALT_ADC_DIR "///smbtest/"
+#define EXT_STORAGE_DIR "///mnt/external/"
+#define NODE_ID 0
 
 class SignalProcessor
 {
@@ -85,6 +89,8 @@ class SignalProcessor
 		int getBlankedPeak(int thread_id);
 		
 		void getExperimentParameters(void);
+		void readHeader(void);
+		
 		WindowFunction parseWindowOption(char* option);		
 		
 		double mag(fftw_complex value){return sqrt(pow(value[0], 2) + pow(value[1], 2));};

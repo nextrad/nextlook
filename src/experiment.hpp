@@ -29,6 +29,13 @@ typedef struct
 	int hist_equal;
 	int slow;
 	int threshold;
+	
+	int year;
+	int month;
+	int day;
+	int hour;
+	int minute;
+	int second;
 
 	std::string dataset_filename; 	
 	std::string reference_filename; 	

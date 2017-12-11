@@ -563,6 +563,63 @@ WindowFunction SignalProcessor::parseWindowOption(char* option)
 }
 
 
+void SignalProcessor::readHeader(void)
+{
+	//check that filepath is good
+	std::ifstream check(HDR_FILE);
+
+	if (!check.good()) 
+	{
+		printf("Please check location of header file and try again.\n");
+		exit(EXIT_FAILURE);
+	}
+	
+	CSimpleIniA ini;
+	ini.LoadFile(HDR_FILE);	
+	
+	//get dataset filename
+	int adc_channel = atoi(ini.GetValue("quicklook", "adc_channel"));
+	
+	experiment->dataset_filename = COBALT_ADC_DIR;
+	
+	switch (adc_channel)
+	{
+		case 0:
+			experiment->dataset_filename += "adc0.dat";
+			break;
+		case 1:
+			experiment->dataset_filename += "adc1.dat";
+			break;
+		case 2:
+			experiment->dataset_filename += "adc2.dat";
+			break;
+	}	
+	
+	//get date and time
+	experiment->year 	= atoi(ini.GetValue("Timing", "YEAR"));
+	experiment->month 	= atoi(ini.GetValue("Timing", "MONTH"));
+	experiment->day 	= atoi(ini.GetValue("Timing", "DAY"));
+	experiment->hour 	= atoi(ini.GetValue("Timing", "HOUR"));
+	experiment->minute 	= atoi(ini.GetValue("Timing", "MINUTE"));
+	experiment->second 	= atoi(ini.GetValue("Timing", "SECOND"));
+	
+	//generate the output file name
+	std::stringstream ss_output_file;
+	
+	ss_output_file << EXT_STORAGE_DIR;
+	ss_output_file << experiment->year 		<< "_";
+	ss_output_file << experiment->month 	<< "_";
+	ss_output_file << experiment->day 		<< "_";
+	ss_output_file << experiment->hour 		<< "_";
+	ss_output_file << experiment->minute 	<< "_";
+	ss_output_file << experiment->second 	<< "_";
+	ss_output_file << NODE_ID;
+	ss_output_file << ".dat";
+	
+	experiment->output_filename = ss_output_file.str();
+}
+
+
 
 
 

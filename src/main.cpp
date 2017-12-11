@@ -20,8 +20,14 @@ int main(int argc, char *argv[])
 	
 	initTerminal();	
 	
+	//get cmd line options
 	parse_options(argc, argv);
 	
+	//get parameters from the header file
+	signalProcessor.readHeader();
+	
+	//get parameters from the experiment file
+	//only if they haven't been set using cmd line or the header file
 	signalProcessor.getExperimentParameters();			
 	
 	boost::thread threads[experiment.n_threads];
