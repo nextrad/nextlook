@@ -36,10 +36,13 @@ typedef struct
 	int hour;
 	int minute;
 	int second;
+	
+	int node_id;
+	int adc_channel;
 
-	std::string dataset_filename; 	
+	std::string dataset_filenames[3]; 	
 	std::string reference_filename; 	
-	std::string output_filename;
+	std::string output_filenames[3];
 	std::string save_path;
 	
 	boost::mutex mutex;

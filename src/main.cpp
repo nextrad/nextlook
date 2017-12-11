@@ -23,6 +23,12 @@ int main(int argc, char *argv[])
 	//get cmd line options
 	parse_options(argc, argv);
 	
+	if (experiment.node_id == -1)
+	{
+		std::cout << "Node ID has not been set. Use -n to set node ID as a command line option." << std::endl;
+		exit(EXIT_FAILURE);
+	}
+	
 	//get parameters from the header file
 	signalProcessor.readHeader();
 	
@@ -116,16 +122,13 @@ void parse_options(int argc, char *argv[])
 {
 	int opt;
 
-    while ((opt = getopt(argc, argv, "hd:r:p:s:k:z:")) != -1 )
+    while ((opt = getopt(argc, argv, "hr:p:s:k:z:n:")) != -1 )
     {
         switch (opt)
         {
             case 'h':
 				help();
 				break;
-            case 'd':
-                experiment.dataset_filename = optarg;
-                break;
 			case 'r':
                 experiment.reference_filename = optarg;
                 break;
@@ -140,7 +143,10 @@ void parse_options(int argc, char *argv[])
                 break;
             case 'k':
                 experiment.ncs_reference = atoi(optarg);
-                break;                             
+                break;    
+            case 'n':
+                experiment.node_id = atoi(optarg);
+                break;                           
             case '?':
 				printf("Unknown command line option.\n");
 				exit(EXIT_FAILURE);

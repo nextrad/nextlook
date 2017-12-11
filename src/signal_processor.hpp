@@ -17,7 +17,6 @@
 #define HDR_FILE "../NeXtRAD.ini"
 #define COBALT_ADC_DIR "///smbtest/"
 #define EXT_STORAGE_DIR "///mnt/external/"
-#define NODE_ID 0
 
 class SignalProcessor
 {

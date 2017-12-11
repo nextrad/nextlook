@@ -6,9 +6,16 @@ SignalProcessor::SignalProcessor(Experiment* exp)
 	dopplerDataStart = 0;
 	experiment = exp;
 	
-	experiment->dataset_filename = (char*)"-1";
-	experiment->reference_filename = (char*)"-1";	
-	experiment->output_filename = "-1";
+	experiment->dataset_filenames[0] = "-1";
+	experiment->dataset_filenames[1] = "-1";
+	experiment->dataset_filenames[2] = "-1";
+	
+	experiment->reference_filename = "-1";	
+	
+	experiment->output_filenames[0] = "-1";
+	experiment->output_filenames[1] = "-1";
+	experiment->output_filenames[2] = "-1";
+	
 	experiment->n_range_lines = -1;		
 	experiment->ncs_range_line = -1;	
 	experiment->ncs_reference = -1;	
@@ -20,6 +27,8 @@ SignalProcessor::SignalProcessor(Experiment* exp)
 	experiment->pulse_blanking = -1;
 	experiment->blanking_threshold = -1;
 	experiment->dynamic_range = -1;
+	experiment->node_id = -1;
+	experiment->adc_channel = -1;
 	experiment->is_move_file = false;		
 }
 
@@ -244,9 +253,8 @@ void SignalProcessor::popRangeBuffer(int rangeLine, int thread_id, bool is_once_
 		{
 			if (rangeLine == 0)
 			{
-				logger.write("Opening Output File", timer);
-				//std::cout << "Moving file to: " << experiment->output_filename.c_str() << std::endl;
-				outFile = fopen(experiment->output_filename.c_str(), "wb");
+				std::cout << "Opening Output File: " << experiment->output_filenames[experiment->adc_channel] << std::endl;
+				outFile = fopen(experiment->output_filenames[experiment->adc_channel].c_str(), "wb");
 			}
 			
 			//check that file exists in the location specified
@@ -262,7 +270,7 @@ void SignalProcessor::popRangeBuffer(int rangeLine, int thread_id, bool is_once_
 					
 					logger.write("Checking That Copy and Original are Identical.", timer);
 					std::stringstream command;
-					command << "diff " << experiment->dataset_filename << " " << experiment->output_filename << "\n";
+					command << "diff " << experiment->dataset_filenames[experiment->adc_channel] << " " << experiment->output_filenames[experiment->adc_channel] << "\n";
 					
 					int ret = system(command.str().c_str());
 					if (WEXITSTATUS(ret) == 0)
@@ -270,7 +278,7 @@ void SignalProcessor::popRangeBuffer(int rangeLine, int thread_id, bool is_once_
 						//clear the stringstream
 						command.str(std::string());
 						
-						command << "rm " << experiment->dataset_filename << "\n";
+						command << "rm " << experiment->dataset_filenames[experiment->adc_channel] << "\n";
 						//std::cout << "Deleting original file: " << command.str();
 						system(command.str().c_str());
 						logger.write("Original Dataset Deleted.", timer);
@@ -347,7 +355,7 @@ void SignalProcessor::loadBinaryDataset(void)
 	FILE *binFile;	
 	
 	//assign pointer to file location
-	binFile = fopen(experiment->dataset_filename.c_str(), "rb");			
+	binFile = fopen(experiment->dataset_filenames[experiment->adc_channel].c_str(), "rb");			
 	
 	//check that file exists in the location specified
 	if (binFile != NULL)
@@ -363,8 +371,8 @@ void SignalProcessor::loadBinaryDataset(void)
 	//file does not exist in the specified location
 	else
 	{
-		logger.write("Binary dataset could not be found in the specified location.");
-		exit(0);
+		std::cout << "Binary dataset could not be found at: " << experiment->dataset_filenames[experiment->adc_channel] << std::endl;
+		exit(EXIT_FAILURE);
 	}
 }
 
@@ -436,15 +444,9 @@ void SignalProcessor::getExperimentParameters(void)
 	CSimpleIniA ini;
 	ini.LoadFile(EXP_FILE);	
 	
-	if (experiment->dataset_filename == "-1")
-		experiment->dataset_filename = (std::string)ini.GetValue("dataset", "data_filename");
-		
 	if (experiment->reference_filename == "-1")
 		experiment->reference_filename = (std::string)ini.GetValue("dataset", "ref_filename");
 		
-	if (experiment->output_filename == "-1")
-		experiment->output_filename = (std::string)ini.GetValue("dataset", "output_filename");
-	
 	if (experiment->n_range_lines == -1)	
 		experiment->n_range_lines = atoi(ini.GetValue("dataset", "n_range_lines"));	
 		
@@ -514,29 +516,6 @@ void SignalProcessor::getExperimentParameters(void)
 	//calculate the number of range lines each thread is responsible for.
 	experiment->n_range_lines_per_thread = experiment->n_range_lines/experiment->n_threads;
 	
-	//extract path from dataset location
-	boost::filesystem::path experiment_filepath(experiment->dataset_filename);
-	boost::filesystem::path filename(experiment_filepath.filename());	
-	boost::filesystem::path path("../results");
-	
-	//make the results folder
-	if(!boost::filesystem::exists(path))
-	{
-		std::string command = "mkdir " + path.string();
-		system(command.c_str());
-	}
-	
-	//make the dataset specific folder
-	filename = path / filename.stem();
-	
-	if(!boost::filesystem::exists(filename.string()))
-	{
-		std::string command = "mkdir " + filename.string();
-		system(command.c_str());
-	}
-	
-	experiment->save_path = filename.string();	
-	
 	if (experiment->n_threads != 1)
 	{
 		experiment->is_doppler = false;
@@ -578,22 +557,11 @@ void SignalProcessor::readHeader(void)
 	ini.LoadFile(HDR_FILE);	
 	
 	//get dataset filename
-	int adc_channel = atoi(ini.GetValue("quicklook", "adc_channel"));
+	experiment->adc_channel = atoi(ini.GetValue("Quicklook", "ADC_CHANNEL"));
 	
-	experiment->dataset_filename = COBALT_ADC_DIR;
-	
-	switch (adc_channel)
-	{
-		case 0:
-			experiment->dataset_filename += "adc0.dat";
-			break;
-		case 1:
-			experiment->dataset_filename += "adc1.dat";
-			break;
-		case 2:
-			experiment->dataset_filename += "adc2.dat";
-			break;
-	}	
+	experiment->dataset_filenames[0] = COBALT_ADC_DIR + (std::string)"adc0.dat";
+	experiment->dataset_filenames[1] = COBALT_ADC_DIR + (std::string)"adc1.dat";
+	experiment->dataset_filenames[2] = COBALT_ADC_DIR + (std::string)"adc2.dat";
 	
 	//get date and time
 	experiment->year 	= atoi(ini.GetValue("Timing", "YEAR"));
@@ -606,17 +574,30 @@ void SignalProcessor::readHeader(void)
 	//generate the output file name
 	std::stringstream ss_output_file;
 	
-	ss_output_file << EXT_STORAGE_DIR;
-	ss_output_file << experiment->year 		<< "_";
-	ss_output_file << experiment->month 	<< "_";
-	ss_output_file << experiment->day 		<< "_";
-	ss_output_file << experiment->hour 		<< "_";
-	ss_output_file << experiment->minute 	<< "_";
-	ss_output_file << experiment->second 	<< "_";
-	ss_output_file << NODE_ID;
-	ss_output_file << ".dat";
+	for (int i = 0; i < 3; i++)
+	{
+		ss_output_file.str(std::string());
+		ss_output_file << EXT_STORAGE_DIR;
+		ss_output_file << experiment->year 	 << "_";
+		ss_output_file << experiment->month	 << "_";
+		ss_output_file << experiment->day 	 << "_";
+		ss_output_file << experiment->hour 	 << "_";
+		ss_output_file << experiment->minute << "_";
+		ss_output_file << experiment->second << "_";		
+		ss_output_file << "n" << experiment->node_id;
+		
+		experiment->save_path = ss_output_file.str();
+		
+		ss_output_file << "_" << "adc" << i;
+		ss_output_file << ".dat";
+		
+		experiment->output_filenames[i] = ss_output_file.str();
+		
+		std::cout << experiment->output_filenames[i] << std::endl;
+	}	
 	
-	experiment->output_filename = ss_output_file.str();
+	std::string command = "mkdir " + experiment->save_path;
+	system(command.c_str());	
 }
 
 
