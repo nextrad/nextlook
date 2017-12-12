@@ -446,20 +446,8 @@ void SignalProcessor::getExperimentParameters(void)
 	CSimpleIniA ini;
 	ini.LoadFile(EXP_FILE);	
 	
-	if (experiment->reference_filename == "-1")
-		experiment->reference_filename = (std::string)ini.GetValue("dataset", "ref_filename");	
-		
-	if (experiment->ncs_reference == -1)
-		experiment->ncs_reference = atoi(ini.GetValue("dataset", "n_cmplx_samples_ref"));	
-	
-	if (experiment->ncs_doppler_cpi == -1)
-		experiment->ncs_doppler_cpi = atoi(ini.GetValue("processing", "doppler_cpi"));	
-		
 	if (experiment->doppler_padding_factor == -1)
 		experiment->doppler_padding_factor = atoi(ini.GetValue("processing", "doppler_padding_factor"));
-		
-	if (experiment->specro_range_bin == -1)
-		experiment->specro_range_bin = atoi(ini.GetValue("processing", "spectrogram_range_bin"));
 	
 	if (experiment->n_threads == -1)		
 		experiment->n_threads = atoi(ini.GetValue("processing", "n_threads"));	
@@ -558,10 +546,71 @@ void SignalProcessor::readHeader(void)
 	experiment->ncs_padded = experiment->ncs_range_line;
 	experiment->dynamic_range = atoi(ini.GetValue("Quicklook", "DYNAMIC_RANGE"));
 	
-	
+	int waveform_index = atoi(ini.GetValue("PulseParameters", "WAVEFORM_INDEX"));
+	int sampling_freq = 90e6;
 	
 	//get dataset filename
 	experiment->adc_channel = atoi(ini.GetValue("Quicklook", "ADC_CHANNEL"));
+	
+	int amp_index = atoi(ini.GetValue("Quicklook", "AMPLIFIER"));
+	
+	std::stringstream ss_ref_filename;
+	
+	ss_ref_filename << REF_DIR;
+	
+	switch (experiment->adc_channel)
+	{
+		case 0:
+			ss_ref_filename << "L_";
+			break;
+		case 1:
+			ss_ref_filename << "X_";
+			break;
+		case 2:
+			ss_ref_filename << "X_";
+			break;			
+	}
+	
+	switch (amp_index)
+	{
+		case 0:
+			ss_ref_filename << "M_";
+			break;
+		case 1:
+			ss_ref_filename << "H_";
+			break;		
+	}	
+	
+	ss_ref_filename << waveform_index << ".dat";
+	
+	experiment->reference_filename = ss_ref_filename.str();
+	
+	std::cout << experiment->reference_filename << std::endl;
+	
+	switch (waveform_index)
+	{
+		case 1:
+			experiment->ncs_reference = 0.5e-6*sampling_freq;
+			break;
+		case 2:
+			experiment->ncs_reference = 1.0e-6*sampling_freq;
+			break;
+		case 3:
+			experiment->ncs_reference = 3.0e-6*sampling_freq;
+			break;
+		case 4:
+			experiment->ncs_reference = 5.0e-6*sampling_freq;
+			break;
+		case 5:
+			experiment->ncs_reference = 10.0e-6*sampling_freq;
+			break;
+		case 6:
+			experiment->ncs_reference = 15.0e-6*sampling_freq;
+			break;
+		case 7:
+			experiment->ncs_reference = 20.0e-6*sampling_freq;
+			break;
+	}
 	
 	experiment->dataset_filenames[0] = COBALT_ADC_DIR + (std::string)("adc0.dat");
 	experiment->dataset_filenames[1] = COBALT_ADC_DIR + (std::string)("adc1.dat");
@@ -617,6 +666,9 @@ void SignalProcessor::readHeader(void)
 			system(command.c_str());
 		}
 	}
+
+	experiment->specro_range_bin = atoi(ini.GetValue("Quicklook", "SPECTROGRAM_BIN"));
+	experiment->ncs_doppler_cpi = atoi(ini.GetValue("Quicklook", "DOPPLER_FFT"));
 }
 
 

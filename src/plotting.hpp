@@ -21,7 +21,7 @@ class OpenCVPlot
 {
 	private:
 		const int cMapWidth = 30;
-		std::string cMapRoot = "../colour_maps/";	
+		std::string cMapRoot = "../cmaps/";	
 		
 		const int slowMax = 500;		
 		const int histMax = 1;
