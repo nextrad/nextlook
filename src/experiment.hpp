@@ -9,6 +9,7 @@ typedef struct
 	bool is_doppler;	
 	bool is_debug;		
 	bool is_move_file;
+	bool is_blanking;
 	
 	int n_threads;
 	int ncs_reference;		
@@ -19,10 +20,10 @@ typedef struct
 	int ncs_doppler_cpi; 	
 	int n_plot_average;
 	int dynamic_range;
+	int ncs_blank;
 	
 	int doppler_padding_factor;
 	int specro_range_bin;
-	int pulse_blanking;
 	int blanking_threshold;
 	int update_rate;	
 	int cm;

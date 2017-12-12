@@ -24,12 +24,12 @@ SignalProcessor::SignalProcessor(Experiment* exp)
 	experiment->doppler_padding_factor = -1;		
 	experiment->specro_range_bin = -1;	
 	experiment->n_threads = -1;		
-	experiment->pulse_blanking = -1;
 	experiment->blanking_threshold = -1;
 	experiment->dynamic_range = -1;
 	experiment->node_id = -1;
 	experiment->adc_channel = -1;
-	experiment->is_move_file = false;		
+	experiment->is_move_file = false;	
+	experiment->is_blanking = false;	
 }
 
 void SignalProcessor::allocateMemory(void)
@@ -149,7 +149,7 @@ void SignalProcessor::processDoppler(int rangeLine, OpenCVPlot &plot)
 	{
 		// doppler plot chopped to have number of samples in pulse less in the front and half
 		//of that from the back
-		for (int i = experiment->ncs_reference; i < experiment->ncs_padded - experiment->ncs_reference/2; i++)		
+		for (int i = experiment->ncs_blank; i < experiment->ncs_padded - experiment->ncs_blank/2; i++)		
 		{
 			popDopplerBuffer(i);	
 			fftDopplerData();
@@ -224,16 +224,16 @@ void SignalProcessor::complxMulti(int thread_id)
 //process data extracted from the bin file into the complex lineBuffer line by line.
 void SignalProcessor::popRangeBuffer(int rangeLine, int thread_id, bool is_once_off)
 {	
-	int start = rangeLine*2*experiment->ncs_range_line;
-	
+	int sample_index = rangeLine*2*experiment->ncs_range_line;	
+
 	//populate complex range data and window
 	for (int i = 0; i < experiment->ncs_padded; i++)
 	{
-		if ((i > experiment->pulse_blanking) && (i < experiment->ncs_range_line))
+		if ((i > experiment->ncs_blank) && (i < experiment->ncs_range_line))
 		{	
 			float windowCoefficient = rangeWindow.getSample(i);
-			lineBuffer[i + thread_id*experiment->ncs_padded][0] = binDataset[i*2 + start    ]*windowCoefficient;     //real component    
-			lineBuffer[i + thread_id*experiment->ncs_padded][1] = binDataset[i*2 + start + 1]*windowCoefficient;     //complex component
+			lineBuffer[i + thread_id*experiment->ncs_padded][0] = binDataset[i*2 + sample_index    ]*windowCoefficient;     //real component    
+			lineBuffer[i + thread_id*experiment->ncs_padded][1] = binDataset[i*2 + sample_index + 1]*windowCoefficient;     //complex component
 		}
 		else
 		{
@@ -251,7 +251,7 @@ void SignalProcessor::popRangeBuffer(int rangeLine, int thread_id, bool is_once_
 	{				
 		if (!is_once_off)
 		{
-			//temporary for moving one channel
+			//temporary for moving one channel !!!!!!!!!!!!!!!!!!!!!!!!!!
 			for (int channel = experiment->adc_channel; channel < experiment->adc_channel + 1; channel++)
 			{
 				if (rangeLine == 0)
@@ -264,7 +264,7 @@ void SignalProcessor::popRangeBuffer(int rangeLine, int thread_id, bool is_once_
 				if (outFile[channel] != NULL)
 				{			
 					//read from binary file into buffer
-					fwrite(&binDataset[start], sizeof(int16_t), experiment->ncs_range_line*2, outFile[channel]);
+					fwrite(&binDataset[sample_index], sizeof(int16_t), experiment->ncs_range_line*2, outFile[channel]);
 
 					if (rangeLine == experiment->n_range_lines - 1)
 					{
@@ -473,12 +473,6 @@ void SignalProcessor::getExperimentParameters(void)
 	if (experiment->n_threads == -1)		
 		experiment->n_threads = atoi(ini.GetValue("processing", "n_threads"));	
 		
-	if (experiment->pulse_blanking == -1)
-		experiment->pulse_blanking = atoi(ini.GetValue("visualisation", "pulse_blanking"));	
-		
-	if (experiment->blanking_threshold == -1)
-		experiment->blanking_threshold 	= atoi(ini.GetValue("visualisation", "plot_baseline"));
-		
 	if (experiment->dynamic_range == -1)
 		experiment->dynamic_range = atoi(ini.GetValue("visualisation", "dynamic_range"));
 	
@@ -488,15 +482,28 @@ void SignalProcessor::getExperimentParameters(void)
 		experiment->is_move_file = true;
 	else
 		experiment->is_move_file = false;
+		
+	std::string blinking_flag = ini.GetValue("config", "is_blanking");	
+		
+	if ((blinking_flag == "1") || (blinking_flag == "true") || (blinking_flag == "TRUE") || (blinking_flag == "True"))
+	{
+		experiment->is_blanking = true;
+		experiment->ncs_blank = experiment->ncs_reference;
+	}
+	else
+	{
+		experiment->is_blanking = false;
+		experiment->ncs_blank = 0;
+	}	
 
-	std::string doppler_flag = ini.GetValue("processing", "doppler_enabled");	
+	std::string doppler_flag = ini.GetValue("config", "is_doppler");	
 		
 	if ((doppler_flag == "1") || (doppler_flag == "true") || (doppler_flag == "TRUE") || (doppler_flag == "True"))
 		experiment->is_doppler = true;
 	else
 		experiment->is_doppler = false;
 		
-	std::string debug_flag = ini.GetValue("config", "debug_mode");	
+	std::string debug_flag = ini.GetValue("config", "is_debug");	
 		
 	if ((debug_flag == "1") || (debug_flag == "true") || (debug_flag == "TRUE") || (debug_flag == "True"))
 		experiment->is_debug = true;
@@ -601,8 +608,6 @@ void SignalProcessor::readHeader(void)
 		ss_output_file << experiment->save_path << "/" << folder_name << "_adc" << i << ".dat";
 		experiment->output_filenames[i] = ss_output_file.str();
 	}	
-	
-	std::cout << "Save Path: " << experiment->save_path << std::endl;	
 	
 	std::string command = "mkdir " + experiment->save_path;
 	system(command.c_str());	
