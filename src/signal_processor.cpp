@@ -447,20 +447,11 @@ void SignalProcessor::getExperimentParameters(void)
 	ini.LoadFile(EXP_FILE);	
 	
 	if (experiment->reference_filename == "-1")
-		experiment->reference_filename = (std::string)ini.GetValue("dataset", "ref_filename");
+		experiment->reference_filename = (std::string)ini.GetValue("dataset", "ref_filename");	
 		
-	if (experiment->n_range_lines == -1)	
-		experiment->n_range_lines = atoi(ini.GetValue("dataset", "n_range_lines"));	
-		
-	if (experiment->ncs_range_line == -1)
-		experiment->ncs_range_line = atoi(ini.GetValue("dataset", "n_cmplx_samples_range_line"));
-	
 	if (experiment->ncs_reference == -1)
 		experiment->ncs_reference = atoi(ini.GetValue("dataset", "n_cmplx_samples_ref"));	
 	
-	if (experiment->ncs_padded == -1)
-		experiment->ncs_padded = atoi(ini.GetValue("dataset", "n_cmplx_samples_padded"));	
-		
 	if (experiment->ncs_doppler_cpi == -1)
 		experiment->ncs_doppler_cpi = atoi(ini.GetValue("processing", "doppler_cpi"));	
 		
@@ -473,9 +464,6 @@ void SignalProcessor::getExperimentParameters(void)
 	if (experiment->n_threads == -1)		
 		experiment->n_threads = atoi(ini.GetValue("processing", "n_threads"));	
 		
-	if (experiment->dynamic_range == -1)
-		experiment->dynamic_range = atoi(ini.GetValue("visualisation", "dynamic_range"));
-	
 	std::string move_flag = ini.GetValue("config", "is_move_file");	
 		
 	if ((move_flag == "1") || (move_flag == "true") || (move_flag == "TRUE") || (move_flag == "True"))
@@ -515,7 +503,6 @@ void SignalProcessor::getExperimentParameters(void)
 	experiment->hist_equal 		= atoi(ini.GetValue("visualisation", "histogram_equalization"));
 	experiment->slow 			= atoi(ini.GetValue("visualisation", "slow"));
 	experiment->threshold 		= atoi(ini.GetValue("visualisation", "threshold"));
-	experiment->n_plot_average 	= atoi(ini.GetValue("visualisation", "doppler_averaging"));	
 	
 	//extract and set windowing functions
 	refWindow.init((WindowFunction)atoi(ini.GetValue("processing", "ref_window")), experiment->ncs_reference);	
@@ -564,6 +551,14 @@ void SignalProcessor::readHeader(void)
 	
 	CSimpleIniA ini;
 	ini.LoadFile(HDR_FILE);	
+	
+	experiment->n_range_lines = atoi(ini.GetValue("PulseParameters", "NUM_PRIS"));
+	experiment->ncs_range_line = atoi(ini.GetValue("PulseParameters", "SAMPLES_PER_PRI"));
+	//no zero pading is currently in place  
+	experiment->ncs_padded = experiment->ncs_range_line;
+	experiment->dynamic_range = atoi(ini.GetValue("Quicklook", "DYNAMIC_RANGE"));
+	
+	
 	
 	//get dataset filename
 	experiment->adc_channel = atoi(ini.GetValue("Quicklook", "ADC_CHANNEL"));
