@@ -484,9 +484,8 @@ void SignalProcessor::getExperimentParameters(void)
 	if ((debug_flag == "1") || (debug_flag == "true") || (debug_flag == "TRUE") || (debug_flag == "True"))
 		experiment->is_debug = true;
 	else
-		experiment->is_debug = false;
-		
-	experiment->update_rate 	= atoi(ini.GetValue("visualisation", "update_rate"));
+		experiment->is_debug = false;		
+	
 	experiment->cm 				= atoi(ini.GetValue("visualisation", "colour_map"));
 	experiment->hist_equal 		= atoi(ini.GetValue("visualisation", "histogram_equalization"));
 	experiment->slow 			= atoi(ini.GetValue("visualisation", "slow"));
@@ -669,6 +668,9 @@ void SignalProcessor::readHeader(void)
 
 	experiment->specro_range_bin = atoi(ini.GetValue("Quicklook", "SPECTROGRAM_BIN"));
 	experiment->ncs_doppler_cpi = atoi(ini.GetValue("Quicklook", "DOPPLER_FFT"));
+	
+	//hard coded update rate
+	experiment->update_rate = experiment->ncs_doppler_cpi;
 }
 
 
