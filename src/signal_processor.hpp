@@ -13,10 +13,15 @@
 #include "logger.hpp" 
 #include "experiment.hpp" 
 
-#define EXP_FILE "../experiment.ini"
-#define HDR_FILE "../NeXtRAD.ini"
+#define EXP_FILE 		"../experiment.ini"
+#define HDR_FILE 		"../NeXtRAD.ini"
+#define COBALT_ADC_DIR 	"/home/darryn/Documents/NeXtRAD/"
+#define EXT_STORAGE_DIR "/home/darryn/Documents/NeXtRAD/"
+
+/*#define EXP_FILE "///smbtest/experiment.ini"
+#define HDR_FILE "///smbtest/NeXtRAD.ini"
 #define COBALT_ADC_DIR "///smbtest/"
-#define EXT_STORAGE_DIR "///mnt/external/"
+#define EXT_STORAGE_DIR "///mnt/external/"*/
 
 class SignalProcessor
 {
@@ -44,7 +49,7 @@ class SignalProcessor
 		Window rangeWindow;
 		Window dopplerWindow;
 		
-		FILE *outFile;
+		FILE *outFile[3];
 		
 		//fftw plans
 		fftw_plan	*rangePlan;

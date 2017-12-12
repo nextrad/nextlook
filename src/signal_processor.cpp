@@ -251,52 +251,54 @@ void SignalProcessor::popRangeBuffer(int rangeLine, int thread_id, bool is_once_
 	{				
 		if (!is_once_off)
 		{
-			if (rangeLine == 0)
+			//temporary for moving one channel
+			for (int channel = experiment->adc_channel; channel < experiment->adc_channel + 1; channel++)
 			{
-				std::cout << "Opening Output File: " << experiment->output_filenames[experiment->adc_channel] << std::endl;
-				outFile = fopen(experiment->output_filenames[experiment->adc_channel].c_str(), "wb");
-			}
-			
-			//check that file exists in the location specified
-			if (outFile != NULL)
-			{			
-				//read from binary file into buffer
-				fwrite(&binDataset[start], sizeof(int16_t), experiment->ncs_range_line*2, outFile);
-
-				if (rangeLine == experiment->n_range_lines - 1)
+				if (rangeLine == 0)
 				{
-					logger.write("Finished Copying Dataset.", timer);
-					fclose(outFile);
-					
-					logger.write("Checking That Copy and Original are Identical.", timer);
-					std::stringstream command;
-					command << "diff " << experiment->dataset_filenames[experiment->adc_channel] << " " << experiment->output_filenames[experiment->adc_channel] << "\n";
-					
-					int ret = system(command.str().c_str());
-					if (WEXITSTATUS(ret) == 0)
-					{						
-						//clear the stringstream
-						command.str(std::string());
-						
-						command << "rm " << experiment->dataset_filenames[experiment->adc_channel] << "\n";
-						//std::cout << "Deleting original file: " << command.str();
-						system(command.str().c_str());
-						logger.write("Original Dataset Deleted.", timer);
-					}
-					else
-					{
-						std::cout << "Copied Dataset is NOT Identical to the Original Dataset." << std::endl;
-						std::cout << "Original Dataset will NOT be Deleted." << std::endl;
-					}
+					std::cout << "Opening Output File: " << experiment->output_filenames[channel] << std::endl;
+					outFile[channel] = fopen(experiment->output_filenames[channel].c_str(), "wb");
 				}
-					
-			}
-			//file does not exist in the specified location
-			else
-			{
-				logger.write("Output File Location Cannot Be Written To.");
-				exit(EXIT_FAILURE);
-			}
+				
+				//check that file exists in the location specified
+				if (outFile[channel] != NULL)
+				{			
+					//read from binary file into buffer
+					fwrite(&binDataset[start], sizeof(int16_t), experiment->ncs_range_line*2, outFile[channel]);
+
+					if (rangeLine == experiment->n_range_lines - 1)
+					{
+						logger.write("Finished Copying Dataset.", timer);
+						fclose(outFile[channel]);
+						
+						logger.write("Checking That Copy and Original are Identical.", timer);
+						std::stringstream command;
+						command << "diff " << experiment->dataset_filenames[channel] << " " << experiment->output_filenames[channel] << "\n";
+						
+						int ret = system(command.str().c_str());
+						if (WEXITSTATUS(ret) == 0)
+						{						
+							//clear the stringstream
+							command.str(std::string());
+							
+							command << "rm " << experiment->dataset_filenames[channel] << "\n";
+							system(command.str().c_str());
+							std::cout << "Deleting original file: " << command.str() << std::endl;
+						}
+						else
+						{
+							std::cout << "Copied Dataset is NOT Identical to the Original Dataset." << std::endl;
+							std::cout << "Original Dataset will NOT be Deleted." << std::endl;
+						}
+					}
+						
+				}				
+				else //file does not exist in the specified location
+				{
+					logger.write("Output File Location Cannot Be Written To.");
+					exit(EXIT_FAILURE);
+				}
+			}	
 		}
 	}
 	else
@@ -559,9 +561,9 @@ void SignalProcessor::readHeader(void)
 	//get dataset filename
 	experiment->adc_channel = atoi(ini.GetValue("Quicklook", "ADC_CHANNEL"));
 	
-	experiment->dataset_filenames[0] = COBALT_ADC_DIR + (std::string)"adc0.dat";
-	experiment->dataset_filenames[1] = COBALT_ADC_DIR + (std::string)"adc1.dat";
-	experiment->dataset_filenames[2] = COBALT_ADC_DIR + (std::string)"adc2.dat";
+	experiment->dataset_filenames[0] = COBALT_ADC_DIR + (std::string)("adc0.dat");
+	experiment->dataset_filenames[1] = COBALT_ADC_DIR + (std::string)("adc1.dat");
+	experiment->dataset_filenames[2] = COBALT_ADC_DIR + (std::string)("adc2.dat");
 	
 	//get date and time
 	experiment->year 	= atoi(ini.GetValue("Timing", "YEAR"));
@@ -572,32 +574,49 @@ void SignalProcessor::readHeader(void)
 	experiment->second 	= atoi(ini.GetValue("Timing", "SECOND"));
 	
 	//generate the output file name
+	std::stringstream ss_output_path;
 	std::stringstream ss_output_file;
+	
+	std::string folder_name;
+
+	ss_output_path << experiment->year 	 << "_";
+	ss_output_path << experiment->month	 << "_";
+	ss_output_path << experiment->day 	 << "_";
+	ss_output_path << experiment->hour 	 << "_";
+	ss_output_path << experiment->minute << "_";
+	ss_output_path << experiment->second << "_";		
+	ss_output_path << "n" << experiment->node_id;
+	
+	//got folder name
+	folder_name = ss_output_path.str();
+	
+	//clear stringstream
+	ss_output_path.str(std::string());
+	ss_output_path << EXT_STORAGE_DIR << folder_name;
+	experiment->save_path = ss_output_path.str();	
 	
 	for (int i = 0; i < 3; i++)
 	{
 		ss_output_file.str(std::string());
-		ss_output_file << EXT_STORAGE_DIR;
-		ss_output_file << experiment->year 	 << "_";
-		ss_output_file << experiment->month	 << "_";
-		ss_output_file << experiment->day 	 << "_";
-		ss_output_file << experiment->hour 	 << "_";
-		ss_output_file << experiment->minute << "_";
-		ss_output_file << experiment->second << "_";		
-		ss_output_file << "n" << experiment->node_id;
-		
-		experiment->save_path = ss_output_file.str();
-		
-		ss_output_file << "_" << "adc" << i;
-		ss_output_file << ".dat";
-		
+		ss_output_file << experiment->save_path << "/" << folder_name << "_adc" << i << ".dat";
 		experiment->output_filenames[i] = ss_output_file.str();
-		
-		std::cout << experiment->output_filenames[i] << std::endl;
 	}	
+	
+	std::cout << "Save Path: " << experiment->save_path << std::endl;	
 	
 	std::string command = "mkdir " + experiment->save_path;
 	system(command.c_str());	
+	
+	//temporary move command
+	for (int i = 0; i < 3; i++)
+	{
+		if (i != experiment->adc_channel)
+		{
+			std::string command = "";
+			command = "mv " + experiment->dataset_filenames[i] + " " + experiment->output_filenames[i] + "\n";
+			system(command.c_str());
+		}
+	}
 }
 
 
