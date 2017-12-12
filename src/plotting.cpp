@@ -159,7 +159,6 @@ void OpenCVPlot::initOpenCV(void)
 	thrsSldr = experiment->threshold;
 	slowSldr = experiment->slow;
 	histSldr = experiment->hist_equal;
-	avrgSldr = experiment->n_plot_average;
 	
 	rtSize = cv::Size(500, 500);
 	rdSize = cv::Size(200, 500);
@@ -191,7 +190,11 @@ void OpenCVPlot::initOpenCV(void)
 		cv::moveWindow("Control", (rtSize.width + rdSize.width + spSize.height + 3*2), 0); 
 		
 		avrgMax = (experiment->n_range_lines)/(experiment->update_rate);
+		//set slider to max by default
+		avrgSldr = avrgMax;		
 		cv::createTrackbar( "RD Averaging", "Control", &avrgSldr, avrgMax);
+		
+		//avrgSldr = experiment->n_plot_average;		
 		
 		rdIndex = 0;			
 		rdImageAvg = cv::Mat(rdSize.height, rdSize.width, CV_64F, cv::Scalar::all(0));	
