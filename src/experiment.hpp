@@ -14,7 +14,8 @@ typedef struct
 	
 	int n_threads;
 	int ncs_reference;		
-	int ncs_range_line;		
+	int ncs_range_line;	
+	int ncs_range_line_image;	
 	int ncs_padded; 		
 	int n_range_lines; 		
 	int n_range_lines_per_thread;

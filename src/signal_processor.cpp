@@ -476,6 +476,14 @@ void SignalProcessor::getExperimentParameters(void)
 		experiment->is_blanking = false;
 		experiment->ncs_blank = 0;
 	}	
+	
+	experiment->ncs_range_line_image = experiment->ncs_padded - (experiment->ncs_blank + experiment->ncs_blank/2);
+	
+	if (experiment->ncs_range_line_image < 0)
+	{
+		std::cout << "\nChopping during blanking causes negative range length.\nSet is_blanking = false, increase SAMPLES_PER_PRI or reduce the WAVEFORM_INDEX to use NeXtLook with blanking enabled.\n" << std::endl;
+		exit(EXIT_FAILURE);
+	}
 
 	std::string doppler_flag = ini.GetValue("config", "is_doppler");	
 		
@@ -691,6 +699,7 @@ void SignalProcessor::readHeader(void)
 	}
 
 	experiment->specro_range_bin = atoi(ini.GetValue("Quicklook", "SPECTROGRAM_BIN"));
+	
 	experiment->ncs_doppler_cpi = atoi(ini.GetValue("Quicklook", "DOPPLER_FFT"));	
 	//hard coded update rate
 	experiment->update_rate = experiment->ncs_doppler_cpi;
