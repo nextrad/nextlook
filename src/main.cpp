@@ -133,7 +133,7 @@ void parse_options(int argc, char *argv[])
 				break;
             case 'n':
                 experiment.node_id = atoi(optarg);
-                if ((experiment.node_id != 0) || (experiment.node_id != 0) || (experiment.node_id != 0))
+                if ((experiment.node_id != 0) || (experiment.node_id != 1) || (experiment.node_id != 2))
                 {
 					std::cout << "Node ID can only be 0, 1 or 2." << std::endl;
 					exit(EXIT_FAILURE);
