@@ -166,6 +166,7 @@ void help(void)
 	printf(" -h: display this help screen\n");
 	printf(" -n: specify node ID (0, 1 or 2)\n");
 	printf(" -v: display plots during processing (requires -X during ssh)\n");	
+	printf(" -b: enable range blanking\n");	
 	exit(EXIT_SUCCESS);	
 }
 
