@@ -60,7 +60,7 @@ int main(int argc, char *argv[])
 	
 	opencvPlot.savePlots();
 	
-	//pushImages();
+	pushImages();
 	
 	signalProcessor.freeMemory();
 	
@@ -174,7 +174,19 @@ void help(void)
 void pushImages(void)
 {
 	std::stringstream ss_command;
+	
+	ss_command.str(std::string());
 	ss_command << "scp " << opencvPlot.get_rt_path() << " nextrad@" << CNC_IP << ":" << CNC_SAVE_PATH << "RTI_N" << experiment.node_id << ".jpg\n";
+	std::cout << ss_command.str();
+	system(ss_command.str().c_str());
+	
+	ss_command.str(std::string());
+	ss_command << "scp " << opencvPlot.get_rd_path() << " nextrad@" << CNC_IP << ":" << CNC_SAVE_PATH << "RD_N" << experiment.node_id << ".jpg\n";
+	std::cout << ss_command.str();
+	system(ss_command.str().c_str());
+	
+	ss_command.str(std::string());
+	ss_command << "scp " << opencvPlot.get_sp_path() << " nextrad@" << CNC_IP << ":" << CNC_SAVE_PATH << "SP_N" << experiment.node_id << ".jpg\n";
 	std::cout << ss_command.str();
 	system(ss_command.str().c_str());
 }
