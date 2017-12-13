@@ -124,7 +124,7 @@ void parse_options(int argc, char *argv[])
 {
 	int opt;
 
-    while ((opt = getopt(argc, argv, "hn:v")) != -1 )
+    while ((opt = getopt(argc, argv, "hn:vb")) != -1 )
     {
         switch (opt)
         {
@@ -140,8 +140,11 @@ void parse_options(int argc, char *argv[])
 				}
                 break;   
             case 'v':
-                experiment.is_visualisation = 1;
-                break;                        
+                experiment.is_visualisation = true;
+                break; 
+            case 'b':
+                experiment.is_blanking = true;
+                break;                         
             case '?':
 				printf("Unknown command line option.\n");
 				exit(EXIT_FAILURE);

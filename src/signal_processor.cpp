@@ -464,18 +464,26 @@ void SignalProcessor::getExperimentParameters(void)
 	else
 		experiment->is_move_file = false;
 		
-	std::string blinking_flag = ini.GetValue("config", "is_blanking");	
-		
-	if ((blinking_flag == "1") || (blinking_flag == "true") || (blinking_flag == "TRUE") || (blinking_flag == "True"))
+	//check if blanking has been enabled via cmd line
+	if (experiment->is_blanking == true)
 	{
-		experiment->is_blanking = true;
 		experiment->ncs_blank = experiment->ncs_reference;
 	}
-	else
-	{
-		experiment->is_blanking = false;
-		experiment->ncs_blank = 0;
-	}	
+	else //check if is_blanking is set in NeXtRAD.ini
+	{		
+		std::string blinking_flag = ini.GetValue("config", "is_blanking");	
+			
+		if ((blinking_flag == "1") || (blinking_flag == "true") || (blinking_flag == "TRUE") || (blinking_flag == "True"))
+		{
+			//is_blanking is set in NeXtRAD.ini
+			experiment->is_blanking = true;
+			experiment->ncs_blank = experiment->ncs_reference;
+		}
+		else //is_blanking was not enabled via cmd line or in NeXtRAD.ini
+		{
+			experiment->ncs_blank = 0;
+		}	
+	}
 	
 	experiment->ncs_range_line_image = experiment->ncs_padded - (experiment->ncs_blank + experiment->ncs_blank/2);
 	
