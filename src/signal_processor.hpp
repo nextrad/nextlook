@@ -13,16 +13,17 @@
 #include "logger.hpp" 
 #include "experiment.hpp" 
 
-#define EXP_FILE 		"../NeXtLook.ini"
+/*#define EXP_FILE 		"../NeXtLook.ini"
 #define HDR_FILE 		"../NeXtRAD.ini"
 #define COBALT_ADC_DIR 	"/home/darryn/Documents/NeXtRAD/"
-#define EXT_STORAGE_DIR "/home/darryn/Documents/NeXtRAD/"
-#define REF_DIR 		"../refs/"
+#define EXT_STORAGE_DIR "/home/darryn/Documents/NeXtRAD/"*/
 
-/*#define EXP_FILE "///smbtest/NeXtLook.ini"
+#define EXP_FILE "///smbtest/NeXtLook.ini"
 #define HDR_FILE "///smbtest/NeXtRAD.ini"
 #define COBALT_ADC_DIR "///smbtest/"
-#define EXT_STORAGE_DIR "///mnt/external/"*/
+#define EXT_STORAGE_DIR "///mnt/external/"
+
+#define REF_DIR 		"../refs/"
 
 class SignalProcessor
 {
