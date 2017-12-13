@@ -485,6 +485,12 @@ void SignalProcessor::getExperimentParameters(void)
 		}	
 	}
 	
+	if (experiment->specro_range_bin < experiment->ncs_blank)
+	{
+		experiment->specro_range_bin = experiment->ncs_blank;
+		logger.write("Spectrogram range bin poorly chosen, changed to minimum blanked bin.", timer);
+	}
+	
 	experiment->ncs_range_line_image = experiment->ncs_padded - (experiment->ncs_blank + experiment->ncs_blank/2);
 	
 	if (experiment->ncs_range_line_image < 0)
@@ -711,6 +717,12 @@ void SignalProcessor::readHeader(void)
 	experiment->ncs_doppler_cpi = atoi(ini.GetValue("Quicklook", "DOPPLER_FFT"));	
 	//hard coded update rate
 	experiment->update_rate = experiment->ncs_doppler_cpi;
+	
+	//copy the header file into the storage directory 
+	logger.write("Copying Header File", timer);
+	command = "cp " + (std::string)HDR_FILE + " " + experiment->save_path;
+	system(command.c_str());
+	
 }
 
 

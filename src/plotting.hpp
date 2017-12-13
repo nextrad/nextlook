@@ -21,7 +21,8 @@ class OpenCVPlot
 {
 	private:
 		const int cMapWidth = 30;
-		std::string cMapRoot = "../cmaps/";	
+		std::string cMapRoot = "///home/transceiversystem/Documents/nextlook/cmaps/";	
+		//std::string cMapRoot = "/home/darryn/Git/nextlook/cmaps/";	
 		
 		const int slowMax = 500;		
 		const int histMax = 1;

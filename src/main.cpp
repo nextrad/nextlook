@@ -5,7 +5,7 @@
 #include "signal_processor.hpp"
 
 #define CNC_IP 			"192.168.1.100"
-#define CNC_SAVE_PATH 	"/home/nextrad/Documents/NeXtLook/"
+#define CNC_SAVE_PATH 	"/home/nextrad/Documents/nextlook_temp/"
 
 void help(void);
 void perThread(int id);
@@ -66,7 +66,7 @@ int main(int argc, char *argv[])
 	
 	if (experiment.is_visualisation)
 	{
-		std::cout << "Press any key to exit..." << std::endl;	
+		std::cout << "Press any key on an image to exit..." << std::endl;	
 		cv::waitKey(0);
 	}
 
@@ -177,17 +177,14 @@ void pushImages(void)
 	
 	ss_command.str(std::string());
 	ss_command << "scp " << opencvPlot.get_rt_path() << " nextrad@" << CNC_IP << ":" << CNC_SAVE_PATH << "RTI_N" << experiment.node_id << ".jpg\n";
-	std::cout << ss_command.str();
 	system(ss_command.str().c_str());
 	
 	ss_command.str(std::string());
 	ss_command << "scp " << opencvPlot.get_rd_path() << " nextrad@" << CNC_IP << ":" << CNC_SAVE_PATH << "RD_N" << experiment.node_id << ".jpg\n";
-	std::cout << ss_command.str();
 	system(ss_command.str().c_str());
 	
 	ss_command.str(std::string());
 	ss_command << "scp " << opencvPlot.get_sp_path() << " nextrad@" << CNC_IP << ":" << CNC_SAVE_PATH << "SP_N" << experiment.node_id << ".jpg\n";
-	std::cout << ss_command.str();
 	system(ss_command.str().c_str());
 }
 
