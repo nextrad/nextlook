@@ -4,11 +4,15 @@
 #include "plotting.hpp"
 #include "signal_processor.hpp"
 
+#define CNC_IP 			"192.168.1.100"
+#define CNC_SAVE_PATH 	"/home/nextrad/Documents/NeXtLook/"
+
 void help(void);
 void perThread(int id);
 void calcThreshold(int pulse_number);
 void initTerminal(void); 
 void parse_options(int argc, char *argv[]);
+void pushImages(void);
 
 Experiment experiment;
 SignalProcessor signalProcessor(&experiment);
@@ -55,6 +59,8 @@ int main(int argc, char *argv[])
 	opencvPlot.plotSP();
 	
 	opencvPlot.savePlots();
+	
+	//pushImages();
 	
 	signalProcessor.freeMemory();
 	
@@ -158,5 +164,14 @@ void help(void)
 	printf(" -n: specify node ID (0, 1 or 2)\n");
 	printf(" -v: display plots during processing (requires -X during ssh)\n");	
 	exit(EXIT_SUCCESS);	
+}
+
+
+void pushImages(void)
+{
+	std::stringstream ss_command;
+	ss_command << "scp " << opencvPlot.get_rt_path() << " nextrad@" << CNC_IP << ":" << CNC_SAVE_PATH << "RTI_N" << experiment.node_id << ".jpg\n";
+	std::cout << ss_command.str();
+	system(ss_command.str().c_str());
 }
 

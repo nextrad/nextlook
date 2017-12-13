@@ -56,6 +56,10 @@ class OpenCVPlot
 		cv::Size rtSize;
 		cv::Size rdSize;
 		cv::Size spSize;
+		
+		std::string rtPath;
+		std::string rdPath;
+		std::string spPath;
 
 		Experiment* experiment;
 	public:
@@ -68,6 +72,11 @@ class OpenCVPlot
 		void addSP(double *imageValues);
 		void initOpenCV(void);
 		void savePlots(void);
+		
+		std::string get_rt_path(void) {return rtPath;};
+		std::string get_rd_path(void) {return rdPath;};
+		std::string get_sp_path(void) {return spPath;};
+		
 		static void updatePlots(int, void*);
 };
 

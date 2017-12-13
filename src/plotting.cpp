@@ -381,24 +381,24 @@ void OpenCVPlot::plotRD(void)
 void OpenCVPlot::savePlots(void)
 {
 	
-	std::string water_path = experiment->save_path + "/Range-Time-Intensity.jpg";	
+	rtPath = experiment->save_path + "/Range-Time-Intensity.jpg";	
 	
-	cv::imwrite(water_path.c_str(), rtImage8bit);	
+	cv::imwrite(rtPath.c_str(), rtImage8bit);	
 	
 	rtImage8bit.release();
 	
 	if (experiment->is_doppler)
 	{
-		std::string doppler_path = experiment->save_path + "/Range-Doppler.jpg";
-		cv::imwrite(doppler_path.c_str(), rdImage8bit); 
+		rdPath = experiment->save_path + "/Range-Doppler.jpg";
+		cv::imwrite(rdPath.c_str(), rdImage8bit); 
 		
 		for (int i = 0; i < experiment->n_plot_average; i++)
 		{
 			rdVector[i].release();	
 		}
 		
-		std::string spectro_path = experiment->save_path + "/Spectrogram.jpg";
-		cv::imwrite(spectro_path.c_str(), spImage8bit); 
+		spPath = experiment->save_path + "/Spectrogram.jpg";
+		cv::imwrite(spPath.c_str(), spImage8bit); 
 	}
 }
 
