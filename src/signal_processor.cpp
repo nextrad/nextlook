@@ -30,6 +30,7 @@ SignalProcessor::SignalProcessor(Experiment* exp)
 	experiment->adc_channel = -1;
 	experiment->is_move_file = false;	
 	experiment->is_blanking = false;	
+	experiment->is_visualisation = false;
 }
 
 void SignalProcessor::allocateMemory(void)
@@ -142,13 +143,12 @@ void SignalProcessor::popDopplerData(int rangeLine)
 
 void SignalProcessor::processDoppler(int rangeLine, OpenCVPlot &plot)
 {
-	
 	popDopplerData(rangeLine); 
 	
 	if ((rangeLine - dopplerDataStart + 1) == experiment->ncs_doppler_cpi)  //check that dopplerData is full
 	{
 		// doppler plot chopped to have number of samples in pulse less in the front and half
-		//of that from the back
+		// of that from the back
 		for (int i = experiment->ncs_blank; i < experiment->ncs_padded - experiment->ncs_blank/2; i++)		
 		{
 			popDopplerBuffer(i);	
@@ -158,9 +158,14 @@ void SignalProcessor::processDoppler(int rangeLine, OpenCVPlot &plot)
 			if (i == experiment->specro_range_bin)
 			{
 				plot.addSP(dopplerImageBuffer);
-				plot.plotSP();
+				
+				if (experiment->is_visualisation)
+				{
+					plot.plotSP();
+				}
 			}			
-		}
+		}		
+		
 		plot.plotRD();
 	}
 }
@@ -256,7 +261,7 @@ void SignalProcessor::popRangeBuffer(int rangeLine, int thread_id, bool is_once_
 			{
 				if (rangeLine == 0)
 				{
-					std::cout << "Opening Output File: " << experiment->output_filenames[channel] << std::endl;
+					//std::cout << "Opening Output File: " << experiment->output_filenames[channel] << std::endl;
 					outFile[channel] = fopen(experiment->output_filenames[channel].c_str(), "wb");
 				}
 				
@@ -268,10 +273,10 @@ void SignalProcessor::popRangeBuffer(int rangeLine, int thread_id, bool is_once_
 
 					if (rangeLine == experiment->n_range_lines - 1)
 					{
-						logger.write("Finished Copying Dataset.", timer);
+						logger.write("Finished Copying Dataset", timer);
 						fclose(outFile[channel]);
 						
-						logger.write("Checking That Copy and Original are Identical.", timer);
+						logger.write("Checking Integrity of Copy", timer);
 						std::stringstream command;
 						command << "diff " << experiment->dataset_filenames[channel] << " " << experiment->output_filenames[channel] << "\n";
 						
@@ -281,9 +286,9 @@ void SignalProcessor::popRangeBuffer(int rangeLine, int thread_id, bool is_once_
 							//clear the stringstream
 							command.str(std::string());
 							
+							logger.write("Deleting Original File", timer);
 							command << "rm " << experiment->dataset_filenames[channel] << "\n";
 							system(command.str().c_str());
-							std::cout << "Deleting original file: " << command.str() << std::endl;
 						}
 						else
 						{
@@ -584,8 +589,6 @@ void SignalProcessor::readHeader(void)
 	
 	experiment->reference_filename = ss_ref_filename.str();
 	
-	std::cout << experiment->reference_filename << std::endl;
-	
 	switch (waveform_index)
 	{
 		case 1:
@@ -607,6 +610,27 @@ void SignalProcessor::readHeader(void)
 			experiment->ncs_reference = 15.0e-6*sampling_freq;
 			break;
 		case 7:
+			experiment->ncs_reference = 20.0e-6*sampling_freq;
+			break;
+		case 8:
+			experiment->ncs_reference = 0.5e-6*sampling_freq;
+			break;
+		case 9:
+			experiment->ncs_reference = 1.0e-6*sampling_freq;
+			break;
+		case 10:
+			experiment->ncs_reference = 3.0e-6*sampling_freq;
+			break;
+		case 11:
+			experiment->ncs_reference = 5.0e-6*sampling_freq;
+			break;
+		case 12:
+			experiment->ncs_reference = 10.0e-6*sampling_freq;
+			break;
+		case 13:
+			experiment->ncs_reference = 15.0e-6*sampling_freq;
+			break;
+		case 14:
 			experiment->ncs_reference = 20.0e-6*sampling_freq;
 			break;
 	}
@@ -667,8 +691,7 @@ void SignalProcessor::readHeader(void)
 	}
 
 	experiment->specro_range_bin = atoi(ini.GetValue("Quicklook", "SPECTROGRAM_BIN"));
-	experiment->ncs_doppler_cpi = atoi(ini.GetValue("Quicklook", "DOPPLER_FFT"));
-	
+	experiment->ncs_doppler_cpi = atoi(ini.GetValue("Quicklook", "DOPPLER_FFT"));	
 	//hard coded update rate
 	experiment->update_rate = experiment->ncs_doppler_cpi;
 }

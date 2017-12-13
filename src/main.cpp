@@ -23,12 +23,6 @@ int main(int argc, char *argv[])
 	//get cmd line options
 	parse_options(argc, argv);
 	
-	if (experiment.node_id == -1)
-	{
-		std::cout << "Node ID has not been set. Use -n to set node ID as a command line option." << std::endl;
-		exit(EXIT_FAILURE);
-	}
-	
 	//get parameters from the header file
 	signalProcessor.readHeader();
 	
@@ -58,15 +52,17 @@ int main(int argc, char *argv[])
 	threadGroup.join_all();	
 	
 	opencvPlot.plotRTI();
+	opencvPlot.plotSP();
 	
 	opencvPlot.savePlots();
 	
 	signalProcessor.freeMemory();
 	
-	std::cout << "Press any key to exit..." << std::endl;
-	
-	cv::waitKey(0);
-	
+	if (experiment.is_visualisation)
+	{
+		std::cout << "Press any key to exit..." << std::endl;	
+		cv::waitKey(0);
+	}
 
 	return 0;
 }
@@ -122,48 +118,45 @@ void parse_options(int argc, char *argv[])
 {
 	int opt;
 
-    while ((opt = getopt(argc, argv, "hr:p:s:k:z:n:")) != -1 )
+    while ((opt = getopt(argc, argv, "hn:v")) != -1 )
     {
         switch (opt)
         {
             case 'h':
 				help();
 				break;
-			case 'r':
-                experiment.reference_filename = optarg;
-                break;
-            case 'p':
-                experiment.n_range_lines = atoi(optarg);
-                break; 
-            case 's':
-                experiment.ncs_range_line = atoi(optarg);
-                break; 
-            case 'z':
-                experiment.ncs_padded = atoi(optarg);
-                break;
-            case 'k':
-                experiment.ncs_reference = atoi(optarg);
-                break;    
             case 'n':
                 experiment.node_id = atoi(optarg);
-                break;                           
+                if ((experiment.node_id != 0) || (experiment.node_id != 0) || (experiment.node_id != 0))
+                {
+					std::cout << "Node ID can only be 0, 1 or 2." << std::endl;
+					exit(EXIT_FAILURE);
+				}
+                break;   
+            case 'v':
+                experiment.is_visualisation = 1;
+                break;                        
             case '?':
 				printf("Unknown command line option.\n");
 				exit(EXIT_FAILURE);
         }        
     }
+    
+	if (experiment.node_id == -1)
+	{
+		std::cout << "Node ID has not set." << std::endl << std::endl;
+		help();
+		exit(EXIT_FAILURE);
+	}
 }
 
 
 void help(void)
 {
+	printf("Usage: ./nextlook [options]\n");
 	printf(" -h: display this help screen\n");
-	printf(" -d: dataset_filename\n");
-	printf(" -r: reference_filename\n");
-	printf(" -p: n_range_lines (pulses)\n");
-	printf(" -s: ncs_range_line (complex range bins)\n");
-	printf(" -z: ncs_padded (complex range bins padded)\n");
-	printf(" -k: ncs_reference (complex samples in reference)\n");
+	printf(" -n: specify node ID (0, 1 or 2)\n");
+	printf(" -v: display plots during processing (requires -X during ssh)\n");	
 	exit(EXIT_SUCCESS);	
 }
 

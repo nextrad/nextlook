@@ -124,12 +124,12 @@ void GNUPlot::plot(fftw_complex *array, int ncs_padded, char const *plotTitle, p
 			{
 				if (i < (ncs_padded/2 + 1)) 
 				{
-					fprintf(pipe_gp, "%i %f\n", i, (abs(sqrt(array[i + (ncs_padded/2 - 1)][0]*array[i + (ncs_padded/2 - 1)][0] +
+					fprintf(pipe_gp, "%i %f\n", i, (double_t)(abs(sqrt(array[i + (ncs_padded/2 - 1)][0]*array[i + (ncs_padded/2 - 1)][0] +
 															 array[i + (ncs_padded/2 - 1)][1]*array[i + (ncs_padded/2 - 1)][1]))));
 				}
 				else
 				{
-					fprintf(pipe_gp, "%i %f\n", i, (abs(sqrt(array[i - (ncs_padded/2 + 1)][0]*array[i - (ncs_padded/2 + 1)][0] + 
+					fprintf(pipe_gp, "%i %f\n", i, (double_t)(abs(sqrt(array[i - (ncs_padded/2 + 1)][0]*array[i - (ncs_padded/2 + 1)][0] + 
 															 array[i - (ncs_padded/2 + 1)][1]*array[i - (ncs_padded/2 + 1)][1]))));
 				}
 			}
@@ -164,45 +164,51 @@ void OpenCVPlot::initOpenCV(void)
 	rdSize = cv::Size(200, 500);
 	spSize = cv::Size(200, 200);
 	
-	cv::namedWindow("Range-Time-Intensity", cv::WINDOW_AUTOSIZE);
-	cv::moveWindow("Range-Time-Intensity", 0, 0);	
+	if (experiment->is_visualisation)
+	{
+		cv::namedWindow("Range-Time-Intensity", cv::WINDOW_AUTOSIZE);
+		cv::moveWindow("Range-Time-Intensity", 0, 0);	
+		
+		cv::namedWindow("Control", cv::WINDOW_AUTOSIZE);
+		cv::moveWindow("Control", (rtSize.width + 2), 0);		
+		cv::createTrackbar( "Colour Map", "Control", &cmapSldr, cMapMax);
+	}
 	
 	//init the range-time image with n_range_lines rows
 	//the number of columns is equal to ncs_padded - ncs_reference off the front and ncs_reference/2 off the back of the image
 	//all values are init to the blanking threshold 
 	rtImage = cv::Mat(experiment->n_range_lines, experiment->ncs_padded - (experiment->ncs_blank + experiment->ncs_blank/2), CV_64F, cv::Scalar::all(experiment->blanking_threshold));	
 	
-	cv::namedWindow("Control", cv::WINDOW_AUTOSIZE);
-	cv::moveWindow("Control", (rtSize.width + 2), 0);	
-	
-	cv::createTrackbar( "Colour Map", "Control", &cmapSldr, cMapMax);
-	
 	if (experiment->is_doppler)
 	{
-		cv::namedWindow("Range-Doppler");
-		cv::moveWindow("Range-Doppler", (rtSize.width + 2), 0); 
 		rdImage = cv::Mat::ones(experiment->n_range_lines, experiment->ncs_doppler_cpi*experiment->doppler_padding_factor, CV_64F);
 		
-		cv::namedWindow("Spectrogram", cv::WINDOW_AUTOSIZE);
-		cv::moveWindow("Spectrogram", (rtSize.width + rdSize.width + 2*2), 0);	
-		//spImage = cv::Mat::ones(1, experiment->ncs_doppler_cpi*experiment->doppler_padding_factor, CV_64F);
-		
-		cv::moveWindow("Control", (rtSize.width + rdSize.width + spSize.height + 3*2), 0); 
-		
 		avrgMax = (experiment->n_range_lines)/(experiment->update_rate);
-		//set slider to max by default
-		avrgSldr = avrgMax;		
-		cv::createTrackbar( "RD Averaging", "Control", &avrgSldr, avrgMax);
+		avrgSldr = avrgMax;	//set slider to max by default
 		
-		//avrgSldr = experiment->n_plot_average;		
+		if (experiment->is_visualisation)
+		{
+			cv::namedWindow("Range-Doppler");
+			cv::moveWindow("Range-Doppler", (rtSize.width + 2), 0); 
+				
+			cv::namedWindow("Spectrogram", cv::WINDOW_AUTOSIZE);
+			cv::moveWindow("Spectrogram", (rtSize.width + rdSize.width + 2*2), 0);	
+			
+			cv::moveWindow("Control", (rtSize.width + rdSize.width + spSize.height + 3*2), 0); 		
+		
+			cv::createTrackbar( "RD Averaging", "Control", &avrgSldr, avrgMax);
+		}
 		
 		rdIndex = 0;			
 		rdImageAvg = cv::Mat(rdSize.height, rdSize.width, CV_64F, cv::Scalar::all(0));	
 	}	
 
-	cv::createTrackbar( "Threshold Value", "Control", &thrsSldr, thrsMax);	
-	cv::createTrackbar( "Slow [ms]", "Control", &slowSldr, slowMax);
-	cv::createTrackbar( "Histogram Eqn", "Control", &histSldr, histMax);
+	if (experiment->is_visualisation)
+	{
+		cv::createTrackbar( "Threshold Value", "Control", &thrsSldr, thrsMax);	
+		cv::createTrackbar( "Slow [ms]", "Control", &slowSldr, slowMax);
+		cv::createTrackbar( "Histogram Eqn", "Control", &histSldr, histMax);
+	}
 }
 
 
@@ -214,11 +220,14 @@ void OpenCVPlot::addRTI(int rangeLine, double  *imageValues)
 	
 	matchedRow.copyTo(rtImage(cv::Rect(0, rangeLine, matchedRow.cols, matchedRow.rows)));
 	
-	if (((rangeLine%(experiment->update_rate - 1) == 0) || rangeLine == (experiment->n_range_lines - 1)) && rangeLine != 0)
+	if (experiment->is_visualisation)
 	{
-		experiment->mutex.lock();
-		plotRTI();
-		experiment->mutex.unlock();
+		if (((rangeLine%(experiment->update_rate - 1) == 0) || (rangeLine == (experiment->n_range_lines - 1))) && rangeLine != 0) 
+		{
+			experiment->mutex.lock();
+			plotRTI();
+			experiment->mutex.unlock();
+		}
 	}
 }
 
@@ -252,19 +261,21 @@ void OpenCVPlot::plotRTI(void)
 		cv::equalizeHist(rtImage8bit, rtImage8bit);
 	}
 	
-	std::string rtCMapPath = cMapRoot + boost::to_string(cmapSldr) + ".jpg";
-	cv::Mat rtCMap = cv::imread(rtCMapPath);
-	cv::imshow("Control", rtCMap);
-	
 	cv::threshold(rtImage8bit, rtImage8bit, thrsSldr, thrsMax, cv::THRESH_TOZERO);
 	
 	cv::applyColorMap(rtImage8bit, rtImage8bit, cmapSldr);	
 	cv::transpose(rtImage8bit, rtImage8bit);
 	cv::flip(rtImage8bit, rtImage8bit, 0);		
 	
-	cv::imshow("Range-Time-Intensity", rtImage8bit);
-
-	cv::waitKey(1 + slowSldr);	
+	if (experiment->is_visualisation)
+	{
+		std::string rtCMapPath = cMapRoot + boost::to_string(cmapSldr) + ".jpg";
+		cv::Mat rtCMap = cv::imread(rtCMapPath);
+		cv::imshow("Control", rtCMap);
+		
+		cv::imshow("Range-Time-Intensity", rtImage8bit);
+		cv::waitKey(1 + slowSldr);
+	}		
 }
 
 
@@ -272,8 +283,6 @@ void OpenCVPlot::plotSP(void)
 {
 	//use bilinear interpolation to reduce number of pixels (decimation)
 	cv::resize(spImage, spImageResize, spSize);		
-	
-	//spImage.release();
 	
 	cv::log(spImageResize, spImageResize);
 	spImageResize = spImageResize/LOG10;
@@ -296,12 +305,18 @@ void OpenCVPlot::plotSP(void)
 	
 	cv::transpose(spImage8bit, spImage8bit);
 	
-	cv::imshow("Spectrogram", spImage8bit);
+	if (experiment->is_visualisation)
+	{
+		cv::imshow("Spectrogram", spImage8bit);
+	}
 }
 
 
 void OpenCVPlot::plotRD(void)
 {
+	//legacy code from the stand alone version
+	//cobalt version will always compute average over all Doppler plots.
+	
 	int summable_plots;
 	
 	//determine the number of plots available for averaging
@@ -354,7 +369,10 @@ void OpenCVPlot::plotRD(void)
 	//vertical flip through x-axis
 	cv::flip(rdImage8bit, rdImage8bit, 0);
 	
-	cv::imshow("Range-Doppler", rdImage8bit);
+	if (experiment->is_visualisation)
+	{
+		cv::imshow("Range-Doppler", rdImage8bit);
+	}
 	
 	//increment the doppler plot index
 	rdIndex++;

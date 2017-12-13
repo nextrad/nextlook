@@ -10,6 +10,7 @@ typedef struct
 	bool is_debug;		
 	bool is_move_file;
 	bool is_blanking;
+	bool is_visualisation;
 	
 	int n_threads;
 	int ncs_reference;		
