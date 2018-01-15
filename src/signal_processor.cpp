@@ -718,11 +718,15 @@ void SignalProcessor::readHeader(void)
 	//hard coded update rate
 	experiment->update_rate = experiment->ncs_doppler_cpi;
 	
-	//copy the header file into the storage directory 
+	/*//copy the header file into the storage directory 
 	logger.write("Copying Header File", timer);
 	command = "cp " + (std::string)HDR_FILE + " " + experiment->save_path;
-	system(command.c_str());
+	system(command.c_str());*/
 	
+	//move the header file into the storage directory 
+	logger.write("Moving Header File", timer);
+	command = "mv " + (std::string)HDR_FILE + " " + experiment->save_path + "/" + folder_name + ".ini";
+	system(command.c_str());	
 }
 
 
